@@ -161,13 +161,18 @@ namespace Camera2.Behaviours {
 
 		private bool didShowHint = false;
 
+		public void CompleteReload()
+		{
+			Plugin.Log.Info("Reloading Camera2 Config...");
+			MovementScriptManager.LoadMovementScripts(true);
+			CamManager.Reload();
+		}
+		
 		void Update() {
 			if(Input.anyKeyDown) { //Some custom scenes to do funny stuff with
 				if(Input.GetKeyDown(KeyCode.F1)) {
 					if(Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift)) {
-						Plugin.Log.Info("Reloading Camera2 Config...");
-						MovementScriptManager.LoadMovementScripts(true);
-						CamManager.Reload();
+						CompleteReload();
 					} else {
 						ScenesManager.LoadGameScene();
 					}

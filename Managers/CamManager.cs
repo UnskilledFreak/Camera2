@@ -38,6 +38,10 @@ namespace Camera2.Managers {
 			UI.SpaghettiUI.Init();
 		}
 
+		public static void CompleteReload() {
+			customScreen.GetComponent<CamerasViewport>().CompleteReload();
+		}
+
 		private static void LoadCameras(bool reload = false) {
 			if(!Directory.Exists(ConfigUtil.CamsDir))
 				Directory.CreateDirectory(ConfigUtil.CamsDir);

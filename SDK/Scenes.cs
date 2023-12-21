@@ -3,6 +3,7 @@ using Camera2.Managers;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Camera2.Behaviours;
 
 namespace Camera2.SDK {
 	public static class Scenes {
@@ -39,6 +40,25 @@ namespace Camera2.SDK {
 		/// </summary>
 		public static void ShowNormalScene() {
 			ScenesManager.LoadGameScene(forceReload: true);
+		}
+
+		/// <summary>
+		/// reloads the config like the CTRL + SHIFT + F1 hotkey does
+		/// </summary>
+		public static void ReloadConfig() {
+			CamManager.CompleteReload();
+		}
+
+		/// <summary>
+		/// gets or sets the auto switch from custom scene value and reloads config because that's missing...
+		/// </summary>
+		public static bool AutoSwitchFromCustomScene {
+			get => ScenesManager.settings.autoswitchFromCustom;
+			set {
+				ScenesManager.settings.autoswitchFromCustom = value;
+				ScenesManager.settings.Save();
+				CamManager.CompleteReload();
+			}
 		}
 	}
 }
