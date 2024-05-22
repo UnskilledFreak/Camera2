@@ -82,11 +82,11 @@ namespace Camera2.Managers
             {
                 toLookup.Insert(0, SceneTypes.Playing);
 
-                if (HookLeveldata.isModdedMap)
+                if (HookLeveldata.IsModdedMap)
                 {
                     toLookup.Insert(0, SceneTypes.PlayingModmap);
                 }
-                else if (HookLeveldata.is360Level)
+                else if (HookLeveldata.Is360Level)
                 {
                     toLookup.Insert(0, SceneTypes.Playing360);
                 }

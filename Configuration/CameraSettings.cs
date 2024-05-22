@@ -309,14 +309,14 @@ namespace Camera2.Configuration
             Cam.Transformer.RotationEuler = TargetRot;
 
             // Force pivoting offset for 360 Levels - Non-Pivoting offset on 360 levels just looks outright trash
-            Cam.Transformer.ApplyAsAbsolute = !IsPositionalCam() && !SmoothFollow.PivotingOffset && !HookLeveldata.is360Level;
+            Cam.Transformer.ApplyAsAbsolute = !IsPositionalCam() && !SmoothFollow.PivotingOffset && !HookLeveldata.Is360Level;
         }
 
         public void ApplyLayerBitmask()
         {
             var maskBuilder = VisibleObjects.EverythingElse ? (VisibilityMasks)CamManager.ClearedBaseCullingMask : 0;
 
-            if (VisibleObjects.Walls == WallVisibility.Visible || (ModMapExtensions.AutoOpaqueWalls && HookLeveldata.isWallMap))
+            if (VisibleObjects.Walls == WallVisibility.Visible || (ModMapExtensions.AutoOpaqueWalls && HookLeveldata.IsWallMap))
             {
                 maskBuilder |= VisibilityMasks.Walls | VisibilityMasks.WallTextures;
             }
@@ -364,7 +364,7 @@ namespace Camera2.Configuration
                 maskBuilder |= VisibilityMasks.Sabers;
             }
 
-            if (VisibleObjects.UI && (!ModMapExtensions.AutoHideHUD || !HookLeveldata.isWallMap))
+            if (VisibleObjects.UI && (!ModMapExtensions.AutoHideHUD || !HookLeveldata.IsWallMap))
             {
                 maskBuilder |= VisibilityMasks.UI;
             }

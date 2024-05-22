@@ -23,7 +23,7 @@ namespace Camera2.Middlewares
             // We want to parent FP cams as well so that the noodle translations are applied instantly and don't get smoothed out by SmoothFollow
             if (
                 enabled 
-                && HookLeveldata.isModdedMap
+                && HookLeveldata.IsModdedMap
                 && (Settings.ModMapExtensions.MoveWithMap || Settings.Type != CameraType.Positionable)
             )
             {

@@ -3,36 +3,47 @@ using Camera2.Utils;
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection;
+using JetBrains.Annotations;
 
-namespace Camera2.HarmonyPatches {
-	/*
-	 * Eh, this is picked at random. OnActiveSceneChanged is too early for RecorderCamera to exit and
-	 * I cba to dig through obfuscated code because obscurity = security right?
-	 */
-	//[HarmonyPatch(typeof(PauseMenuManager))]
-	//[HarmonyPatch("Awake")]
-	[HarmonyPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.StartSong))]
-	static class HookAudioTimeSyncController {
-		static void Postfix(AudioTimeSyncController __instance) {
+namespace Camera2.HarmonyPatches
+{
+    /*
+     * Eh, this is picked at random. OnActiveSceneChanged is too early for RecorderCamera to exit and
+     * I cba to dig through obfuscated code because obscurity = security right?
+     */
+    //[HarmonyPatch(typeof(PauseMenuManager))]
+    //[HarmonyPatch("Awake")]
+    [HarmonyPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.StartSong))]
+    internal static class HookAudioTimeSyncController
+    {
+        [UsedImplicitly]
+        // ReSharper disable once InconsistentNaming
+        private static void Postfix(AudioTimeSyncController __instance)
+        {
 #if DEBUG
-			Plugin.Log.Info("AudioTimeSyncController.StartSong()");
+            Plugin.Log.Info("AudioTimeSyncController.StartSong()");
 #endif
-			SceneUtil.SongStarted(__instance);
-		}
-	}
+            SceneUtil.SongStarted(__instance);
+        }
+    }
 
-	[HarmonyPatch]
-	static class HookAudioTimeSyncController2 {
-		static void Postfix() {
+    [HarmonyPatch]
+    internal static class HookAudioTimeSyncController2
+    {
+        [UsedImplicitly]
+        private static void Postfix()
+        {
 #if DEBUG
-			Plugin.Log.Info("AudioTimeSyncController.Pause/Resume()");
+            Plugin.Log.Info("AudioTimeSyncController.Pause/Resume()");
 #endif
-			CamManager.ApplyCameraValues(worldCam: true);
-		}
+            CamManager.ApplyCameraValues(worldCam: true);
+        }
 
-		static IEnumerable<MethodBase> TargetMethods() {
-			yield return AccessTools.Method(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Pause));
-			yield return AccessTools.Method(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Resume));
-		}
-	}
+        [UsedImplicitly]
+        private static IEnumerable<MethodBase> TargetMethods()
+        {
+            yield return AccessTools.Method(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Pause));
+            yield return AccessTools.Method(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Resume));
+        }
+    }
 }

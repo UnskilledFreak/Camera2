@@ -1,28 +1,42 @@
 ﻿using Camera2.Managers;
 using HarmonyLib;
+using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Camera2.HarmonyPatches {
-	[HarmonyPatch(typeof(SmoothCameraController), nameof(SmoothCameraController.ActivateSmoothCameraIfNeeded))]
-	static class InitOnMainAvailable {
-		static bool isInited = false;
-		public static bool useDepthTexture { get; private set; }
-		static void Postfix(MainSettingsModelSO ____mainSettingsModel) {
-			useDepthTexture = ____mainSettingsModel.smokeGraphicsSettings;
+namespace Camera2.HarmonyPatches
+{
+    [HarmonyPatch(typeof(SmoothCameraController), nameof(SmoothCameraController.ActivateSmoothCameraIfNeeded))]
+    internal static class InitOnMainAvailable
+    {
+        static bool isInited = false;
+        public static bool useDepthTexture { get; private set; }
 
-			if(!isInited) {
-				if(CamManager.BaseCullingMask == 0)
-					CamManager.BaseCullingMask = Camera.main.cullingMask;
+        [UsedImplicitly]
+        // ReSharper disable once InconsistentNaming
+        private static void Postfix(MainSettingsModelSO ____mainSettingsModel)
+        {
+            useDepthTexture = ____mainSettingsModel.smokeGraphicsSettings;
 
-				isInited = true;
+            if (!isInited)
+            {
+                if (CamManager.BaseCullingMask == 0)
+                {
+                    CamManager.BaseCullingMask = Camera.main.cullingMask;
+                }
 
-				Plugin.Log.Notice("Game is ready, Initializing...");
+                isInited = true;
 
-				CamManager.Init();
-			} else {
-				foreach(var cam in CamManager.Cams.Values)
-					cam.UpdateDepthTextureActive();
-			}
-		}
-	}
+                Plugin.Log.Notice("Game is ready, Initializing...");
+
+                CamManager.Init();
+            }
+            else
+            {
+                foreach (var cam in CamManager.Cams.Values)
+                {
+                    cam.UpdateDepthTextureActive();
+                }
+            }
+        }
+    }
 }

@@ -1,34 +1,38 @@
 ﻿using Camera2.Utils;
 using HarmonyLib;
 
-namespace Camera2.HarmonyPatches {
-	[HarmonyPatch]
-	static class HookLeveldata {
-		public static IDifficultyBeatmap difficultyBeatmap;
-		public static GameplayModifiers gameplayModifiers;
-		public static bool is360Level = false;
-		public static bool isModdedMap = false;
-		public static bool isWallMap = false;
+namespace Camera2.HarmonyPatches
+{
+    [HarmonyPatch]
+    internal static class HookLeveldata
+    {
+        public static IDifficultyBeatmap difficultyBeatmap;
+        public static GameplayModifiers gameplayModifiers;
+        public static bool Is360Level = false;
+        public static bool IsModdedMap = false;
+        public static bool IsWallMap = false;
 
-		[HarmonyPriority(int.MinValue)]
-		[HarmonyPatch(typeof(StandardLevelScenesTransitionSetupDataSO), nameof(StandardLevelScenesTransitionSetupDataSO.Init))]
-		[HarmonyPatch(typeof(MissionLevelScenesTransitionSetupDataSO), nameof(MissionLevelScenesTransitionSetupDataSO.Init))]
-		[HarmonyPatch(typeof(MultiplayerLevelScenesTransitionSetupDataSO), nameof(MultiplayerLevelScenesTransitionSetupDataSO.Init))]
-		static void Postfix(IDifficultyBeatmap difficultyBeatmap, GameplayModifiers gameplayModifiers) {
+        [HarmonyPriority(int.MinValue)]
+        [HarmonyPatch(typeof(StandardLevelScenesTransitionSetupDataSO), nameof(StandardLevelScenesTransitionSetupDataSO.Init))]
+        [HarmonyPatch(typeof(MissionLevelScenesTransitionSetupDataSO), nameof(MissionLevelScenesTransitionSetupDataSO.Init))]
+        [HarmonyPatch(typeof(MultiplayerLevelScenesTransitionSetupDataSO), nameof(MultiplayerLevelScenesTransitionSetupDataSO.Init))]
+        private static void Postfix(IDifficultyBeatmap difficultyBeatmap, GameplayModifiers gameplayModifiers)
+        {
 #if DEBUG
-			Plugin.Log.Info("Got level data!");
+            Plugin.Log.Info("Got level data!");
 #endif
-			HookLeveldata.difficultyBeatmap = difficultyBeatmap;
-			HookLeveldata.gameplayModifiers = gameplayModifiers;
+            HookLeveldata.difficultyBeatmap = difficultyBeatmap;
+            HookLeveldata.gameplayModifiers = gameplayModifiers;
 
-			isModdedMap = ModMapUtil.IsModdedMap(difficultyBeatmap);
-			is360Level = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.containsRotationEvents;
-			isWallMap = ModMapUtil.IsProbablyWallmap(difficultyBeatmap);
-		}
+            IsModdedMap = ModMapUtil.IsModdedMap(difficultyBeatmap);
+            Is360Level = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.containsRotationEvents;
+            IsWallMap = ModMapUtil.IsProbablyWallmap(difficultyBeatmap);
+        }
 
-		internal static void Reset() {
-			is360Level = isModdedMap = isWallMap = false;
-			difficultyBeatmap = null;
-		}
-	}
+        internal static void Reset()
+        {
+            Is360Level = IsModdedMap = IsWallMap = false;
+            difficultyBeatmap = null;
+        }
+    }
 }
