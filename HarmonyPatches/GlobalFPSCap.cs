@@ -52,17 +52,17 @@ namespace Camera2.HarmonyPatches {
 			} else {
 				var Kapp = 30;
 
-				if(CamManager.cams?.Count > 0) {
+				if(CamManager.Cams?.Count > 0) {
 					QualitySettings.vSyncCount = 1;
 					var srr = Screen.currentResolution.refreshRate;
 					Kapp = -1;
 
-					foreach(var cam in CamManager.cams.Values.Where(x => x.gameObject.activeInHierarchy)) {
-						if(cam.settings.FPSLimiter.fpsLimit <= 0 || cam.settings.FPSLimiter.fpsLimit == srr) {
+					foreach(var cam in CamManager.Cams.Values.Where(x => x.gameObject.activeInHierarchy)) {
+						if(cam.Settings.FPSLimiter.FPSLimit <= 0 || cam.Settings.FPSLimiter.FPSLimit == srr) {
 							if(Kapp < srr)
 								Kapp = srr;
-						} else if(Kapp < cam.settings.FPSLimiter.fpsLimit) {
-							Kapp = cam.settings.FPSLimiter.fpsLimit;
+						} else if(Kapp < cam.Settings.FPSLimiter.FPSLimit) {
+							Kapp = cam.Settings.FPSLimiter.FPSLimit;
 							QualitySettings.vSyncCount = 0;
 						}
 					}

@@ -1,44 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Camera2.Utils;
+﻿using System.Collections.Generic;
+using Camera2.Interfaces;
+using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Camera2.SDK {
-	public static class ReplaySources {
-		internal static HashSet<ISource> sources = new HashSet<ISource>();
+namespace Camera2.SDK
+{
+    public static class ReplaySources
+    {
+        internal static readonly HashSet<ISource> Sources = new HashSet<ISource>();
 
-		public interface ISource {
-			public string name { get; }
-			public bool isInReplay { get; }
-			public Vector3 localHeadPosition { get; }
-			public Quaternion localHeadRotation { get; }
-		}
+        public static void Register(ISource source) => Sources.Add(source);
 
-		public class GenericSource : ISource {
-			public string name { get; private set; }
-			public bool isInReplay { get; private set; }
-			public Vector3 localHeadPosition { get; private set; }
-			public Quaternion localHeadRotation { get; private set; }
+        public static void Unregister(ISource source) => Sources.Remove(source);
 
-			public GenericSource(string name) {
-				this.name = name;
-			}
+        // this needs to be here because BeatLeader adapted Kinsi's spaghetti code
+        // also funny that they used reflections and not the SDK, talking about not working SDK.... yikes
+        [UsedImplicitly]
+        public class GenericSource : ISource
+        {
+            public string Name { get; }
+            public bool IsInReplay { get; private set; }
 
-			public void Update(ref Vector3 localHeadPosition, ref Quaternion localHeadRotation) {
-				this.localHeadPosition = localHeadPosition;
-				this.localHeadRotation = localHeadRotation;
-			}
+            // another things thank to spaghetti... lower case public members urgh
+            [UsedImplicitly]
+            public Vector3 localHeadPosition { get; private set; }
 
-			public void SetActive(bool isInReplay) {
-				this.isInReplay = isInReplay;
-			}
-		}
+            // another things thank to spaghetti... lower case public members urgh
+            [UsedImplicitly]
+            public Quaternion localHeadRotation { get; private set; }
 
-		public static void Register(ISource source) => sources.Add(source);
+            public GenericSource(string name)
+            {
+                Name = name;
+            }
 
-		public static void Unregister(ISource source) => sources.Remove(source);
-	}
+            [UsedImplicitly]
+            public void Update(ref Vector3 localHeadPosition, ref Quaternion localHeadRotation)
+            {
+                this.localHeadPosition = localHeadPosition;
+                this.localHeadRotation = localHeadRotation;
+            }
+
+            [UsedImplicitly]
+            public void SetActive(bool isInReplay)
+            {
+                IsInReplay = isInReplay;
+            }
+        }
+    }
 }

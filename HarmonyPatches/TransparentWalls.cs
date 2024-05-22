@@ -1,4 +1,4 @@
-﻿using Camera2.Utils;
+﻿using Camera2.Enums;
 using HarmonyLib;
 using UnityEngine;
 

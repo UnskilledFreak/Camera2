@@ -35,7 +35,7 @@ namespace Camera2.HarmonyPatches {
 		public static void ApplyCustom(Vector3 position, Quaternion rotation) {
 			HookRoomAdjust.position = position;
 			HookRoomAdjust.rotation = rotation;
-			HookRoomAdjust.eulerAngles = rotation.eulerAngles;
+			eulerAngles = rotation.eulerAngles;
 
 #if DEBUG
 			Plugin.Log.Warn("HookRoomAdjust.ApplyCustom!");

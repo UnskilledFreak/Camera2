@@ -4,193 +4,248 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Camera2.Enums;
 using UnityEngine;
 using UnityEngine.XR;
+using Object = UnityEngine.Object;
 
-namespace Camera2.Managers {
+namespace Camera2.Managers
+{
+    internal static class CamManager
+    {
+        public static Dictionary<string, Cam2> Cams { get; private set; } = new Dictionary<string, Cam2>();
+        internal static CamerasViewport CustomScreen { get; private set; }
+        public static int BaseCullingMask { get; internal set; }
+        public static int ClearedBaseCullingMask { get; private set; }
 
-#if DEBUG
-	public
-#endif
-	static class CamManager {
-		public static Dictionary<string, Cam2> cams { get; private set; } = new Dictionary<string, Cam2>();
-		internal static CamerasViewport customScreen { get; private set; }
-		public static int baseCullingMask { get; internal set; }
-		public static int clearedBaseCullingMask { get; private set; }
+        public static void Init()
+        {
+            ClearedBaseCullingMask = BaseCullingMask != 0 ? BaseCullingMask : SceneUtil.GetMainCameraButReally().GetComponent<Camera>().cullingMask;
 
-		public static void Init() {
-			clearedBaseCullingMask = baseCullingMask != 0 ? baseCullingMask : SceneUtil.GetMainCameraButReally().GetComponent<Camera>().cullingMask;
+            foreach (int mask in Enum.GetValues(typeof(VisibilityMasks)))
+            {
+                ClearedBaseCullingMask &= ~mask;
+            }
 
-			foreach(int mask in Enum.GetValues(typeof(VisibilityMasks)))
-				clearedBaseCullingMask &= ~mask;
+            //Adding _THIS_IS_NORMAL so that ends up in the stupid warning Unity logs when having a SS overlay w/ active VR
+            CustomScreen = new GameObject("Cam2_Viewport_THIS_IS_NORMAL").AddComponent<CamerasViewport>();
 
-			//Adding _THIS_IS_NORMAL so that ends up in the stupid warning Unity logs when having a SS overlay w/ active VR
-			customScreen = new GameObject("Cam2_Viewport_THIS_IS_NORMAL").AddComponent<CamerasViewport>();
+            LoadCameras();
 
-			LoadCameras();
+            ScenesManager.Settings.Load();
 
-			ScenesManager.settings.Load();
+            XRSettings.gameViewRenderMode = GameViewRenderMode.None;
 
-			XRSettings.gameViewRenderMode = GameViewRenderMode.None;
+            // todo :: UF :: possible memory leak when reloading or switching scenes
+            new GameObject("Cam2_Positioner", typeof(CamPositioner));
 
-			new GameObject("Cam2_Positioner", typeof(CamPositioner));
+            UI.SpaghettiUI.Init();
+        }
 
-			UI.SpaghettiUI.Init();
-		}
+        public static void CompleteReload()
+        {
+            CustomScreen.GetComponent<CamerasViewport>().CompleteReload();
+        }
 
-		public static void CompleteReload() {
-			customScreen.GetComponent<CamerasViewport>().CompleteReload();
-		}
+        private static void LoadCameras(bool reload = false)
+        {
+            if (!Directory.Exists(ConfigUtil.CamsDir))
+            {
+                Directory.CreateDirectory(ConfigUtil.CamsDir);
+            }
 
-		private static void LoadCameras(bool reload = false) {
-			if(!Directory.Exists(ConfigUtil.CamsDir))
-				Directory.CreateDirectory(ConfigUtil.CamsDir);
+            var loadedNames = new List<string>();
 
-			var loadedNames = new List<string>();
+            foreach (var cam in Directory.GetFiles(ConfigUtil.CamsDir, "*.json"))
+            {
+                try
+                {
+                    var name = Path.GetFileNameWithoutExtension(cam);
 
-			foreach(var cam in Directory.GetFiles(ConfigUtil.CamsDir, "*.json")) {
-				try {
-					var name = Path.GetFileNameWithoutExtension(cam);
+                    InitCamera(name, true, reload);
 
-					InitCamera(name, true, reload);
+                    if (reload)
+                        loadedNames.Add(name);
+                }
+                catch (Exception ex)
+                {
+                    Plugin.Log.Error($"Failed to load Camera {Path.GetFileName(cam)}");
+                    Plugin.Log.Error(ex);
+                }
+            }
 
-					if(reload)
-						loadedNames.Add(name);
-				} catch(Exception ex) {
-					Plugin.Log.Error($"Failed to load Camera {Path.GetFileName(cam)}");
-					Plugin.Log.Error(ex);
-				}
-			}
-			if(reload) foreach(var deletedCam in cams.Where(x => !loadedNames.Contains(x.Key))) {
-				GameObject.Destroy(deletedCam.Value);
-				cams.Remove(deletedCam.Key);
-			}
+            if (reload)
+            {
+                foreach (var deletedCam in Cams.Where(x => !loadedNames.Contains(x.Key)))
+                {
+                    Object.Destroy(deletedCam.Value);
+                    Cams.Remove(deletedCam.Key);
+                }
+            }
 
-			if(cams.Count == 0) {
-				var cam = InitCamera("Main", false);
-			}
+            if (Cams.Count == 0)
+            {
+                var cam = InitCamera("Main", false);
+            }
 
-			ApplyCameraValues(viewLayer: true);
-		}
+            ApplyCameraValues(viewLayer: true);
+        }
 
-		public static void Reload() {
-			LoadCameras(true);
-			ScenesManager.settings.Load();
-		}
+        public static void Reload()
+        {
+            LoadCameras(true);
+            ScenesManager.Settings.Load();
+        }
 
-		/* 
-		 * Unfortunately the Canvas Images cannot have their "layer" / z-index set to arbitrary numbers,
-		 * so we need to sort the cams by their set layer number and set the sibling index accordingly
-		 */
-		public static void ApplyCameraValues(bool viewLayer = false, bool bitMask = false, bool worldCam = false, bool posRot = false) {
-			var collection = viewLayer ? cams.Values.OrderBy(x => x.isCurrentlySelectedInSettings ? int.MaxValue : x.settings.layer).AsEnumerable() : cams.Values;
+        /*
+         * Unfortunately the Canvas Images cannot have their "layer" / z-index set to arbitrary numbers,
+         * so we need to sort the cams by their set layer number and set the sibling index accordingly
+         */
+        public static void ApplyCameraValues(bool viewLayer = false, bool bitMask = false, bool worldCam = false, bool posRot = false)
+        {
+            var collection = viewLayer ? Cams.Values.OrderBy(x => x.IsCurrentlySelectedInSettings ? int.MaxValue : x.Settings.Layer).AsEnumerable() : Cams.Values;
 
-			foreach(var cam in collection) {
-				if(viewLayer) cam.previewImage.transform.SetAsLastSibling();
-				if(bitMask) cam.settings.ApplyLayerBitmask();
-				if(worldCam) cam.ShowWorldCamIfNecessary();
-				if(posRot) cam.settings.ApplyPositionAndRotation();
-			}
-		}
+            foreach (var cam in collection)
+            {
+                if (viewLayer)
+                {
+                    cam.PreviewImage.transform.SetAsLastSibling();
+                }
 
-		public static Cam2 InitCamera(string name, bool loadConfig = true, bool reload = false) {
-			if(cams.TryGetValue(name, out var cam)) {
-				if(reload) {
-					cam.settings.Reload();
-					return cam;
-				}
+                if (bitMask)
+                {
+                    cam.Settings.ApplyLayerBitmask();
+                }
 
-				throw new Exception("Already exists??");
-			}
+                if (worldCam)
+                {
+                    cam.ShowWorldCamIfNecessary();
+                }
 
-			cam = new GameObject($"Cam2_{name}").AddComponent<Cam2>();
+                if (posRot)
+                {
+                    cam.Settings.ApplyPositionAndRotation();
+                }
+            }
+        }
 
-			try {
-				cam.Init(name, customScreen.AddNewView(), loadConfig);
-			} catch {
-				GameObject.DestroyImmediate(cam);
-				throw;
-			}
+        private static Cam2 InitCamera(string name, bool loadConfig = true, bool reload = false)
+        {
+            if (Cams.TryGetValue(name, out var cam))
+            {
+                if (reload)
+                {
+                    cam.Settings.Reload();
+                    return cam;
+                }
 
-			cams[name] = cam;
+                throw new Exception("Already exists??");
+            }
 
-			//Newly added cameras should always be the last child and thus on top
-			//ApplyCameraValues(viewLayer: true);
+            cam = new GameObject($"Cam2_{name}").AddComponent<Cam2>();
 
-			return cam;
-		}
+            try
+            {
+                cam.Init(name, CustomScreen.AddNewView(), loadConfig);
+            }
+            catch
+            {
+                Object.DestroyImmediate(cam);
+                throw;
+            }
 
-		public static Cam2 AddNewCamera(string namePrefix = "Unnamed Camera") {
-			var nameToUse = namePrefix;
-			var i = 2;
+            Cams[name] = cam;
 
-			while(cams.ContainsKey(nameToUse))
-				nameToUse = $"{namePrefix}{i++}";
+            //Newly added cameras should always be the last child and thus on top
+            //ApplyCameraValues(viewLayer: true);
 
-			return InitCamera(nameToUse, false);
-		}
+            return cam;
+        }
 
-		public static void DeleteCamera(Cam2 cam) {
-			if(!cams.Values.Contains(cam))
-				return;
+        public static Cam2 AddNewCamera(string namePrefix = "Unnamed Camera")
+        {
+            var nameToUse = namePrefix;
+            var i = 2;
 
-			if(cams[cam.name] != cam)
-				return;
+            while (Cams.ContainsKey(nameToUse))
+                nameToUse = $"{namePrefix}{i++}";
 
-			cams.Remove(cam.name);
+            return InitCamera(nameToUse, false);
+        }
 
-			var cfgPath = ConfigUtil.GetCameraPath(cam.name);
+        public static void DeleteCamera(Cam2 cam)
+        {
+            if (!Cams.Values.Contains(cam))
+                return;
 
-			GameObject.DestroyImmediate(cam);
+            if (Cams[cam.Name] != cam)
+                return;
 
-			if(File.Exists(cfgPath))
-				File.Delete(cfgPath);
+            Cams.Remove(cam.Name);
 
-			foreach(var x in ScenesManager.settings.scenes.Values)
-				if(x.Contains(cam.name))
-					x.RemoveAll(x => x == cam.name);
+            var cfgPath = ConfigUtil.GetCameraPath(cam.Name);
+            
+            Object.DestroyImmediate(cam);
 
-			foreach(var x in ScenesManager.settings.customScenes.Values)
-				if(x.Contains(cam.name))
-					x.RemoveAll(x => x == cam.name);
+            if (File.Exists(cfgPath))
+            {
+                File.Delete(cfgPath);
+            }
 
-			ScenesManager.settings.Save();
-		}
+            foreach (var x in ScenesManager.Settings.Scenes.Values.Where(x => x.Contains(cam.Name)))
+            {
+                x.RemoveAll(x => x == cam.Name);
+            }
 
-		public static bool RenameCamera(Cam2 cam, string newName) {
-			if(cams.ContainsKey(newName))
-				return false;
+            foreach (var x in ScenesManager.Settings.CustomScenes.Values.Where(x => x.Contains(cam.Name)))
+            {
+                x.RemoveAll(x => x == cam.Name);
+            }
 
-			if(!cams.ContainsValue(cam))
-				return false;
+            ScenesManager.Settings.Save();
+        }
 
-			newName = string.Concat(newName.Split(Path.GetInvalidFileNameChars())).Trim();
+        public static bool RenameCamera(Cam2 cam, string newName)
+        {
+            if (Cams.ContainsKey(newName))
+            {
+                return false;
+            }
 
-			if(newName.Length == 0)
-				return false;
+            if (!Cams.ContainsValue(cam))
+            {
+                return false;
+            }
 
-			var oldName = cam.name;
+            newName = string.Concat(newName.Split(Path.GetInvalidFileNameChars())).Trim();
 
-			if(newName == oldName)
-				return true;
+            if (newName.Length == 0)
+            {
+                return false;
+            }
 
-			cams[newName] = cam;
-			cams.Remove(oldName);
+            var oldName = cam.Name;
 
-			foreach(var scene in ScenesManager.settings.scenes.Values) {
-				if(!scene.Contains(oldName))
-					continue;
+            if (newName == oldName)
+            {
+                return true;
+            }
 
-				scene.Add(newName);
-				scene.Remove(oldName);
-			}
+            Cams[newName] = cam;
+            Cams.Remove(oldName);
 
-			cam.settings.Save();
-			File.Move(cam.configPath, ConfigUtil.GetCameraPath(newName));
-			cam.Init(newName, rename: true);
-			ScenesManager.settings.Save();
+            foreach (var scene in ScenesManager.Settings.Scenes.Values.Where(scene => scene.Contains(oldName)))
+            {
+                scene.Add(newName);
+                scene.Remove(oldName);
+            }
 
-			return true;
-		}
-	}
+            cam.Settings.Save();
+            File.Move(cam.ConfigPath, ConfigUtil.GetCameraPath(newName));
+            cam.Init(newName, rename: true);
+            ScenesManager.Settings.Save();
+
+            return true;
+        }
+    }
 }

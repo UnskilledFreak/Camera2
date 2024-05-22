@@ -3,94 +3,121 @@ using System.Linq;
 using UnityEngine;
 using VRUIControls;
 
-namespace Camera2.Behaviours {
-	class CamPositioner : MonoBehaviour {
-		//private static VRPointer pointer;
-		private static VRController controller;
-		private static Cam2 grabbedCamera = null;
-		private static Transform camTransform;
+namespace Camera2.Behaviours
+{
+    internal class CamPositioner : MonoBehaviour
+    {
+        //private static VRPointer pointer;
+        private static VRController controller;
+        private static Cam2 grabbedCamera;
+        private static Transform camTransform;
 
-		private static Vector3 grabStartPos;
-		private static Quaternion grabStartRot;
+        private static Vector3 grabStartPos;
+        private static Quaternion grabStartRot;
 
-		public void Awake() {
-			DontDestroyOnLoad(gameObject);
-		}
+        public void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
 
-		public static void BeingDragCamera(Cam2 camera) {
-			if(grabbedCamera != null)
-				FinishCameraMove();
+        public static void BeingDragCamera(Cam2 camera)
+        {
+            if (grabbedCamera != null)
+            {
+                FinishCameraMove();
+            }
 
-			var controllers = Resources.FindObjectsOfTypeAll<VRLaserPointer>();
+            var controllers = Resources.FindObjectsOfTypeAll<VRLaserPointer>();
 
-			controller = (!HookFPFCToggle.isInFPFC ? 
-				controllers.LastOrDefault(x => x.isActiveAndEnabled) : 
-				controllers.LastOrDefault(x =>
-				{
-					var controllerTransform = x.transform;
-					return controllerTransform.eulerAngles + controllerTransform.position != Vector3.zero;
-				})
-			)?.GetComponentInParent<VRController>();
+            controller = (!HookFPFCToggle.isInFPFC
+                    ? controllers.LastOrDefault(x => x.isActiveAndEnabled)
+                    : controllers.LastOrDefault(x =>
+                    {
+                        var controllerTransform = x.transform;
+                        return controllerTransform.eulerAngles + controllerTransform.position != Vector3.zero;
+                    })
+                )?.GetComponentInParent<VRController>();
 
-			if(controller == null)
-				return;
+            if (controller == null)
+            {
+                return;
+            }
 
-			//TODO: I should probably move this to use a Transformer...
-			grabbedCamera = camera;
-			camTransform = camera.UCamera.transform;
+            //TODO: I should probably move this to use a Transformer...
+            grabbedCamera = camera;
+            camTransform = camera.UCamera.transform;
 
-			grabStartPos = controller.transform.InverseTransformPoint(camTransform.position);
-			grabStartRot = Quaternion.Inverse(controller.rotation) * camTransform.rotation;
+            grabStartPos = controller.transform.InverseTransformPoint(camTransform.position);
+            grabStartRot = Quaternion.Inverse(controller.rotation) * camTransform.rotation;
 
-			grabbedCamera.worldCam.SetPreviewPositionAndSize(false);
-		}
+            grabbedCamera.WorldCam.SetPreviewPositionAndSize(false);
+        }
 
-		public void Update() {
-			if(grabbedCamera != null) {
-				if(controller != null && grabbedCamera.worldCam.isActiveAndEnabled) {
-					var p = controller.transform.TransformPoint(grabStartPos);
-					var r = (controller.rotation * grabStartRot).eulerAngles;
+        public void Update()
+        {
+            if (grabbedCamera == null)
+            {
+                return;
+            }
 
-					//grabbedCamera.transformchain.BacktrackTo(grabbedCamera.transformer, ref p, ref r);
+            if (controller != null && grabbedCamera.WorldCam.isActiveAndEnabled)
+            {
+                var p = controller.transform.TransformPoint(grabStartPos);
+                var r = (controller.rotation * grabStartRot).eulerAngles;
 
-					grabbedCamera.transformer.position = p;
-					void snap(ref float a, float snap = 4f, float step = 45f) {
-						var l = a % step;
+                //grabbedCamera.transformchain.BacktrackTo(grabbedCamera.transformer, ref p, ref r);
 
-						if(l <= snap)
-							a -= l;
-						else if(l >= step - snap)
-							a += step - l;
-					}
-					//grabbedCamera.transformer.rotation = r;
-					snap(ref r.x);
-					snap(ref r.y);
-					snap(ref r.z);
-					grabbedCamera.transformer.rotation = Quaternion.Euler(r.x, r.y, r.z);
+                grabbedCamera.Transformer.Position = p;
 
-					grabbedCamera.transformchain.Calculate();
+                //grabbedCamera.transformer.rotation = r;
+                Snap(ref r.x);
+                Snap(ref r.y);
+                Snap(ref r.z);
+                
+                grabbedCamera.Transformer.Rotation = Quaternion.Euler(r.x, r.y, r.z);
 
-					if(controller.triggerValue > 0.5f || (HookFPFCToggle.isInFPFC && Input.GetMouseButton(0)))
-						return;
-				}
+                grabbedCamera.TransformChain.Calculate();
 
-				FinishCameraMove();
-			}
-		}
+                if (controller.triggerValue > 0.5f || (HookFPFCToggle.isInFPFC && Input.GetMouseButton(0)))
+                {
+                    return;
+                }
+            }
 
-		private static void FinishCameraMove() {
-			if(grabbedCamera == null) return;
+            FinishCameraMove();
+        }
 
-			grabbedCamera.settings.targetPos = grabbedCamera.transformer.position;
-			grabbedCamera.settings.targetRot = grabbedCamera.transformer.rotation.eulerAngles;
+        private static void Snap(ref float a, float snap = 4f, float step = 45f)
+        {
+            var l = a % step;
 
-			grabbedCamera.settings.ApplyPositionAndRotation();
+            if (l <= snap)
+            {
+                a -= l;
+            }
+            else if (l >= step - snap)
+            {
+                a += step - l;
+            }
+        }
 
-			grabbedCamera.worldCam.SetPreviewPositionAndSize(true);
+        private static void FinishCameraMove()
+        {
+            if (grabbedCamera == null)
+            {
+                return;
+            }
 
-			grabbedCamera.settings.Save();
+            grabbedCamera.Settings.TargetPos = grabbedCamera.Transformer.Position;
+            grabbedCamera.Settings.TargetRot = grabbedCamera.Transformer.Rotation.eulerAngles;
 
-			grabbedCamera = null;
-		}
-	}
+            grabbedCamera.Settings.ApplyPositionAndRotation();
+
+            grabbedCamera.WorldCam.SetPreviewPositionAndSize();
+
+            grabbedCamera.Settings.Save();
+
+            grabbedCamera = null;
+        }
+    }
 }

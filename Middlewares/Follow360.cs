@@ -3,74 +3,81 @@ using Camera2.Interfaces;
 using Camera2.Utils;
 using System;
 using UnityEngine;
+using CameraType = Camera2.Enums.CameraType;
 
-namespace Camera2.Configuration {
-	class Settings_Follow360 : CameraSubSettings {
-		public bool enabled = true;
-		public float smoothing = 10f;
-	}
-}
+namespace Camera2.Middlewares
+{
+    internal class Follow360 : CamMiddleware, IMHandler
+    {
+        public void OnDisable() => Reset();
 
-namespace Camera2.Middlewares {
-	class Follow360 : CamMiddleware, IMHandler {
-		public void OnDisable() => Reset();
+        private Transformer _rotationApplier;
+        private float _currentRotateAmount;
 
-		Transformer rotationApplier = null;
-		float currentRotateAmount = 0f;
+        private void Reset()
+        {
+            if (_rotationApplier == null)
+            {
+                return;
+            }
 
-		private void Reset() {
-			if(rotationApplier != null) {
-				currentRotateAmount = 0f;
-				rotationApplier.rotation = Quaternion.identity;
-				rotationApplier.position = Vector3.zero;
-			}
-		}
+            _currentRotateAmount = 0f;
+            _rotationApplier.Rotation = Quaternion.identity;
+            _rotationApplier.Position = Vector3.zero;
+        }
 
-		new public bool Pre() {
-			if(
-				!enabled ||
-				!settings.Follow360.enabled ||
-				SceneUtil.isInMenu ||
-				!HookLeveldata.is360Level ||
-				HookLevelRotation.Instance == null ||
-				settings.type != Configuration.CameraType.Positionable
-			) {
-				Reset();
+        public new bool Pre()
+        {
+            if (
+                !enabled
+                || !Settings.Follow360.Enabled
+                || SceneUtil.IsInMenu 
+                || !HookLeveldata.is360Level 
+                || HookLevelRotation.Instance == null 
+                || Settings.Type != CameraType.Positionable
+            )
+            {
+                Reset();
 
-				return true;
-			}
+                return true;
+            }
 
-			if(rotationApplier == null) {
-				rotationApplier = cam.transformchain.AddOrGet("Follow360", TransformerOrders.Follow360);
-				rotationApplier.applyAsAbsolute = true;
-			}
+            if (_rotationApplier == null)
+            {
+                _rotationApplier = Cam.TransformChain.AddOrGet("Follow360", TransformerOrders.Follow360);
+                _rotationApplier.ApplyAsAbsolute = true;
+            }
 
-			if(HookLevelRotation.Instance.targetRotation != 0f) {
-				if(currentRotateAmount == HookLevelRotation.Instance.targetRotation)
-					return true;
+            if (HookLevelRotation.Instance.targetRotation == 0f)
+            {
+                return true;
+            }
 
-				var rotateStep = HookLevelRotation.Instance.targetRotation;
+            if (_currentRotateAmount == HookLevelRotation.Instance.targetRotation)
+            {
+                return true;
+            }
 
-				// Make sure we dont spam unnecessary calculations / rotation steps for the last little bit
-				if(Math.Abs(currentRotateAmount - HookLevelRotation.Instance.targetRotation) > 0.3f)
-					rotateStep = Mathf.LerpAngle(currentRotateAmount, HookLevelRotation.Instance.targetRotation, cam.timeSinceLastRender * settings.Follow360.smoothing);
+            var rotateStep = HookLevelRotation.Instance.targetRotation;
 
-				var rot = Quaternion.Euler(0, rotateStep, 0);
+            // Make sure we don't spam unnecessary calculations / rotation steps for the last little bit
+            if (Math.Abs(_currentRotateAmount - HookLevelRotation.Instance.targetRotation) > 0.3f)
+            {
+                rotateStep = Mathf.LerpAngle(_currentRotateAmount, HookLevelRotation.Instance.targetRotation, Cam.TimeSinceLastRender * Settings.Follow360.Smoothing);
+            }
 
-				rotationApplier.position = rot * (cam.transformer.position - HookRoomAdjust.position) + HookRoomAdjust.position;
+            var rot = Quaternion.Euler(0, rotateStep, 0);
 
-				rotationApplier.position -= cam.transformer.position;
+            _rotationApplier.Position = (rot * (Cam.Transformer.Position - HookRoomAdjust.position)) + HookRoomAdjust.position;
+            _rotationApplier.Position -= Cam.Transformer.Position;
 
-				if(settings.type == Configuration.CameraType.Positionable) {
-					rotationApplier.rotation = rot;
-				} else {
-					rotationApplier.rotation = Quaternion.identity;
-				}
+            _rotationApplier.Rotation = Settings.Type == CameraType.Positionable 
+                ? rot 
+                : Quaternion.identity;
 
-				currentRotateAmount = rotateStep;
-			}
+            _currentRotateAmount = rotateStep;
 
-			return true;
-		}
-	}
+            return true;
+        }
+    }
 }

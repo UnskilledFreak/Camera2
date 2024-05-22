@@ -1,56 +1,96 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace Camera2.Configuration {
-	[JsonObject(MemberSerialization.OptIn)]
-	class CameraBoundsConfig {
-		static readonly IFormatProvider h = CultureInfo.InvariantCulture.NumberFormat;
+namespace Camera2.Configuration
+{
+    [JsonObject(MemberSerialization.OptIn)]
+    internal class CameraBoundsConfig
+    {
+        private static readonly IFormatProvider Formater = CultureInfo.InvariantCulture.NumberFormat;
 
-		static void ParseInto(ref float min, ref float max, string val) {
-			min = float.NegativeInfinity;
-			max = float.PositiveInfinity;
+        public float RotXMin = float.NegativeInfinity;
+        public float RotXMax = float.PositiveInfinity;
 
-			if(val == null || val.Length == 0)
-				return;
+        public float RotYMin = float.NegativeInfinity;
+        public float RotYMax = float.PositiveInfinity;
 
-			var spl = val.Split(':');
-
-			if(!float.TryParse(spl[0], NumberStyles.Float, h, out min))
-				max = float.PositiveInfinity;
-
-			if(spl.Length == 1 || !float.TryParse(spl[1], NumberStyles.Float, h, out max))
-				max = float.PositiveInfinity;
-		}
-
-		[JsonProperty] public string pos_x { get => string.Format(h, "{0}:{1}", pos_x_min, pos_x_max); set => ParseInto(ref pos_x_min, ref pos_x_max, value); }
-		[JsonProperty] public string pos_y { get => string.Format(h, "{0}:{1}", pos_y_min, pos_y_max); set => ParseInto(ref pos_y_min, ref pos_y_max, value); }
-		[JsonProperty] public string pos_z { get => string.Format(h, "{0}:{1}", pos_z_min, pos_z_max); set => ParseInto(ref pos_z_min, ref pos_z_max, value); }
-		[JsonProperty] public string rot_x { get => string.Format(h, "{0}:{1}", rot_x_min, rot_x_max); set => ParseInto(ref rot_x_min, ref rot_x_max, value); }
-		[JsonProperty] public string rot_y { get => string.Format(h, "{0}:{1}", rot_y_min, rot_y_max); set => ParseInto(ref rot_y_min, ref rot_y_max, value); }
-		[JsonProperty] public string rot_z { get => string.Format(h, "{0}:{1}", rot_z_min, rot_z_max); set => ParseInto(ref rot_z_min, ref rot_z_max, value); }
-
-		public float rot_x_min = float.NegativeInfinity;
-		public float rot_x_max = float.PositiveInfinity;
-
-		public float rot_y_min = float.NegativeInfinity;
-		public float rot_y_max = float.PositiveInfinity;
-
-		public float rot_z_min = float.NegativeInfinity;
-		public float rot_z_max = float.PositiveInfinity;
+        public float RotZMin = float.NegativeInfinity;
+        public float RotZMax = float.PositiveInfinity;
 
 
-		public float pos_x_min = float.NegativeInfinity;
-		public float pos_x_max = float.PositiveInfinity;
+        public float PosXMin = float.NegativeInfinity;
+        public float PosXMax = float.PositiveInfinity;
 
-		public float pos_y_min = float.NegativeInfinity;
-		public float pos_y_max = float.PositiveInfinity;
+        public float PosYMin = float.NegativeInfinity;
+        public float PosYMax = float.PositiveInfinity;
 
-		public float pos_z_min = float.NegativeInfinity;
-		public float pos_z_max = float.PositiveInfinity;
-	}
+        public float PosZMin = float.NegativeInfinity;
+        public float PosZMax = float.PositiveInfinity;
+
+        [JsonProperty("pos_x")]
+        public string PosX
+        {
+            get => string.Format(Formater, "{0}:{1}", PosXMin, PosXMax);
+            set => ParseInto(ref PosXMin, ref PosXMax, value);
+        }
+
+        [JsonProperty("pos_y")]
+        public string PosY
+        {
+            get => string.Format(Formater, "{0}:{1}", PosYMin, PosYMax); 
+            set => ParseInto(ref PosYMin, ref PosYMax, value);
+        }
+
+        [JsonProperty("pos_z")]
+        public string PosZ
+        {
+            get => string.Format(Formater, "{0}:{1}", PosZMin, PosZMax); 
+            set => ParseInto(ref PosZMin, ref PosZMax, value);
+        }
+
+        [JsonProperty("rot_x")]
+        public string RotX
+        {
+            get => string.Format(Formater, "{0}:{1}", RotXMin, RotXMax); 
+            set => ParseInto(ref RotXMin, ref RotXMax, value);
+        }
+
+        [JsonProperty("rot_y")]
+        public string RotY
+        {
+            get => string.Format(Formater, "{0}:{1}", RotYMin, RotYMax); 
+            set => ParseInto(ref RotYMin, ref RotYMax, value);
+        }
+
+        [JsonProperty("rot_z")]
+        public string RotZ
+        {
+            get => string.Format(Formater, "{0}:{1}", RotZMin, RotZMax); 
+            set => ParseInto(ref RotZMin, ref RotZMax, value);
+        }
+
+        private static void ParseInto(ref float min, ref float max, string val)
+        {
+            min = float.NegativeInfinity;
+            max = float.PositiveInfinity;
+
+            if (string.IsNullOrEmpty(val))
+            {
+                return;
+            }
+
+            var spl = val.Split(':');
+
+            if (!float.TryParse(spl[0], NumberStyles.Float, Formater, out min))
+            {
+                max = float.PositiveInfinity;
+            }
+
+            if (spl.Length == 1 || !float.TryParse(spl[1], NumberStyles.Float, Formater, out max))
+            {
+                max = float.PositiveInfinity;
+            }
+        }
+    }
 }

@@ -1,9 +1,7 @@
 ﻿using Camera2.Managers;
 using HarmonyLib;
 using IPA.Loader;
-using IPA.Utilities;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 

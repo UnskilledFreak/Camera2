@@ -1,277 +1,235 @@
 ﻿using Camera2.HarmonyPatches;
 using Camera2.Managers;
 using Camera2.Utils;
-using System;
 using System.Linq;
+using Camera2.Enums;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace Camera2.Behaviours {
+namespace Camera2.Behaviours
+{
+    internal class CamerasViewport : MonoBehaviour
+    {
+        private const float GrabberSize = 25;
+        
+        private static CameraDesktopView TargetCam { get; set; }
+        
+        private static Canvas canvas;
+        private static readonly int[][] DeltaSchemes = {
+            new[] { 1, 1, 1, 1 }, // Drag
+            new[] { 0, 1, 1, 0 }, // Resize from bottom right
+            new[] { 1, 0, 0, 1 }, // Resize from top left
+            new[] { 0, 0, 1, 1 }, // Resize from top right
+            new[] { 1, 1, 0, 0 } // Resize from bottom left
+        };
 
-#if DEBUG
-	public
-#endif
-	class CameraDesktopView : RawImage {
-		public Cam2 cam { get; private set; }
-		public RectTransform rekt { get; private set; }
+        private Vector3 _lastMousePos;
+        private Vector2 _mouseStartPos01;
+        private Vector2 _lastScreenRes = Vector2.zero;
+        private CamAction _possibleAction = CamAction.None;
+        private CamAction _currentAction = CamAction.None;
 
-		const float minSizePct = 0.05f;
+        public void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
 
-		public void SetPositionClamped(Vector2 delta, int[] matrix, bool writeToConfig = false) {
-			/*
-			 * If you can simplify this I happily invite you to do so, this took me way too long lmao
-			 * This is probably possible in half the LOC but i already spent way too much time on this
-			 */
-			var vrc = cam.settings.viewRect;
-			var iMin = vrc.MinAnchor();
-			var iMax = vrc.MaxAnchor();
+            canvas = gameObject.AddComponent<Canvas>();
+            // I know this logs a stupid warning because VR is active, no way to fix that it seems.
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        }
 
-			// Theoretical transform, ignoring bounds
-			var oMin = new Vector2(iMin.x + (delta.x * matrix[0]), iMin.y + (delta.y * matrix[1]));
-			var oMax = new Vector2(iMax.x + (delta.x * matrix[2]), iMax.y + (delta.y * matrix[3]));
+        public CameraDesktopView AddNewView()
+        {
+            var img = new GameObject().AddComponent<CameraDesktopView>();
 
-			// Constraining min/max to stay within bounds and the size to stay the same
-			var oMinConstrained = new Vector2(
-				Mathf.Clamp(oMin.x, 0, 1 - (vrc.width * matrix[2])),
-				Mathf.Clamp(oMin.y, 0, 1 - (vrc.height * matrix[3]))
-			);
-			var oMaxConstrained = new Vector2(
-				Mathf.Clamp(oMax.x, vrc.width * matrix[0], 1),
-				Mathf.Clamp(oMax.y, vrc.height * matrix[1], 1)
-			);
+            img.transform.SetParent(gameObject.transform, true);
 
-			var clampW = matrix[0] | matrix[2];
-			var clampH = matrix[1] | matrix[3];
+            return img;
+        }
 
-			// Clamp output size to be at least N while staying in bounds
-			var oMinClamped = new Vector2(
-				matrix[0] == 0 ? iMin.x : Mathf.Clamp(oMinConstrained.x, 0, (clampW * oMaxConstrained.x) - minSizePct),
-				matrix[1] == 0 ? iMin.y : Mathf.Clamp(oMinConstrained.y, 0, (clampH * oMaxConstrained.y) - minSizePct)
-			);
+        private CameraDesktopView GetViewAtPoint(Vector2 point, ref CamAction actionAtPoint)
+        {
+            // This should already be sorted in the correct order
+            foreach (var camScreen in GetComponentsInChildren<CameraDesktopView>(false).Reverse())
+            {
+                var d = new Rect(camScreen.Rect.position, camScreen.Rect.rect.size);
 
-			var oMaxClamped = new Vector2(
-				matrix[2] == 0 ? iMax.x : Mathf.Clamp(oMaxConstrained.x, minSizePct + (clampW * oMinConstrained.x), 1),
-				matrix[3] == 0 ? iMax.y : Mathf.Clamp(oMaxConstrained.y, minSizePct + (clampH * oMinConstrained.y), 1)
-			);
+                if (d.Contains(point) && (!camScreen.Cam.Settings.IsScreenLocked || UI.SettingsView.CurrentCam == camScreen.Cam))
+                {
+                    var relativeCursorPos = point - d.position;
 
-			rekt.anchorMin = oMinClamped;
-			rekt.anchorMax = oMaxClamped;
+                    if (relativeCursorPos.y <= GrabberSize && relativeCursorPos.x >= d.width - GrabberSize)
+                    {
+                        actionAtPoint = CamAction.Resize_BR;
+                    }
+                    else if (relativeCursorPos.y >= d.height - GrabberSize && relativeCursorPos.x >= d.width - GrabberSize)
+                    {
+                        actionAtPoint = CamAction.Resize_TR;
+                    }
+                    else if (relativeCursorPos.y >= d.height - GrabberSize && relativeCursorPos.x <= GrabberSize)
+                    {
+                        actionAtPoint = CamAction.Resize_TL;
+                    }
+                    else if (relativeCursorPos.y <= GrabberSize && relativeCursorPos.x <= GrabberSize)
+                    {
+                        actionAtPoint = CamAction.Resize_BL;
+                    }
+                    else
+                    {
+                        actionAtPoint = CamAction.Move;
+                    }
 
-			if(writeToConfig && delta != Vector2.zero) {
-				cam.settings.SetViewRect(oMinClamped.x, oMinClamped.y, oMaxClamped.x - oMinClamped.x, oMaxClamped.y - oMinClamped.y);
-				cam.settings.Save();
-			}
-		}
+                    return camScreen;
+                }
+            }
 
-		new public void Awake() {
-			rekt = (transform as RectTransform);
-			rekt.pivot = rekt.sizeDelta = new Vector2(0, 0);
-		}
+            actionAtPoint = CamAction.None;
 
-		public void SetSource(Cam2 cam) {
-			this.cam = cam;
+            return null;
+        }
 
-			texture = cam.renderTexture;
+        public void CompleteReload()
+        {
+            Plugin.Log.Info("Reloading Camera2 Config...");
+            MovementScriptManager.LoadMovementScripts(true);
+            CamManager.Reload();
+        }
 
-			rekt.anchorMin = cam.settings.viewRect.MinAnchor();
-			rekt.anchorMax = cam.settings.viewRect.MaxAnchor();
+        public void Update()
+        {
+            if (Input.anyKeyDown)
+            {
+                //Some custom scenes to do funny stuff with
+                if (Input.GetKeyDown(KeyCode.F1))
+                {
+                    if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift))
+                    {
+                        CompleteReload();
+                    }
+                    else
+                    {
+                        ScenesManager.LoadGameScene();
+                    }
+                }
+                else
+                {
+                    foreach (var k in ScenesManager.Settings.CustomSceneBindings.Where(k => Input.GetKeyDown(k.Key)))
+                    {
+                        ScenesManager.SwitchToCustomScene(k.Value);
+                        break;
+                    }
+                }
+            }
 
-			rekt.anchoredPosition = new Vector2(0, 0);
-			gameObject.name = cam.name;
-		}
-	}
+            // This doesn't really belong here.....
+            var curRes = new Vector2(Screen.width, Screen.height);
+            if (_lastScreenRes != Vector2.zero)
+            {
+                foreach (var c in CamManager.Cams)
+                {
+                    c.Value.UpdateRenderTextureAndView();
+                }
+            }
 
-	class CamerasViewport : MonoBehaviour {
-		private static Canvas canvas;
+            _lastScreenRes = curRes;
 
-		public void Awake() {
-			DontDestroyOnLoad(gameObject);
+            if (HookFPFCToggle.isInFPFC)
+            {
+                if ((int)_currentAction >= 2)
+                {
+                    ProcessCamAction(true);
+                }
 
-			canvas = gameObject.AddComponent<Canvas>();
-			// I know this logs a stupid warning because VR is active, no way to fix that it seems.
-			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-		}
+                TargetCam = null;
+                return;
+            }
 
-		public CameraDesktopView AddNewView() {
-			var img = new GameObject().AddComponent<CameraDesktopView>();
+            if (_currentAction == CamAction.None && _lastMousePos != Input.mousePosition)
+            {
+                if (!Application.isFocused)
+                {
+                    return;
+                }
 
-			img.transform.SetParent(gameObject.transform, true); //.parent = gameObject.transform;
+                _possibleAction = CamAction.None;
+                _lastMousePos = Input.mousePosition;
 
-			return img;
-		}
+                if (_lastMousePos.x < 0 || _lastMousePos.y < 0 || _lastMousePos.x > Screen.width || _lastMousePos.y > Screen.height)
+                {
+                    return;
+                }
 
-		enum CamAction {
-			None,
-			Menu,
-			Move,
-			Resize_BR,
-			Resize_TL,
-			Resize_TR,
-			Resize_BL,
-		}
+                var pCam = TargetCam;
+                TargetCam = GetViewAtPoint(_lastMousePos, ref _possibleAction);
 
-		static int[][] deltaSchemes = new int[][] {
-			new int[] { 1, 1, 1, 1 }, // Drag
-			new int[] { 0, 1, 1, 0 }, // Resize from bottom right
-			new int[] { 1, 0, 0, 1 }, // Resize from top left
-			new int[] { 0, 0, 1, 1 }, // Resize from top right
-			new int[] { 1, 1, 0, 0 } // Resize from bottom left
-		};
+                if (TargetCam != pCam)
+                {
+                    if (TargetCam != null)
+                    {
+                        TargetCam.Cam.PrepareMiddleWareRender(true);
+                    }
 
-		const float grabbersize = 25;
+                    if (pCam != null)
+                    {
+                        pCam.Cam.PrepareMiddleWareRender(true);
+                    }
+                }
 
-		CameraDesktopView GetViewAtPoint(Vector2 point, ref CamAction actionAtPoint) {
-			// This should already be sorted in the correct order
-			foreach(var camScreen in GetComponentsInChildren<CameraDesktopView>(false).Reverse()) {
-				var d = new Rect(camScreen.rekt.position, camScreen.rekt.rect.size);
+                // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
+                switch (_possibleAction)
+                {
+                    case CamAction.Resize_BR:
+                    case CamAction.Resize_TL:
+                        WinAPI.SetCursor(WindowsCursor.IdcSizeNwSe);
+                        break;
+                    case CamAction.Resize_BL:
+                    case CamAction.Resize_TR:
+                        WinAPI.SetCursor(WindowsCursor.IdcSizeNeSw);
+                        break;
+                }
+            }
 
-				if(d.Contains(point) && (!camScreen.cam.settings.isScreenLocked || UI.SettingsView.cam == camScreen.cam)) {
-					var relativeCursorPos = point - d.position;
+            if (_possibleAction == CamAction.None)
+            {
+                return;
+            }
 
-					if(relativeCursorPos.y <= grabbersize && relativeCursorPos.x >= d.width - grabbersize) {
-						actionAtPoint = CamAction.Resize_BR;
-					} else if(relativeCursorPos.y >= d.height - grabbersize && relativeCursorPos.x >= d.width - grabbersize) {
-						actionAtPoint = CamAction.Resize_TR;
-					} else if(relativeCursorPos.y >= d.height - grabbersize && relativeCursorPos.x <= grabbersize) {
-						actionAtPoint = CamAction.Resize_TL;
-					} else if(relativeCursorPos.y <= grabbersize && relativeCursorPos.x <= grabbersize) {
-						actionAtPoint = CamAction.Resize_BL;
-					} else {
-						actionAtPoint = CamAction.Move;
-					}
+            // Drag handler / Resize
+            if (Input.GetMouseButtonDown(0) && TargetCam != null && _currentAction == CamAction.None)
+            {
+                _mouseStartPos01 = _lastMousePos / new Vector2(Screen.width, Screen.height);
+                _currentAction = _possibleAction;
+            }
 
-					return camScreen;
-				}
-			}
+            if (_currentAction == CamAction.None)
+            {
+                return;
+            }
 
-			actionAtPoint = CamAction.None;
+            var released = !Input.GetMouseButton(0) || !TargetCam.isActiveAndEnabled;
 
-			return null;
-		}
+            ProcessCamAction(released);
+        }
 
+        private void ProcessCamAction(bool finished)
+        {
+            var x = Input.mousePosition / new Vector2(Screen.width, Screen.height);
 
+            if ((int)_currentAction >= 2)
+            {
+                TargetCam.SetPositionClamped(
+                    // We take the current configured position and set the view position to it + the cursor move delta
+                    x - _mouseStartPos01,
+                    DeltaSchemes[(int)_currentAction - 2],
+                    // And only when the button was released, save it to the config to make it the new config value
+                    finished
+                );
+            }
 
-		private Vector2 mouseStartPos01;
-		private Vector2 lastScreenRes = Vector2.zero;
-		public static CameraDesktopView targetCam { get; private set; }
-		private CamAction possibleAction = CamAction.None;
-		private CamAction currentAction = CamAction.None;
-
-		private Vector3 lastMousePos;
-
-		private bool didShowHint = false;
-
-		public void CompleteReload()
-		{
-			Plugin.Log.Info("Reloading Camera2 Config...");
-			MovementScriptManager.LoadMovementScripts(true);
-			CamManager.Reload();
-		}
-		
-		void Update() {
-			if(Input.anyKeyDown) { //Some custom scenes to do funny stuff with
-				if(Input.GetKeyDown(KeyCode.F1)) {
-					if(Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift)) {
-						CompleteReload();
-					} else {
-						ScenesManager.LoadGameScene();
-					}
-				} else {
-#if DEV
-					if(Input.GetKeyDown(KeyCode.F7)) {
-						Plugin.LoadShaders();
-						return;
-					}
-#endif
-
-					foreach(var k in ScenesManager.settings.customSceneBindings) {
-						if(!Input.GetKeyDown(k.Key))
-							continue;
-
-						ScenesManager.SwitchToCustomScene(k.Value);
-						break;
-					}
-				}
-			}
-
-			// This doesnt really belong here.....
-			var curRes = new Vector2(Screen.width, Screen.height);
-			if(lastScreenRes != Vector2.zero) {
-				foreach(var c in CamManager.cams)
-					c.Value.UpdateRenderTextureAndView();
-			}
-
-			lastScreenRes = curRes;
-
-			if(HookFPFCToggle.isInFPFC) {
-				if((int)currentAction >= 2)
-					ProcessCamAction(true);
-
-				targetCam = null;
-				return;
-			}
-
-			if(currentAction == CamAction.None && lastMousePos != Input.mousePosition) {
-				if(!Application.isFocused)
-					return;
-
-				possibleAction = CamAction.None;
-				lastMousePos = Input.mousePosition;
-
-				if(lastMousePos.x < 0 || lastMousePos.y < 0 || lastMousePos.x > Screen.width || lastMousePos.y > Screen.height)
-					return;
-
-				var pCam = targetCam;
-				targetCam = GetViewAtPoint(lastMousePos, ref possibleAction);
-
-				if(targetCam != pCam) {
-					if(targetCam != null)
-						targetCam.cam.PrepareMiddlewaredRender(true);
-
-					if(pCam != null)
-						pCam.cam.PrepareMiddlewaredRender(true);
-				}
-
-				if(possibleAction == CamAction.Resize_BR || possibleAction == CamAction.Resize_TL) {
-					WinAPI.SetCursor(WinAPI.WindowsCursor.IDC_SIZENWSE);
-				} else if(possibleAction == CamAction.Resize_BL || possibleAction == CamAction.Resize_TR) {
-					WinAPI.SetCursor(WinAPI.WindowsCursor.IDC_SIZENESW);
-				}
-			}
-
-			void ProcessCamAction(bool finished) {
-				var x = Input.mousePosition / new Vector2(Screen.width, Screen.height);
-
-				if((int)currentAction >= 2) {
-					targetCam.SetPositionClamped(
-						// We take the current configured position and set the view position to it + the cursor move delta
-						x - mouseStartPos01,
-
-						deltaSchemes[(int)currentAction - 2],
-						// And only when the button was released, save it to the config to make it the new config value
-						finished
-					);
-				}
-
-				GL.Clear(true, true, Color.black);
-				if(finished)
-					currentAction = CamAction.None;
-			}
-
-			if(possibleAction != CamAction.None) {
-				// Drag handler / Resize
-				if(Input.GetMouseButtonDown(0) && targetCam != null && currentAction == CamAction.None) {
-					mouseStartPos01 = lastMousePos / new Vector2(Screen.width, Screen.height);
-					currentAction = possibleAction;
-				}
-
-				if(currentAction == CamAction.None)
-					return;
-
-				bool released = !Input.GetMouseButton(0) || !targetCam.isActiveAndEnabled;
-
-				ProcessCamAction(released);
-			}
-		}
-	}
+            GL.Clear(true, true, Color.black);
+            if (finished)
+            {
+                _currentAction = CamAction.None;
+            }
+        }
+    }
 }

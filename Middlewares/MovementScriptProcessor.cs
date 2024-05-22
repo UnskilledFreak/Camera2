@@ -3,163 +3,190 @@ using Camera2.Interfaces;
 using Camera2.Managers;
 using Camera2.Utils;
 using System.Linq;
+using Camera2.Enums;
 using UnityEngine;
-using static Camera2.Configuration.MovementScript;
+using CameraType = Camera2.Enums.CameraType;
 
-namespace Camera2.Configuration {
-	class Settings_MovementScript : CameraSubSettings {
-		public string[] scriptList = new string[] { };
-		public bool fromOrigin = true;
-		public bool enableInMenu = false;
-	}
-}
+namespace Camera2.Middlewares
+{
+    internal class MovementScriptProcessor : CamMiddleware, IMHandler
+    {
+        private static readonly System.Random RandomSource = new System.Random();
 
-namespace Camera2.Middlewares {
-	class MovementScriptProcessor : CamMiddleware, IMHandler {
-		static System.Random randomSource = new System.Random();
+        private Transformer _scriptTransformer;
+        private MovementScript _loadedScript;
+        private float _currentAnimationTime;
+        private int _frameIndex;
+        private float _lastFov;
+        private Vector3 _lastPos = Vector3.zero;
+        private Quaternion _lastRot = Quaternion.identity;
+        private float _lastAnimTime;
+        private MovementScript.Frame TargetFrame => _loadedScript.Frames[_frameIndex];
 
-		Transformer scriptTransformer = null;
+        private void Reset()
+        {
+            if (_scriptTransformer != null)
+            {
+                _scriptTransformer.Position = Vector3.zero;
+                _scriptTransformer.Rotation = Quaternion.identity;
 
-		MovementScript loadedScript = null;
-		float currentAnimationTime = 0f;
+                if (Settings.MovementScript.FromOrigin)
+                {
+                    Cam.Settings.ApplyPositionAndRotation();
+                }
+            }
 
+            _currentAnimationTime = 0f;
+            _lastAnimTime = 0;
 
-		int frameIndex = 0;
+            if (_loadedScript == null)
+            {
+                return;
+            }
 
-		float lastFov = 0f;
-		Vector3 lastPos = Vector3.zero;
-		Quaternion lastRot = Quaternion.identity;
+            _loadedScript = null;
+            _frameIndex = 0;
+            _lastFov = 0f;
+            Cam.UCamera.fieldOfView = Settings.FOV;
+        }
 
-		float lastAnimTime = 0;
+        public new void CamConfigReloaded() => Reset();
 
-		Frame targetFrame => loadedScript.frames[frameIndex];
+        public void OnDisable() => Reset();
 
-		private void Reset() {
-			if(scriptTransformer != null) {
-				scriptTransformer.position = Vector3.zero;
-				scriptTransformer.rotation = Quaternion.identity;
+        public new bool Pre()
+        {
+            if (
+                Settings.MovementScript.ScriptList.Length == 0
+                || (!SceneUtil.IsInSong && !Settings.MovementScript.EnableInMenu)
+                || Cam.Settings.Type == CameraType.FirstPerson
+            )
+            {
+                Reset();
+                return true;
+            }
 
-				if(settings.MovementScript.fromOrigin)
-					cam.settings.ApplyPositionAndRotation();
-			}
+            if (_loadedScript == null)
+            {
+                var possibleScripts = Settings.MovementScript.ScriptList.Where(MovementScriptManager.MovementScripts.ContainsKey).ToArray();
 
-			currentAnimationTime = 0f;
-			lastAnimTime = 0;
+                if (possibleScripts.Length == 0)
+                {
+                    return true;
+                }
 
-			if(loadedScript == null)
-				return;
+                var scriptToUse = possibleScripts[RandomSource.Next(possibleScripts.Length)];
 
-			loadedScript = null;
-			frameIndex = 0;
-			lastFov = 0f;
-			cam.UCamera.fieldOfView = settings.FOV;
-#if DEBUG
-			Plugin.Log.Info($"Resetting MovementScriptProcessor of camera {cam.name}");
-#endif
-		}
+                _loadedScript = MovementScriptManager.MovementScripts[scriptToUse];
 
-		new public void CamConfigReloaded() => Reset();
+                if (_loadedScript == null)
+                {
+                    return true;
+                }
 
-		public void OnDisable() => Reset();
+                _lastFov = Cam.UCamera.fieldOfView;
 
-		new public bool Pre() {
-			if(settings.MovementScript.scriptList.Length == 0 ||
-				(!SceneUtil.isInSong && !settings.MovementScript.enableInMenu) ||
-				cam.settings.type == Configuration.CameraType.FirstPerson
-			) {
-				Reset();
-				return true;
-			}
+                Plugin.Log.Info($"Applying Movement script {scriptToUse} for camera {Cam.Name}");
 
-			if(loadedScript == null) {
-				var possibleScripts = settings.MovementScript.scriptList.Where(MovementScriptManager.movementScripts.ContainsKey).ToArray();
+                _scriptTransformer ??= Cam.TransformChain.AddOrGet("MovementScript");
+            }
 
-				if(possibleScripts.Length == 0)
-					return true;
+            if (_loadedScript.SyncToSong && SceneUtil.IsInSong)
+            {
+                /*
+                 * In MP the TimeSyncController doesn't exist in the countdown phase,
+                 * so if the script is synced to the song we'll just hard lock the time
+                 * at 0 if the controller doesn't exist
+                 */
+                _currentAnimationTime = !SceneUtil.HasSongPlayer ? 0 : SceneUtil.AudioTimeSyncController.songTime;
+            }
+            else
+            {
+                _currentAnimationTime += Cam.TimeSinceLastRender;
+            }
 
-				var scriptToUse = possibleScripts[randomSource.Next(possibleScripts.Length)];
+            if (Settings.MovementScript.FromOrigin)
+            {
+                Cam.Transformer.Position = Vector3.zero;
+                Cam.Transformer.Rotation = Quaternion.identity;
+            }
 
-				loadedScript = MovementScriptManager.movementScripts[scriptToUse];
+            if (_currentAnimationTime > _loadedScript.ScriptDuration)
+            {
+                if (!_loadedScript.Loop)
+                {
+                    return true;
+                }
 
-				if(loadedScript == null)
-					return true;
+                _currentAnimationTime %= _loadedScript.ScriptDuration;
+                _lastAnimTime = _currentAnimationTime;
+                _frameIndex = 0;
+            }
 
-				lastFov = cam.UCamera.fieldOfView;
+            for (;;)
+            {
+                // Rollback logic for skipping through replays
+                if (_lastAnimTime > _currentAnimationTime)
+                {
+                    while (_frameIndex > 0)
+                    {
+                        _frameIndex--;
 
-				Plugin.Log.Info($"Applying Movementscript {scriptToUse} for camera {cam.name}");
+                        if (TargetFrame.StartTime <= _currentAnimationTime)
+                        {
+                            break;
+                        }
+                    }
 
-				scriptTransformer ??= cam.transformchain.AddOrGet("MovementScript", TransformerOrders.MovementScriptProcessor);
-			}
+                    _lastAnimTime = _currentAnimationTime;
+                }
 
-			if(loadedScript.syncToSong && SceneUtil.isInSong) {
-				/*
-				 * In MP the TimeSyncController doesnt exist in the countdown phase, 
-				 * so if the script is synced to the song we'll just hardlock the time
-				 * at 0 if the controller doesnt exist
-				 */
-				currentAnimationTime = !SceneUtil.hasSongPlayer ? 0 : SceneUtil.audioTimeSyncController.songTime;
-			} else {
-				currentAnimationTime += cam.timeSinceLastRender;
-			}
+                if (TargetFrame.StartTime > _currentAnimationTime)
+                {
+                    break;
+                }
 
-			if(settings.MovementScript.fromOrigin) {
-				cam.transformer.position = Vector3.zero;
-				cam.transformer.rotation = Quaternion.identity;
-			}
+                if (TargetFrame.TransitionEndTime <= _currentAnimationTime)
+                {
+                    _lastPos = _scriptTransformer.Position = TargetFrame.Position;
+                    _lastRot = _scriptTransformer.Rotation = TargetFrame.Rotation;
+                    if (TargetFrame.FOV > 0)
+                    {
+                        _lastFov = Cam.UCamera.fieldOfView = TargetFrame.FOV;
+                    }
+                }
+                else if (TargetFrame.StartTime <= _currentAnimationTime)
+                {
+                    var frameProgress = (_currentAnimationTime - TargetFrame.StartTime) / TargetFrame.Duration;
 
-			if(currentAnimationTime > loadedScript.scriptDuration) {
-				if(!loadedScript.loop)
-					return true;
+                    if (TargetFrame.Transition == MoveType.Eased)
+                    {
+                        frameProgress = Easings.EaseInOutCubic01(frameProgress);
+                    }
 
-				currentAnimationTime %= loadedScript.scriptDuration;
-				lastAnimTime = currentAnimationTime;
-				frameIndex = 0;
-			}
+                    _scriptTransformer.Position = Vector3.LerpUnclamped(_lastPos, TargetFrame.Position, frameProgress);
+                    _scriptTransformer.Rotation = Quaternion.LerpUnclamped(_lastRot, TargetFrame.Rotation, frameProgress);
 
-			for(; ; ) {
-				// Rollback logic for skipping through replays
-				if(lastAnimTime > currentAnimationTime) {
-					while(frameIndex > 0) {
-						frameIndex--;
+                    if (TargetFrame.FOV > 0f)
+                    {
+                        Cam.UCamera.fieldOfView = Mathf.LerpUnclamped(_lastFov, TargetFrame.FOV, frameProgress);
+                    }
 
-						if(targetFrame.startTime <= currentAnimationTime)
-							break;
-					}
-					lastAnimTime = currentAnimationTime;
-				}
+                    break;
+                }
 
-				if(targetFrame.startTime > currentAnimationTime)
-					break;
+                if (++_frameIndex < _loadedScript.Frames.Count)
+                {
+                    continue;
+                }
 
-				if(targetFrame.transitionEndTime <= currentAnimationTime) {
-					lastPos = scriptTransformer.position = targetFrame.position;
-					lastRot = scriptTransformer.rotation = targetFrame.rotation;
-					if(targetFrame.FOV > 0)
-						lastFov = cam.UCamera.fieldOfView = targetFrame.FOV;
-				} else if(targetFrame.startTime <= currentAnimationTime) {
-					var frameProgress = (currentAnimationTime - targetFrame.startTime) / targetFrame.duration;
+                _frameIndex = 0;
+                break;
+            }
 
-					if(targetFrame.transition == MoveType.Eased)
-						frameProgress = Easings.EaseInOutCubic01(frameProgress);
+            _lastAnimTime = _currentAnimationTime;
 
-					scriptTransformer.position = Vector3.LerpUnclamped(lastPos, targetFrame.position, frameProgress);
-					scriptTransformer.rotation = Quaternion.LerpUnclamped(lastRot, targetFrame.rotation, frameProgress);
-
-					if(targetFrame.FOV > 0f)
-						cam.UCamera.fieldOfView = Mathf.LerpUnclamped(lastFov, targetFrame.FOV, frameProgress);
-
-					break;
-				}
-
-				if(++frameIndex >= loadedScript.frames.Count) {
-					frameIndex = 0;
-					break;
-				}
-			}
-
-			lastAnimTime = currentAnimationTime;
-
-			return true;
-		}
-	}
+            return true;
+        }
+    }
 }

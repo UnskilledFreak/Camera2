@@ -1,7 +1,6 @@
 ﻿using Camera2.Managers;
 using HarmonyLib;
 using UnityEngine;
-using System.Linq;
 
 namespace Camera2.HarmonyPatches {
 	[HarmonyPatch(typeof(SmoothCameraController), nameof(SmoothCameraController.ActivateSmoothCameraIfNeeded))]
@@ -12,8 +11,8 @@ namespace Camera2.HarmonyPatches {
 			useDepthTexture = ____mainSettingsModel.smokeGraphicsSettings;
 
 			if(!isInited) {
-				if(CamManager.baseCullingMask == 0)
-					CamManager.baseCullingMask = Camera.main.cullingMask;
+				if(CamManager.BaseCullingMask == 0)
+					CamManager.BaseCullingMask = Camera.main.cullingMask;
 
 				isInited = true;
 
@@ -21,7 +20,7 @@ namespace Camera2.HarmonyPatches {
 
 				CamManager.Init();
 			} else {
-				foreach(var cam in CamManager.cams.Values)
+				foreach(var cam in CamManager.Cams.Values)
 					cam.UpdateDepthTextureActive();
 			}
 		}

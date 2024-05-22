@@ -1,141 +1,98 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Camera2.Utils {
-	static class TransformerOrders {
-		public static int PlayerOrigin = -6900;
-		public static int ModmapParenting = -600;
-		public static int SmoothFollow = -500;
-		public static int PositionOffset = -400;
-		public static int Follow360 = -300;
-		public static int MovementScriptProcessor = 0;
-	}
+namespace Camera2.Utils
+{
+    internal class TransformChain
+    {
+        private readonly List<Transformer> _transformers = new List<Transformer>();
+        private readonly Dictionary<string, Transformer> _transformerMap = new Dictionary<string, Transformer>();
 
-	class Transformer {
-		public Vector3 position = Vector3.zero;
-		public Quaternion rotation = Quaternion.identity;
-		public Vector3 rotationEuler { set => rotation = Quaternion.Euler(value); }
+        public Vector3 Position { get; private set; }
+        public Quaternion Rotation { get; private set; }
 
-		public Vector3 positionSum;
-		public Quaternion rotationSum;
+        private readonly Transform _targetBase;
+        private readonly Transform _target;
 
-		public int order = 0;
+        private void Resort(bool calculate = true)
+        {
+            _transformers.Sort((a, b) => a.Order - b.Order);
 
-		public bool applyAsAbsolute = false;
-	}
+            if (calculate)
+            {
+                Calculate();
+            }
+        }
 
-	class TransformChain {
-		private List<Transformer> transformers = new List<Transformer>();
-		public Dictionary<string, Transformer> transformerMap = new Dictionary<string, Transformer>();
+        public TransformChain(Transform targetBase, Transform target = null)
+        {
+            _targetBase = targetBase;
+            _target = target;
+        }
 
+        public Transformer AddOrGet(string name, int order = 0, bool sortIn = true)
+        {
+            if (_transformerMap.TryGetValue(name, out var t))
+            {
+                return t;
+            }
 
-		public void Resort(bool calculate = true) {
-			transformers.Sort((a, b) => a.order - b.order);
+            t = new Transformer { Order = order };
 
-			if(calculate) Calculate();
-		}
+            _transformers.Add(t);
+            _transformerMap.Add(name, t);
 
-		public Vector3 position { get; private set; }
-		public Quaternion rotation { get; private set; }
+            if (sortIn)
+            {
+                Resort(false);
+            }
 
-		Transform tbase;
-		Transform target;
-		public TransformChain(Transform tbase, Transform target = null) {
-			this.tbase = tbase;
-			this.target = target;
-		}
+            return t;
+        }
+        
+        public void Calculate(bool apply = true)
+        {
+            if (_transformers.Count == 0)
+            {
+                Position = Vector3.zero;
+                Rotation = Quaternion.identity;
+                return;
+            }
 
-		public Transformer AddOrGet(string name, int order = 0, bool sortIn = true) {
-			if(transformerMap.TryGetValue(name, out var t))
-				return t;
+            Position = _targetBase.position;
+            Rotation = _targetBase.rotation;
 
-			t = new Transformer();
+            for (var i = 0; i != _transformers.Count; i++)
+            {
+                var x = _transformers[i];
 
-			t.order = order;
+                if (x.Position != Vector3.zero)
+                {
+                    Position += x.ApplyAsAbsolute ? x.Position : Rotation * x.Position;
+                }
 
-			transformers.Add(t);
-			transformerMap.Add(name, t);
+                if (x.Rotation != Quaternion.identity)
+                {
+                    if (!x.ApplyAsAbsolute)
+                    {
+                        Rotation *= x.Rotation;
+                    } else
+                    {
+                        Rotation = x.Rotation * Rotation;
+                    }
+                }
 
-			if(sortIn)
-				Resort(false);
+                x.PositionSum = Position;
+                x.RotationSum = Rotation;
+            }
 
-			return t;
-		}
+            if (_target == null || !apply)
+            {
+                return;
+            }
 
-		//public void BacktrackTo(Transformer t, ref Vector3 pos, ref Quaternion rot) {
-		//	var index = transformers.IndexOf(t);
-
-		//	Transformer x;
-
-		//	for(int i = transformers.Count - 1; i > index; i--) {
-		//		x = transformers[i];
-
-		//		if(x.position != Vector3.zero)
-		//			pos -= x.applyAsAbsolute ? x.position : Quaternion.Inverse(x.rotation) * x.position;
-
-		//		if(x.rotation != Quaternion.identity) {
-		//			if(!x.applyAsAbsolute) {
-		//				rot *= Quaternion.Inverse(x.rotation);
-		//			} else {
-		//				rot = Quaternion.Inverse(x.rotation) * rot;
-		//			}
-		//		}
-		//	}
-
-		//	Calculate(false);
-
-		//	pos = pos - t.positionSum + t.position;
-
-		//	//rot = t.rotation * (t.rotationSum * );
-		//}
-
-#if DEBUG
-		public string debug = "";
-#endif
-
-		public void Calculate(bool apply = true) {
-			if(transformers.Count == 0) {
-				position = Vector3.zero;
-				rotation = Quaternion.identity;
-				return;
-			}
-
-			Transformer x;
-#if DEBUG
-			debug = "";
-#endif
-
-			position = tbase.position;
-			rotation = tbase.rotation;
-
-			for(var i = 0; i != transformers.Count; i++) {
-				x = transformers[i];
-
-				if(x.position != Vector3.zero)
-					position += x.applyAsAbsolute ? x.position : rotation * x.position;
-
-				if(x.rotation != Quaternion.identity) {
-					if(!x.applyAsAbsolute) {
-						rotation *= x.rotation;
-					} else {
-						rotation = x.rotation * rotation;
-					}
-				}
-
-				x.positionSum = position;
-				x.rotationSum = rotation;
-
-#if DEBUG
-				debug += $"{i} ({transformerMap.First(y => y.Value == x).Key}): {x.position} {x.rotation} => {position} {rotation}\n";
-#endif
-			}
-
-			if(target == null || !apply)
-				return;
-
-			target.position = position;
-			target.rotation = rotation;
-		}
-	}
+            _target.position = Position;
+            _target.rotation = Rotation;
+        }
+    }
 }

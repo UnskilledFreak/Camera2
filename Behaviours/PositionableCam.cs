@@ -1,92 +1,97 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Camera2.Behaviours {
-	class PositionableCam : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
-		private static readonly int MainTex = Shader.PropertyToID("_MainTex");
+namespace Camera2.Behaviours
+{
+    internal class PositionableCam : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    {
+        private static readonly int MainTex = Shader.PropertyToID("_MainTex");
 
-		public Cam2 cam { get; private set; }
+        private Cam2 Cam { get; set; }
 
-		private GameObject camOrigin;
-		private GameObject camPreview;
-		private Material viewMaterial;
+        private GameObject _camOrigin;
+        private GameObject _camPreview;
+        private Material _viewMaterial;
 
-		//private static Material hoverMaterial = new Material(Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name == "HandleHologram"));
-		//private static Material normalMaterial = new Material(Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name == "MenuShockwave"));
-		private static Material hoverMaterial;
-		private static Material normalMaterial;
+        //private static Material hoverMaterial = new Material(Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name == "HandleHologram"));
+        //private static Material normalMaterial = new Material(Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name == "MenuShockwave"));
+        private static Material hoverMaterial;
+        private static Material normalMaterial;
 
-		private MeshRenderer renderer;
+        private MeshRenderer _renderer;
 
-		public void Awake() {
-			hoverMaterial ??= new Material(Shader.Find("Hidden/Internal-DepthNormalsTexture"));
-			normalMaterial ??= new Material(Shader.Find("Standard"));
+        public void Awake()
+        {
+            hoverMaterial ??= new Material(Shader.Find("Hidden/Internal-DepthNormalsTexture"));
+            normalMaterial ??= new Material(Shader.Find("Standard"));
 
-			DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
 
-			camOrigin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-			camOrigin.transform.parent = transform;
+            _camOrigin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            _camOrigin.transform.parent = transform;
 
-			camOrigin.transform.localScale = new Vector3(0.08f, 0.08f, 0.2f);
-			camOrigin.transform.localPosition = new Vector3(0, 0, -(camOrigin.transform.localScale.x * .3f));
-			camOrigin.transform.localEulerAngles = new Vector3(90f, 0, 0);
+            _camOrigin.transform.localScale = new Vector3(0.08f, 0.08f, 0.2f);
+            _camOrigin.transform.localPosition = new Vector3(0, 0, -(_camOrigin.transform.localScale.x * .3f));
+            _camOrigin.transform.localEulerAngles = new Vector3(90f, 0, 0);
 
-			renderer = camOrigin.GetComponent<MeshRenderer>();
-			normalMaterial.color = new Color(255, 255, 175, 0.7f);
-			renderer.material = normalMaterial;
+            _renderer = _camOrigin.GetComponent<MeshRenderer>();
+            normalMaterial.color = new Color(255, 255, 175, 0.7f);
+            _renderer.material = normalMaterial;
 
-			camPreview = GameObject.CreatePrimitive(PrimitiveType.Quad);
-			Destroy(camPreview.GetComponent<Collider>());
-			camPreview.transform.parent = transform;
+            _camPreview = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            Destroy(_camPreview.GetComponent<Collider>());
+            _camPreview.transform.parent = transform;
 
-			viewMaterial = new Material(Plugin.Shader_VolumetricBlit);
-			camPreview.GetComponent<MeshRenderer>().material = viewMaterial;
-		}
+            _viewMaterial = new Material(Plugin.ShaderVolumetricBlit);
+            _camPreview.GetComponent<MeshRenderer>().material = _viewMaterial;
+        }
 
-		public void SetSource(Cam2 cam) {
-			this.cam = cam;
+        public void SetSource(Cam2 cam)
+        {
+            Cam = cam;
 
-			viewMaterial.SetTexture(MainTex, cam.renderTexture);
-			SetPreviewPositionAndSize();
-		}
+            _viewMaterial.SetTexture(MainTex, cam.RenderTexture);
+            SetPreviewPositionAndSize();
+        }
 
-		public void SetPreviewPositionAndSize(bool small = true) {
-			var size = small ? cam.settings.previewScreenSize : Math.Min(cam.settings.previewScreenSize * 2f, 4);
+        public void SetPreviewPositionAndSize(bool small = true)
+        {
+            var size = small ? Cam.Settings.PreviewScreenSize : Math.Min(Cam.Settings.PreviewScreenSize * 2f, 4);
 
-			if(cam.UCamera.aspect > 1f) {
-				camPreview.transform.localScale = new Vector3(size, size / cam.UCamera.aspect, 0);
-			} else {
-				camPreview.transform.localScale = new Vector3(size * cam.UCamera.aspect, size, 0);
-			}
+            _camPreview.transform.localScale = Cam.UCamera.aspect > 1f 
+                ? new Vector3(size, size / Cam.UCamera.aspect, 0) 
+                : new Vector3(size * Cam.UCamera.aspect, size, 0);
 
-			if(cam.settings.worldCamUnderScreen) {
-				camOrigin.transform.localScale = new Vector3(0.08f, 0.08f, 0.2f);
-			} else {
-				camOrigin.transform.localScale = new Vector3(0.04f, 0.05f, 0.1f);
-			}
+            _camOrigin.transform.localScale = Cam.Settings.WorldCamUnderScreen 
+                ? new Vector3(0.08f, 0.08f, 0.2f) 
+                : new Vector3(0.04f, 0.05f, 0.1f);
 
-			camPreview.transform.localPosition = new Vector3(
-				0, 
-				cam.settings.worldCamUnderScreen ? 0.15f + (camPreview.transform.localScale.y / 2f) : 0, 
-				camOrigin.transform.localPosition.z / 2
-			);
-		}
+            _camPreview.transform.localPosition = new Vector3(
+                0,
+                Cam.Settings.WorldCamUnderScreen ? 0.15f + (_camPreview.transform.localScale.y / 2f) : 0,
+                _camOrigin.transform.localPosition.z / 2
+            );
+        }
 
-		public void OnPointerClick(PointerEventData eventData) {
-			if(!(eventData.currentInputModule is VRUIControls.VRInputModule))
-				return;
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (!(eventData.currentInputModule is VRUIControls.VRInputModule))
+            {
+                return;
+            }
 
-			CamPositioner.BeingDragCamera(cam);
-		}
+            CamPositioner.BeingDragCamera(Cam);
+        }
 
-		public void OnPointerEnter(PointerEventData eventData) {
-			renderer.material = hoverMaterial;
-		}
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            _renderer.material = hoverMaterial;
+        }
 
-		public void OnPointerExit(PointerEventData eventData) {
-			renderer.material = normalMaterial;
-		}
-	}
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            _renderer.material = normalMaterial;
+        }
+    }
 }

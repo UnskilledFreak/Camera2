@@ -1,17 +1,19 @@
-﻿using HarmonyLib;
-using System;
-using System.Reflection;
+﻿using System.Reflection;
 
-namespace Camera2.Utils {
-	class CustomNotesUtil {
-		static PropertyInfo LayerUtils_HMDOnly;
+namespace Camera2.Utils
+{
+    internal static class CustomNotesUtil
+    {
+        private static PropertyInfo layerUtilsHmdOnly;
 
-		public static void Reflect() {
-			LayerUtils_HMDOnly = IPA.Loader.PluginManager.GetPluginFromId("Custom Notes")?
-				.Assembly.GetType("CustomNotes.Utilities.LayerUtils")?
-				.GetProperty("HMDOnly", BindingFlags.Public | BindingFlags.Static);
-		}
+        public static void Reflect()
+        {
+            layerUtilsHmdOnly = IPA.Loader.PluginManager.GetPluginFromId("Custom Notes")
+                ?.Assembly
+                .GetType("CustomNotes.Utilities.LayerUtils")
+                ?.GetProperty("HMDOnly", BindingFlags.Public | BindingFlags.Static);
+        }
 
-		public static bool HasHMDOnlyEnabled() => LayerUtils_HMDOnly != null && (bool)LayerUtils_HMDOnly.GetValue(null);
-	}
+        public static bool HasHMDOnlyEnabled() => layerUtilsHmdOnly != null && (bool)layerUtilsHmdOnly.GetValue(null);
+    }
 }

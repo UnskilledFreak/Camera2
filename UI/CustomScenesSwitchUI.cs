@@ -4,80 +4,54 @@ using Camera2.Managers;
 using HMUI;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
-namespace Camera2.UI {
-	class CustomSceneUIEntry {
-		public string _name { get; private set; }
+namespace Camera2.UI
+{
+    class CustomScenesSwitchUI
+    {
+        [UIComponent("customScenesList")]
+        [UsedImplicitly]
+        private CustomCellListTableData _list;
 
-		public CustomSceneUIEntry(string name) {
-			_name = name;
-			bg = null;
-		}
+        [UIValue("scenes")]
+        private static List<object> Scenes => ScenesManager.Settings.CustomScenes.Keys
+            .Select(x => new CustomSceneUIEntry(x))
+            .Prepend(new CustomSceneUIEntry(null))
+            .Cast<object>()
+            .ToList();
 
-		bool exists => ScenesManager.settings.customScenes.ContainsKey(name);
+        private void SwitchToCustomScene(TableView tableView, CustomSceneUIEntry row)
+        {
+            if (row.Name == null)
+            {
+                ScenesManager.LoadGameScene(forceReload: true);
+                return;
+            }
 
-		string name => _name == null ? "Switch to default scene" : _name;
+            ScenesManager.SwitchToCustomScene(row.Name);
+        }
 
-		string camCount {
-			get {
-				if(!exists)
-					return "";
+        public void Update(int setSelected = -1, bool reloadData = true)
+        {
+            if (_list == null || _list.tableView == null)
+            {
+                return;
+            }
 
-				var c = ScenesManager.settings.customScenes[name].Count;
+            if (reloadData)
+            {
+                _list.data = Scenes;
+                _list.tableView.ReloadData();
+            }
 
-				var s = $"{c} camera";
+            if (setSelected <= -1)
+            {
+                return;
+            }
 
-				if(c == 1) return s;
-
-				return s + "s";
-			}
-		}
-
-		string camNames => !exists ? "" : string.Join(", ", ScenesManager.settings.customScenes[name]);
-
-		[UIComponent("bgContainer")] ImageView bg;
-
-		[UIAction("refresh-visuals")]
-		public void Refresh(bool selected, bool highlighted) {
-			var x = new UnityEngine.Color(0, 0, 0, 0.45f);
-
-			if(selected || highlighted)
-				x.a = selected ? 0.9f : 0.6f;
-
-			bg.color = x;
-		}
-	}
-
-	class CustomScenesSwitchUI {
-		[UIComponent("customScenesList")] public CustomCellListTableData list = null;
-		[UIValue("scenes")] List<object> scenes =>
-			ScenesManager.settings.customScenes.Keys.Select(x => new CustomSceneUIEntry(x))
-				.Prepend(new CustomSceneUIEntry(null))
-				.Cast<object>()
-				.ToList();
-
-		void SwitchToCustomScene(TableView tableView, CustomSceneUIEntry row) {
-			if(row._name == null) {
-				ScenesManager.LoadGameScene(forceReload: true);
-				return;
-			}
-
-			ScenesManager.SwitchToCustomScene(row._name);
-		}
-
-		public void Update(int setSelected = -1, bool reloadData = true) {
-			if(list == null || list.tableView == null)
-				return;
-
-			if(reloadData) {
-				list.data = scenes;
-				list.tableView.ReloadData();
-			}
-
-			if(setSelected > -1) {
-				list.tableView.SelectCellWithIdx(setSelected);
-				list.tableView.ScrollToCellWithIdx(setSelected, TableView.ScrollPositionType.Center, false);
-			}
-		}
-	}
+            _list.tableView.SelectCellWithIdx(setSelected);
+            _list.tableView.ScrollToCellWithIdx(setSelected, TableView.ScrollPositionType.Center, false);
+        }
+    }
 }

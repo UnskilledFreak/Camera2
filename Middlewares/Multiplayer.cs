@@ -3,43 +3,45 @@ using Camera2.Interfaces;
 using Camera2.Utils;
 using UnityEngine;
 
-namespace Camera2.Configuration {
-	class Settings_Multiplayer : CameraSubSettings {
-		public bool followSpectatorPlattform = true;
-	}
-}
+namespace Camera2.Middlewares
+{
+    internal class Multiplayer : CamMiddleware, IMHandler
+    {
+        private Transformer _originLmao;
 
-namespace Camera2.Middlewares {
-	class Multiplayer : CamMiddleware, IMHandler {
-		Transformer originLmao = null;
+        public new bool Pre()
+        {
+            /*
+             * TODO: This should *eventually* (™) allow to set the origin of this camera to another player
+             * which is not us, which would allow to have third and firstperson cameras which work in the
+             * context of another player
+             */
+            var x = HookMultiplayerSpectatorController.instance;
 
-		new public bool Pre() {
-			/*
-			 * TODO: This should *eventually* (™) allow to set the origin of this camera to another player
-			 * which is not us, which would allow to have third and firstperson cameras which work in the
-			 * context of another player
-			 */
-			var x = HookMultiplayerSpectatorController.instance;
+            if (!SceneUtil.IsInMultiplayer || !SceneUtil.IsInSong || x == null || !Settings.Multiplayer.FollowSpectatorPlatform)
+            {
+                if (_originLmao == null)
+                {
+                    return true;
+                }
 
-			if(!SceneUtil.isInMultiplayer || !SceneUtil.isInSong || x == null || !settings.Multiplayer.followSpectatorPlattform) {
-				if(originLmao != null) {
-					originLmao.position = Vector3.zero;
-					originLmao.rotation = Quaternion.identity;
-				}
+                _originLmao.Position = Vector3.zero;
+                _originLmao.Rotation = Quaternion.identity;
 
-				return true;
-			}
+                return true;
+            }
 
-			if(originLmao == null) {
-				originLmao = settings.cam.transformchain.AddOrGet("MultiplayerOrigin", TransformerOrders.PlayerOrigin);
-			}
+            _originLmao ??= Settings.Cam.TransformChain.AddOrGet("MultiplayerOrigin", TransformerOrders.PlayerOrigin);
 
-			if(x.currentSpot != null) {
-				originLmao.position = x.currentSpot.transform.position;
-				originLmao.rotation = x.currentSpot.transform.rotation;
-			}
+            if (x.currentSpot == null)
+            {
+                return true;
+            }
 
-			return true;
-		}
-	}
+            _originLmao.Position = x.currentSpot.transform.position;
+            _originLmao.Rotation = x.currentSpot.transform.rotation;
+
+            return true;
+        }
+    }
 }
