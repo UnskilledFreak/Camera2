@@ -51,10 +51,10 @@
 		<vertical preferred-width='72' vertical-fit='PreferredSize' pad-left='2' pad-right='2' spacing='2'>
 			<horizontal pad-bottom='2' pad-top='1'>
 				<horizontal bg='panel-top-gradient'>
-					<text text='Camera2 - Add camera from template' align='Center' font-size='3'/>
+					<text text='Camera 2.5 - Add camera' align='Center' font-size='3'/>
 				</horizontal>
 			</horizontal>
-			<vertical spacing='1.5' pad-bottom='2' preferred-width='60'>
+			<vertical spacing='1.2' pad-bottom='2' preferred-width='60'>
 				<primary-button on-click='AddCamDefault' text='Default / Unconfigured' click-event='closeAddModal' horizontal-fit='Unconstrained'/>
 				<primary-button on-click='AddCamSideView' text='Side view / Swing cam' click-event='closeAddModal' horizontal-fit='Unconstrained'/>
 				<primary-button on-click='AddCamBackView' text='Back view / "Cut cam"' click-event='closeAddModal' horizontal-fit='Unconstrained'/>

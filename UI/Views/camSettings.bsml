@@ -53,13 +53,16 @@
     <tab tags='tabs' tab-name='Target' id='attachingTab'>
         <vertical horizontal-fit='PreferredSize' vertical-fit='PreferredSize'>
             <modifier-container child-expand-width='true' horizontal-fit='PreferredSize'>
+                <!--
                 <horizontal preferred-width="90">
-                    <text text="Target to attach to or look at" color="#CCC" font-size="4" align="Center"></text>
+                    <text text="Target to attach to or look at" color="#CCC" font-size="3" align="Center"></text>
                 </horizontal>
+                -->
                 <string-setting id='attachedTarget' text='Target' value='TargetParent' bind-value='true' apply-on-change='true'
                                 hover-hint='Insert the absolute path to any GameObject here'/>
+                <button text="Templates" click-event="targetTemplateModal"/>
                 <horizontal preferred-width="90">
-                    <text text="Offsets" color="#CCC" font-size="4" align="Center"></text>
+                    <text text="Offsets" color="#CCC" font-size="3" align="Center"></text>
                 </horizontal>
                 <slider-setting text='Position X' min='-50' max='50' increment='0.01' show-buttons='true' value='TargetPosX' bind-value='true' apply-on-change='true'/>
                 <slider-setting text='Position Y' min='-50' max='50' increment='0.01' show-buttons='true' value='TargetPosY' bind-value='true' apply-on-change='true'/>
@@ -67,8 +70,8 @@
                 <slider-setting text='Rotation X' min='0' max='360' increment='0.1' show-buttons='true' value='TargetRotX' bind-value='true' apply-on-change='true'/>
                 <slider-setting text='Rotation Y' min='0' max='360' increment='0.1' show-buttons='true' value='TargetRotY' bind-value='true' apply-on-change='true'/>
                 <slider-setting text='Rotation Z' min='0' max='360' increment='0.1' show-buttons='true' value='TargetRotZ' bind-value='true' apply-on-change='true'/>
-                <slider-setting text='Position Smoothing *' min='0.1' max='50' increment='0.1' value='SmoothFollowPosition' bind-value='true' apply-on-change='true'/>
-                <slider-setting text='Rotation Smoothing *' min='0.1' max='50' increment='0.1' value='SmoothFollowRotation' bind-value='true' apply-on-change='true'/>
+                <slider-setting text='Position Smoothing' min='0.1' max='50' increment='0.1' value='SmoothFollowPosition' bind-value='true' apply-on-change='true'/>
+                <slider-setting text='Rotation Smoothing' min='0.1' max='50' increment='0.1' value='SmoothFollowRotation' bind-value='true' apply-on-change='true'/>
             </modifier-container>
         </vertical>
     </tab>
@@ -195,4 +198,19 @@
             <slider-setting text='Height' min='0.04' max='1' increment='0.02' value='ViewRectHeight' bind-value='true' apply-on-change='true'/>
         </vertical>
     </tab>
+    
+    <modal clickerino-offerino-closerino='true' move-to-center='true' hide-event='CloseTargetModal' show-event='targetTemplateModal' size-delta-x='72' size-delta-y='70'>
+    <vertical preferred-width='72' vertical-fit='PreferredSize' pad-left='2' pad-right='2' spacing='2'>
+        <horizontal pad-bottom='2' pad-top='1'>
+            <horizontal bg='panel-top-gradient'>
+                <text text='Camera 2.5 - Target template' align='Center' font-size='3'/>
+            </horizontal>
+        </horizontal>
+        <vertical spacing='1.5' pad-bottom='2' preferred-width='60'>
+            <primary-button on-click='TargetAvatarsHead' text='CustomAvatars -> Head' click-event='CloseTargetModal' horizontal-fit='Unconstrained'/>
+            <primary-button on-click='TargetCatHead' text='NalulunaCat -> Head' click-event='CloseTargetModal' horizontal-fit='Unconstrained'/>
+        </vertical>
+        <button text='Cancel' click-event='CloseTargetModal'/>
+    </vertical>
+</modal>
 </vertical>

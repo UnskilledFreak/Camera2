@@ -511,7 +511,22 @@ namespace Camera2.UI
         [UsedImplicitly]
         public void SetRenderDistanceUnlimited() => CurrentCam.Settings.FarZ = 5000f;
 
+        [UIAction("TargetAvatarsHead")]
+        [UsedImplicitly]
+        public void TargetAvatarsHead() => SetNewTarget("Hips/Spine/Chest/Neck/Head");
+
+        [UIAction("TargetCatHead")]
+        [UsedImplicitly]
+        public void TargetNalulunaCatHead() => SetNewTarget("Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head");
+
         #endregion
+
+        private void SetNewTarget(string target)
+        {
+            CurrentCam.Settings.SmoothFollow.TargetParent = target;
+            CurrentCam.Settings.ParentChange();
+            NotifyPropertyChanged();
+        }
 
         public void Awake()
         {
