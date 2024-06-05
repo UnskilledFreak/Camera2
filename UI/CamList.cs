@@ -154,7 +154,7 @@ namespace Camera2.UI
         }
 
         [UsedImplicitly]
-        private void AddCamFollowAvatarFaceCam()
+        private void AddCamFollowerCam()
         {
             var cam = GetNewCam("Follower Cam");
 

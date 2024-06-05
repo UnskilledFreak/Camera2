@@ -60,7 +60,7 @@
 				<primary-button on-click='AddCamBackView' text='Back view / "Cut cam"' click-event='closeAddModal' horizontal-fit='Unconstrained'/>
 				<primary-button on-click='AddCamThirdPerson' text='Static Thirdperson' click-event='closeAddModal' horizontal-fit='Unconstrained'/>
 				<primary-button on-click='AddCamAvatarFaceCam' text='"Facecam" (For Avatars)' click-event='closeAddModal' horizontal-fit='Unconstrained'/>
-				<primary-button on-click='AddCamFollowAvatarFaceCam' text='Follower Cam TEST' click-event='closeAddModal' horizontal-fit='Unconstrained'/>
+				<primary-button on-click='AddCamFollowerCam' text='Follower Cam TEST' click-event='closeAddModal' horizontal-fit='Unconstrained'/>
 			</vertical>
 			<button text='Cancel' click-event='closeAddModal'/>
 		</vertical>
