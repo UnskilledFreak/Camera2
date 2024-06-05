@@ -85,7 +85,7 @@ namespace Camera2.UI
             {
                 if (CamManager.RenameCamera(CurrentCam, value))
                 {
-                    Coordinator.Instance.CamList.list.tableView.ReloadData();
+                    SettingsCoordinator.Instance.CamList.list.tableView.ReloadData();
                 }
 
                 NotifyPropertyChanged();
@@ -600,7 +600,7 @@ namespace Camera2.UI
 
             viewRectTab.IsVisible = false;
 
-            Coordinator.Instance.ShowSettingsForCam(CamManager.Cams.Values.First());
+            SettingsCoordinator.Instance.ShowSettingsForCam(CamManager.Cams.Values.First());
         }
 
         private void ToggleSettingVisibility()

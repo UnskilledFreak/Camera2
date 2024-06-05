@@ -50,7 +50,7 @@ namespace Camera2.UI
 
         [UIAction("SelectCamera")]
         [UsedImplicitly]
-        private void SelectCamera(TableView tableView, CamListCellWrapper row) => Coordinator.Instance.ShowSettingsForCam(row.Cam);
+        private void SelectCamera(TableView tableView, CamListCellWrapper row) => SettingsCoordinator.Instance.ShowSettingsForCam(row.Cam);
 
         private static Cam2 GetNewCam(string name)
         {
@@ -73,7 +73,7 @@ namespace Camera2.UI
 
             _listData.Insert(0, new CamListCellWrapper(cam));
             UpdateCamListUI();
-            Coordinator.Instance.ShowSettingsForCam(cam);
+            SettingsCoordinator.Instance.ShowSettingsForCam(cam);
         }
 
         [UsedImplicitly]
@@ -181,14 +181,14 @@ namespace Camera2.UI
             _listData.Remove(_listData.Find(x => x.Cam == SettingsView.CurrentCam));
             CamManager.DeleteCamera(SettingsView.CurrentCam);
             UpdateCamListUI();
-            Coordinator.Instance.ShowSettingsForCam(ListDataOrdered.First().Cam);
+            SettingsCoordinator.Instance.ShowSettingsForCam(ListDataOrdered.First().Cam);
         }
 
         private static void ChangeLayer(int diff)
         {
             SettingsView.CurrentCam.Settings.Layer += diff;
-            Coordinator.Instance.CamList.UpdateCamListUI();
-            Coordinator.Instance.ShowSettingsForCam(SettingsView.CurrentCam, true);
+            SettingsCoordinator.Instance.CamList.UpdateCamListUI();
+            SettingsCoordinator.Instance.ShowSettingsForCam(SettingsView.CurrentCam, true);
         }
 
         [UsedImplicitly]
@@ -198,7 +198,7 @@ namespace Camera2.UI
         private void LayerDecrease() => ChangeLayer(-1);
 
         [UsedImplicitly]
-        private void UnlockCamPosTab() => Coordinator.Instance.SettingsView.viewRectTab.IsVisible = true;
+        private void UnlockCamPosTab() => SettingsCoordinator.Instance.SettingsView.viewRectTab.IsVisible = true;
 
         [UsedImplicitly]
         private void ShowGithub() => Process.Start("https://github.com/kinsi55/CS_BeatSaber_Camera2");

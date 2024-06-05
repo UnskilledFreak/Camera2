@@ -21,6 +21,7 @@ namespace Camera2.UI
             .Cast<object>()
             .ToList();
 
+        [UsedImplicitly]
         private void SwitchToCustomScene(TableView tableView, CustomSceneUIEntry row)
         {
             if (row.Name == null)

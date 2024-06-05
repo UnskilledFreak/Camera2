@@ -2,18 +2,21 @@
 using BeatSaberMarkupLanguage.GameplaySetup;
 using BeatSaberMarkupLanguage.MenuButtons;
 using Camera2.Managers;
+using JetBrains.Annotations;
 
 namespace Camera2.UI
 {
-    // There's a reason this is called Spaghetti UI, I will definitely maybe possibly make this not spaghetti one day.
+    [UsedImplicitly]
     internal class SpaghettiUI
     {
-        private static Coordinator flow;
+        private static SettingsCoordinator settingsFlow;
+        private static SceneCoordinator sceneFlow;
         internal static readonly CustomScenesSwitchUI ScenesSwitchUI = new CustomScenesSwitchUI();
 
         public static void Init()
         {
-            MenuButtons.instance.RegisterButton(new MenuButton(Plugin.Name, "Why helping others when you can be a jerk?", ShowFlow));
+            MenuButtons.instance.RegisterButton(new MenuButton(Plugin.Name, "Why helping others when you can be a jerk?", ShowSettingsFlow));
+            MenuButtons.instance.RegisterButton(new MenuButton(Plugin.Name + " Scene Tester", "Test all scenes here", ShowSceneFlow));
 
             if (ScenesManager.Settings.CustomScenes.Count > 0)
             {
@@ -21,14 +24,24 @@ namespace Camera2.UI
             }
         }
 
-        private static void ShowFlow()
+        private static void ShowSettingsFlow()
         {
-            if (flow == null)
+            if (settingsFlow == null)
             {
-                flow = BeatSaberUI.CreateFlowCoordinator<Coordinator>();
+                settingsFlow = BeatSaberUI.CreateFlowCoordinator<SettingsCoordinator>();
             }
 
-            BeatSaberUI.MainFlowCoordinator.PresentFlowCoordinator(flow);
+            BeatSaberUI.MainFlowCoordinator.PresentFlowCoordinator(settingsFlow);
+        }
+
+        private static void ShowSceneFlow()
+        {
+            if (sceneFlow == null)
+            {
+                sceneFlow = BeatSaberUI.CreateFlowCoordinator<SceneCoordinator>();
+            }
+
+            BeatSaberUI.MainFlowCoordinator.PresentFlowCoordinator(sceneFlow);
         }
     }
 }

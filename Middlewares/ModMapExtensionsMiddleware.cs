@@ -2,7 +2,6 @@
 using Camera2.Interfaces;
 using Camera2.Utils;
 using UnityEngine;
-using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Middlewares
 {

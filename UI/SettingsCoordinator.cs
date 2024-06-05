@@ -7,9 +7,9 @@ using HMUI;
 
 namespace Camera2.UI
 {
-    internal class Coordinator : FlowCoordinator
+    internal class SettingsCoordinator : FlowCoordinator
     {
-        internal static Coordinator Instance { get; private set; }
+        internal static SettingsCoordinator Instance { get; private set; }
 
         internal SettingsView SettingsView;
         internal CamList CamList;

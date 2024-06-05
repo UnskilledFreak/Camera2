@@ -24,7 +24,7 @@ namespace Camera2.Behaviours
 
         internal string Name { get; private set; }
         internal string ConfigPath => ConfigUtil.GetCameraPath(Name);
-        internal bool IsCurrentlySelectedInSettings => Coordinator.Instance && Coordinator.Instance.SettingsView.isActiveAndEnabled && SettingsView.CurrentCam == this;
+        internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.SettingsView.isActiveAndEnabled && SettingsView.CurrentCam == this;
         internal Camera Camera { get; private set; }
         internal CameraSettings Settings { get; private set; }
         internal RenderTexture RenderTexture { get; private set; }

@@ -1,6 +1,5 @@
 ﻿using Camera2.HarmonyPatches;
 using System.Linq;
-using Camera2.Utils;
 using UnityEngine;
 using VRUIControls;
 using CameraType = Camera2.Enums.CameraType;

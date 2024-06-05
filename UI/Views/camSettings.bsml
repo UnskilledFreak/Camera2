@@ -67,6 +67,8 @@
                 <slider-setting text='Rotation X' min='0' max='360' increment='0.1' show-buttons='true' value='TargetRotX' bind-value='true' apply-on-change='true'/>
                 <slider-setting text='Rotation Y' min='0' max='360' increment='0.1' show-buttons='true' value='TargetRotY' bind-value='true' apply-on-change='true'/>
                 <slider-setting text='Rotation Z' min='0' max='360' increment='0.1' show-buttons='true' value='TargetRotZ' bind-value='true' apply-on-change='true'/>
+                <slider-setting text='Position Smoothing *' min='0.1' max='50' increment='0.1' value='SmoothFollowPosition' bind-value='true' apply-on-change='true'/>
+                <slider-setting text='Rotation Smoothing *' min='0.1' max='50' increment='0.1' value='SmoothFollowRotation' bind-value='true' apply-on-change='true'/>
             </modifier-container>
         </vertical>
     </tab>

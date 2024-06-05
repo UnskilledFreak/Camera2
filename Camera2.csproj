@@ -194,6 +194,7 @@
     <EmbeddedResource Include="UI\Views\camPreview.bsml" />
     <EmbeddedResource Include="UI\Views\camSettings.bsml" />
     <EmbeddedResource Include="UI\Views\customScenesList.bsml" />
+    <EmbeddedResource Include="UI\Views\sceneView.bsml" />
   </ItemGroup>
 
   <ItemGroup>

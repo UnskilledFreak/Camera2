@@ -118,7 +118,7 @@ namespace Camera2.Managers
             SwitchToScene(FindSceneToUse(toLookup), forceReload);
         }
 
-        private static void SwitchToScene(SceneTypes scene, bool forceReload = false)
+        public static void SwitchToScene(SceneTypes scene, bool forceReload = false)
         {
             if (!Settings.Scenes.ContainsKey(scene))
             {
