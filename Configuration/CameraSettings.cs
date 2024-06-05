@@ -92,17 +92,17 @@ namespace Camera2.Configuration
             get => OverrideToken?.FOV ?? _fov;
             set
             {
-                _fov = Cam.UCamera.fieldOfView = value;
-                Cam.UCamera.orthographicSize = _fov * 0.0333f;
+                _fov = Cam.Camera.fieldOfView = value;
+                Cam.Camera.orthographicSize = _fov * 0.0333f;
             }
         }
 
         public int Layer
         {
-            get => (int)Cam.UCamera.depth;
+            get => (int)Cam.Camera.depth;
             set
             {
-                Cam.UCamera.depth = value;
+                Cam.Camera.depth = value;
                 if (IsLoaded)
                 {
                     CamManager.ApplyCameraValues(viewLayer: true);
@@ -138,13 +138,13 @@ namespace Camera2.Configuration
 
         public bool Orthographic
         {
-            get => Cam.UCamera.orthographic;
-            set => Cam.UCamera.orthographic = value;
+            get => Cam.Camera.orthographic;
+            set => Cam.Camera.orthographic = value;
         }
 
         public float FarZ
         {
-            get => Cam.UCamera.farClipPlane;
+            get => Cam.Camera.farClipPlane;
             set
             {
                 /* TODO: Remove this at some point 😀
@@ -155,14 +155,14 @@ namespace Camera2.Configuration
                     value = 5000f;
                 }
 
-                Cam.UCamera.farClipPlane = Mathf.Max(value);
+                Cam.Camera.farClipPlane = Mathf.Max(value);
             }
         }
 
         public float NearZ
         {
-            get => Cam.UCamera.nearClipPlane;
-            set => Cam.UCamera.nearClipPlane = Mathf.Max(0.00f, value);
+            get => Cam.Camera.nearClipPlane;
+            set => Cam.Camera.nearClipPlane = Mathf.Max(0.00f, value);
         }
 
         [JsonIgnore] public GameObjects VisibleObjects => OverrideToken?.VisibleObjects ?? _visibleObjects;
@@ -204,6 +204,36 @@ namespace Camera2.Configuration
             }
         }
 
+        [JsonIgnore]
+        [CanBeNull]
+        internal Transform Parent
+        {
+            get
+            {
+                if (_parent != null)
+                {
+                    return _parent;
+                }
+
+                var tmp = GameObject.Find(SmoothFollow.TargetParent)?.transform;
+                if (tmp == null)
+                {
+                    Cam.LogError("target not found: " + SmoothFollow.TargetParent);
+                }
+                else
+                {
+                    Cam.LogDebug("target found: " + SmoothFollow.TargetParent);
+                }
+                    
+                _parent = tmp;
+
+                return _parent;
+            }
+        }
+        
+        [JsonIgnore]
+        private Transform _parent;
+
         private bool IsLoaded { get; set; }
         private CameraType _type = CameraType.FirstPerson;
         private WorldCamVisibility _worldCamVisibility = WorldCamVisibility.HiddenWhilePlaying;
@@ -239,11 +269,16 @@ namespace Camera2.Configuration
             PostProcessing = CameraSubSettings.GetFor<SettingsPostProcessing>(this);
         }
 
-        //public bool IsPositionalCam() => Type == CameraType.Positionable || Type == CameraType.Follower;
-        public bool IsPositionalCam() => Type == CameraType.Positionable;
+        public void ParentChange()
+        {
+            _parent = null;
+        }
+
+        public bool IsPositionalCam() => Type == CameraType.Positionable || Type == CameraType.Follower;
 
         public void Load(bool loadConfig = true)
         {
+            _parent = null;
             IsLoaded = false;
             // Set default value in case they're not loaded from JSON
             FOV = 90f;
@@ -257,14 +292,16 @@ namespace Camera2.Configuration
             }
             else
             {
-                Layer = CamManager.Cams.Count == 0 ? 1 : CamManager.Cams.Max(x => x.Value.Settings.Layer) + 1;
+                Layer = CamManager.Cams.Count == 0 
+                    ? 1 
+                    : CamManager.Cams.Max(x => x.Value.Settings.Layer) + 1;
             }
 
             // We always save after loading, even if it's a fresh load. This will make sure to migrate configs after updates.
             Save();
 
             ViewRect ??= new ScreenRect(0, 0, 1, 1, false);
-
+            
             ApplyPositionAndRotation();
             ApplyLayerBitmask();
             Cam.UpdateRenderTextureAndView();
@@ -287,8 +324,8 @@ namespace Camera2.Configuration
             }
             catch (Exception ex)
             {
-                Plugin.Log.Error($"Failed to save Config for Camera {Cam.Name}:");
-                Plugin.Log.Error(ex);
+                Cam.LogError($"Failed to save Config for Camera {Cam.Name}:");
+                Cam.LogError(ex);
             }
 
             OverrideToken = x;
@@ -369,9 +406,9 @@ namespace Camera2.Configuration
                 maskBuilder |= VisibilityMasks.UI;
             }
 
-            if (Cam.UCamera.cullingMask != (int)maskBuilder)
+            if (Cam.Camera.cullingMask != (int)maskBuilder)
             {
-                Cam.UCamera.cullingMask = (int)maskBuilder;
+                Cam.Camera.cullingMask = (int)maskBuilder;
             }
         }
 
@@ -425,7 +462,5 @@ namespace Camera2.Configuration
 
         [UsedImplicitly]
         public bool ShouldSerializeMovementScript() => Type != CameraType.FirstPerson;
-        //[UsedImplicitly]
-        //public bool ShouldSerializeTargetPos() => Type != CameraType.Follower;
     }
 }

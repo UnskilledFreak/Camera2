@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Camera2.Interfaces;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Camera2.Utils

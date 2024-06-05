@@ -81,9 +81,7 @@ namespace Camera2.Behaviours
                     return camScreen;
                 }
             }
-
-            actionAtPoint = CamAction.None;
-
+            
             return null;
         }
 
@@ -92,6 +90,7 @@ namespace Camera2.Behaviours
             Plugin.Log.Info("Reloading Camera2 Config...");
             MovementScriptManager.LoadMovementScripts(true);
             CamManager.Reload();
+            Plugin.Log.Info("Reloading done");
         }
 
         public void Update()
@@ -124,9 +123,9 @@ namespace Camera2.Behaviours
             var curRes = new Vector2(Screen.width, Screen.height);
             if (_lastScreenRes != Vector2.zero)
             {
-                foreach (var c in CamManager.Cams)
+                foreach (var pair in CamManager.Cams)
                 {
-                    c.Value.UpdateRenderTextureAndView();
+                    pair.Value.UpdateRenderTextureAndView();
                 }
             }
 

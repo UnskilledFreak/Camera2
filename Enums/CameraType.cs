@@ -5,6 +5,6 @@
         FirstPerson,
         Attached,
         Positionable,
-        //Follower
+        Follower
     }
 }

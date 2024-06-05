@@ -5,43 +5,47 @@ using UnityEngine;
 
 namespace Camera2.Middlewares
 {
-    internal class Multiplayer : CamMiddleware, IMHandler
+    internal class MultiplayerMiddleware : CamMiddleware, IMHandler
     {
-        private Transformer _originLmao;
+        private Transformer _origin;
 
-        public new bool Pre()
+        public bool Pre()
         {
             /*
              * TODO: This should *eventually* (™) allow to set the origin of this camera to another player
-             * which is not us, which would allow to have third and firstperson cameras which work in the
+             * which is not us, which would allow to have third and first person cameras which work in the
              * context of another player
              */
             var x = HookMultiplayerSpectatorController.instance;
 
             if (!SceneUtil.IsInMultiplayer || !SceneUtil.IsInSong || x == null || !Settings.Multiplayer.FollowSpectatorPlatform)
             {
-                if (_originLmao == null)
+                if (_origin == null)
                 {
                     return true;
                 }
 
-                _originLmao.Position = Vector3.zero;
-                _originLmao.Rotation = Quaternion.identity;
+                _origin.Position = Vector3.zero;
+                _origin.Rotation = Quaternion.identity;
 
                 return true;
             }
 
-            _originLmao ??= Settings.Cam.TransformChain.AddOrGet("MultiplayerOrigin", TransformerOrders.PlayerOrigin);
+            _origin ??= Settings.Cam.TransformChain.AddOrGet("MultiplayerOrigin", TransformerOrders.PlayerOrigin);
 
             if (x.currentSpot == null)
             {
                 return true;
             }
 
-            _originLmao.Position = x.currentSpot.transform.position;
-            _originLmao.Rotation = x.currentSpot.transform.rotation;
+            _origin.Position = x.currentSpot.transform.position;
+            _origin.Rotation = x.currentSpot.transform.rotation;
 
             return true;
         }
+
+        public void Post() { }
+
+        public void CamConfigReloaded() { }
     }
 }

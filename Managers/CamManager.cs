@@ -35,9 +35,8 @@ namespace Camera2.Managers
             ScenesManager.Settings.Load();
 
             XRSettings.gameViewRenderMode = GameViewRenderMode.None;
-
-            // todo :: UF :: possible memory leak when reloading or switching scenes
-            new GameObject("Cam2_Positioner", typeof(CamPositioner));
+            
+            _ = new GameObject("Cam2_Positioner", typeof(CamPositioner));
 
             UI.SpaghettiUI.Init();
         }
@@ -65,7 +64,9 @@ namespace Camera2.Managers
                     InitCamera(name, true, reload);
 
                     if (reload)
+                    {
                         loadedNames.Add(name);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -85,16 +86,17 @@ namespace Camera2.Managers
 
             if (Cams.Count == 0)
             {
-                var cam = InitCamera("Main", false);
+                InitCamera("Main", false);
             }
 
-            ApplyCameraValues(viewLayer: true);
+            ApplyCameraValues(true);
         }
 
         public static void Reload()
         {
             LoadCameras(true);
             ScenesManager.Settings.Load();
+            UI.SpaghettiUI.ScenesSwitchUI.Update();
         }
 
         /*
@@ -133,13 +135,13 @@ namespace Camera2.Managers
         {
             if (Cams.TryGetValue(name, out var cam))
             {
-                if (reload)
+                if (!reload)
                 {
-                    cam.Settings.Reload();
-                    return cam;
+                    throw new Exception("Already exists??");
                 }
 
-                throw new Exception("Already exists??");
+                cam.Settings.Reload();
+                return cam;
             }
 
             cam = new GameObject($"Cam2_{name}").AddComponent<Cam2>();
@@ -168,7 +170,9 @@ namespace Camera2.Managers
             var i = 2;
 
             while (Cams.ContainsKey(nameToUse))
+            {
                 nameToUse = $"{namePrefix}{i++}";
+            }
 
             return InitCamera(nameToUse, false);
         }
@@ -176,15 +180,19 @@ namespace Camera2.Managers
         public static void DeleteCamera(Cam2 cam)
         {
             if (!Cams.Values.Contains(cam))
+            {
                 return;
+            }
 
             if (Cams[cam.Name] != cam)
+            {
                 return;
+            }
 
             Cams.Remove(cam.Name);
 
             var cfgPath = ConfigUtil.GetCameraPath(cam.Name);
-            
+
             Object.DestroyImmediate(cam);
 
             if (File.Exists(cfgPath))

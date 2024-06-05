@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using BeatSaberMarkupLanguage.Attributes;
@@ -14,7 +12,6 @@ using Camera2.Managers;
 using HarmonyLib;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 using CameraType = Camera2.Enums.CameraType;
 
@@ -77,8 +74,9 @@ namespace Camera2.UI
         #endregion
 
         #region UI Getter and Setter
+
         // public makes it impossible for BSML to access?
-        
+
         [UsedImplicitly]
         internal string CamName
         {
@@ -109,7 +107,7 @@ namespace Camera2.UI
                         NotifyPropertyChanged("zOffset");
                         break;
                     case CameraType.Positionable:
-                    //case CameraType.Follower:
+                    case CameraType.Follower:
                         CurrentCam.Settings.TargetPos = new Vector3(0, 1.5f, 1f);
                         break;
                 }
@@ -415,6 +413,7 @@ namespace Camera2.UI
             set
             {
                 CurrentCam.Settings.SmoothFollow.TargetParent = value;
+                CurrentCam.Settings.ParentChange();
                 NotifyPropertyChanged();
             }
         }
@@ -489,9 +488,13 @@ namespace Camera2.UI
         internal float VisibilityNearZ
         {
             get => CurrentCam.Settings.NearZ;
-            set => CurrentCam.Settings.NearZ = value;
+            set
+            {
+                CurrentCam.Settings.NearZ = value;
+                NotifyPropertyChanged();
+            }
         }
-        
+
         #endregion
 
         #region UI Buttons
@@ -615,7 +618,7 @@ namespace Camera2.UI
             worldCamVisibilityObj.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             smoothFollowTab.IsVisible = Type == CameraType.FirstPerson;
             follow360Tab.IsVisible = CurrentCam.Settings.IsPositionalCam();
-            attachingTab.IsVisible = Type == CameraType.Attached;
+            attachingTab.IsVisible = Type == CameraType.Attached || Type == CameraType.Follower;
 
             // Apparently this is the best possible way to programmatically switch the selected tab
             tabSelector.textSegmentedControl.SelectCellWithNumber(0);
@@ -642,16 +645,18 @@ namespace Camera2.UI
             return ret;
         }
 
-        private void SetAndUpdateUnOverridenPosition(float? x = null, float? y = null, float? z = null)
+        private static void SetAndUpdateUnOverridenPosition(float? x = null, float? y = null, float? z = null)
         {
-            CurrentCam.Settings.TargetPos = UpdateVector(GetUnOverridenPosition(), x, y, z);;
+            CurrentCam.Settings.TargetPos = UpdateVector(GetUnOverridenPosition(), x, y, z);
+            ;
             CurrentCam.Settings.ApplyPositionAndRotation();
         }
 
-        private void SetAndUpdateUnOverridenRotation(float? x = null, float? y = null, float? z = null)
+        private static void SetAndUpdateUnOverridenRotation(float? x = null, float? y = null, float? z = null)
         {
-            CurrentCam.Settings.TargetRot = UpdateVector(GetUnOverridenRotation(), x, y, z);;
-            CurrentCam.Settings.ApplyPositionAndRotation();   
+            CurrentCam.Settings.TargetRot = UpdateVector(GetUnOverridenRotation(), x, y, z);
+            ;
+            CurrentCam.Settings.ApplyPositionAndRotation();
         }
 
         private static Vector3 UpdateVector(Vector3 vector, float? x, float? y, float? z)

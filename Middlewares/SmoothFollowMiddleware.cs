@@ -10,10 +10,9 @@ using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Middlewares
 {
-    internal class SmoothFollow : CamMiddleware, IMHandler
+    internal class SmoothFollowMiddleware : CamMiddleware, IMHandler
     {
         private Scene _lastScene;
-        private bool _teleportOnNextFrame;
 
         private Transform Parent
         {
@@ -25,77 +24,22 @@ namespace Camera2.Middlewares
         {
             /*
              * If the camera was just enabled we want to teleport the positon / rotation.
-             * This is useful when you switch to a scene with a firstperson camera that was
+             * This is useful when you switch to a scene with a first person camera that was
              * not enabled for a while to make it have a "correct" initial position instead
              * of smoothing it to the correct position over time
              */
-            _teleportOnNextFrame = true;
+            TeleportOnNextFrame = true;
         }
 
-        private static float ClampAngle(float angle, float from, float to)
+        public bool Pre()
         {
-            // accepts e.g. -80, 80
-            if (angle < 0f)
+            if (Settings.IsPositionalCam())
             {
-                angle = 360 + angle;
-            }
-
-            return angle > 180f
-                ? Math.Max(angle, 360 + from)
-                : Math.Min(angle, to);
-        }
-
-        public new bool Pre()
-        {
-            if (Settings.Type == CameraType.Positionable)
-            {
-                if (Settings.SmoothFollow.Transformer == null)
-                {
-                    return true;
-                }
-
-                Settings.SmoothFollow.Transformer.Position = Vector3.zero;
-                Settings.SmoothFollow.Transformer.Rotation = Quaternion.identity;
-
                 return true;
             }
-            
-            /*
-            if (Settings.Type == CameraType.Follower)
-            {
-                if (Settings.SmoothFollow.Transformer != null)
-                {
-                    var target = GameObject.Find(Cam.Settings.SmoothFollow.TargetParent);
-                    if (target == null)
-                    {
-                        return true;
-                    }
-
-                    Settings.SmoothFollow.Transformer.Position = Vector3.zero;
-                    Settings.SmoothFollow.Transformer.Rotation = Quaternion.LookRotation(target.transform.position);
-                    //Cam.transform.LookAt(target.transform);
-                    //Cam.transform.position = Settings.TargetPos;
-                    //Cam.transform.Rotate(
-                    //    Cam.transform.rotation.x + Settings.TargetRot.x,
-                    //    Cam.transform.rotation.y + Settings.TargetRot.y,
-                    //    Cam.transform.rotation.z + Settings.TargetRot.z
-                    //);
-                    return true;
-                }
-            }
-            */
 
             Transform parentToUse = null;
-            ISource currentReplaySource = null;
-
-            if (Settings.Type == CameraType.FirstPerson && Settings.SmoothFollow.FollowReplayPosition)
-            {
-                foreach (var source in ReplaySources.Sources.Where(source => source.IsInReplay))
-                {
-                    currentReplaySource = source;
-                    break;
-                }
-            }
+            var currentReplaySource = GetCurrentReplaySourceIfAny();
 
             if (Settings.Type == CameraType.FirstPerson && HookFPFCToggle.isInFPFC)
             {
@@ -126,8 +70,7 @@ namespace Camera2.Middlewares
                             Settings.SmoothFollow.UseLocalPosition = !ScoreSaber.IsInReplayProp;
                             break;
                         case CameraType.Attached:
-                        //case CameraType.Follower:
-                            Parent = parentToUse = GameObject.Find(Cam.Settings.SmoothFollow.TargetParent)?.transform;
+                            Parent = parentToUse = Settings.Parent;
                             Settings.SmoothFollow.UseLocalPosition = false;
                             break;
                     }
@@ -174,67 +117,30 @@ namespace Camera2.Middlewares
 
             if (!HookFPFCToggle.isInFPFC)
             {
-                // TODO: This is kinda shit
-                var l = Settings.SmoothFollow.Limits;
-
-                if (!float.IsNegativeInfinity(l.PosXMin) || !float.IsPositiveInfinity(l.PosXMax))
-                {
-                    targetPosition.x = Mathf.Clamp(targetPosition.x, l.PosXMin, l.PosXMax);
-                }
-
-                if (!float.IsNegativeInfinity(l.PosYMin) || !float.IsPositiveInfinity(l.PosYMax))
-                {
-                    targetPosition.y = Mathf.Clamp(targetPosition.y, l.PosYMin, l.PosYMax);
-                }
-
-                if (!float.IsNegativeInfinity(l.PosZMin) || !float.IsPositiveInfinity(l.PosZMax))
-                {
-                    targetPosition.z = Mathf.Clamp(targetPosition.z, l.PosZMin, l.PosZMax);
-                }
-
-                var eulerAngles = targetRotation.eulerAngles;
-
-                if (!float.IsNegativeInfinity(l.RotXMin) || !float.IsPositiveInfinity(l.RotXMax))
-                {
-                    eulerAngles.x = ClampAngle(eulerAngles.x, l.RotXMin, l.RotXMax);
-                }
-
-                if (!float.IsNegativeInfinity(l.RotYMin) || !float.IsPositiveInfinity(l.RotYMax))
-                {
-                    eulerAngles.y = ClampAngle(eulerAngles.y, l.RotYMin, l.RotYMax);
-                }
-
-                if (!float.IsNegativeInfinity(l.RotZMin) || !float.IsPositiveInfinity(l.RotZMax))
-                {
-                    eulerAngles.z = ClampAngle(eulerAngles.z, l.RotZMin, l.RotZMax);
-                }
-
-                targetRotation.eulerAngles = eulerAngles;
+                CalculateLimits(ref targetPosition, ref targetRotation);
             }
 
-            if (!_teleportOnNextFrame)
+            if (!TeleportOnNextFrame)
             {
-                _teleportOnNextFrame = _lastScene != SceneUtil.CurrentScene
-                                       || (HookFPFCToggle.isInFPFC && currentReplaySource == null);
+                TeleportOnNextFrame = _lastScene != SceneUtil.CurrentScene || (HookFPFCToggle.isInFPFC && currentReplaySource == null);
             }
 
             if (Settings.SmoothFollow.Transformer == null)
             {
                 Settings.SmoothFollow.Transformer = Cam.TransformChain.AddOrGet("SmoothFollow", TransformerOrders.SmoothFollow);
-
-                _teleportOnNextFrame = true;
+                TeleportOnNextFrame = true;
             }
 
             var theTransform = Settings.SmoothFollow.Transformer;
 
             // If we switched scenes (E.g. left / entered a song) we want to snap to the correct position before smoothing again
-            if (_teleportOnNextFrame)
+            if (TeleportOnNextFrame)
             {
                 theTransform.Position = targetPosition;
                 theTransform.Rotation = targetRotation;
 
                 _lastScene = SceneUtil.CurrentScene;
-                _teleportOnNextFrame = false;
+                TeleportOnNextFrame = false;
             }
             else
             {
@@ -243,6 +149,73 @@ namespace Camera2.Middlewares
             }
 
             return true;
+        }
+
+        public void Post() { }
+
+        public void CamConfigReloaded() { }
+
+        private ISource GetCurrentReplaySourceIfAny()
+        {
+            if (Settings.Type != CameraType.FirstPerson || !Settings.SmoothFollow.FollowReplayPosition)
+            {
+                return null;
+            }
+
+            return ReplaySources.Sources.FirstOrDefault(source => source.IsInReplay);
+        }
+
+        private void CalculateLimits(ref Vector3 targetPosition, ref Quaternion targetRotation)
+        {
+            // TODO: This is kinda shit
+            var l = Settings.SmoothFollow.Limits;
+
+            if (!float.IsNegativeInfinity(l.PosXMin) || !float.IsPositiveInfinity(l.PosXMax))
+            {
+                targetPosition.x = Mathf.Clamp(targetPosition.x, l.PosXMin, l.PosXMax);
+            }
+
+            if (!float.IsNegativeInfinity(l.PosYMin) || !float.IsPositiveInfinity(l.PosYMax))
+            {
+                targetPosition.y = Mathf.Clamp(targetPosition.y, l.PosYMin, l.PosYMax);
+            }
+
+            if (!float.IsNegativeInfinity(l.PosZMin) || !float.IsPositiveInfinity(l.PosZMax))
+            {
+                targetPosition.z = Mathf.Clamp(targetPosition.z, l.PosZMin, l.PosZMax);
+            }
+
+            var eulerAngles = targetRotation.eulerAngles;
+
+            if (!float.IsNegativeInfinity(l.RotXMin) || !float.IsPositiveInfinity(l.RotXMax))
+            {
+                eulerAngles.x = ClampAngle(eulerAngles.x, l.RotXMin, l.RotXMax);
+            }
+
+            if (!float.IsNegativeInfinity(l.RotYMin) || !float.IsPositiveInfinity(l.RotYMax))
+            {
+                eulerAngles.y = ClampAngle(eulerAngles.y, l.RotYMin, l.RotYMax);
+            }
+
+            if (!float.IsNegativeInfinity(l.RotZMin) || !float.IsPositiveInfinity(l.RotZMax))
+            {
+                eulerAngles.z = ClampAngle(eulerAngles.z, l.RotZMin, l.RotZMax);
+            }
+
+            targetRotation.eulerAngles = eulerAngles;
+        }
+
+        private static float ClampAngle(float angle, float from, float to)
+        {
+            // accepts e.g. -80, 80
+            if (angle < 0f)
+            {
+                angle = 360 + angle;
+            }
+
+            return angle > 180f
+                ? Math.Max(angle, 360 + from)
+                : Math.Min(angle, to);
         }
     }
 }

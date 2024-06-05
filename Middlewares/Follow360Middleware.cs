@@ -7,7 +7,7 @@ using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Middlewares
 {
-    internal class Follow360 : CamMiddleware, IMHandler
+    internal class Follow360Middleware : CamMiddleware, IMHandler
     {
         public void OnDisable() => Reset();
 
@@ -26,7 +26,7 @@ namespace Camera2.Middlewares
             _rotationApplier.Position = Vector3.zero;
         }
 
-        public new bool Pre()
+        public bool Pre()
         {
             if (
                 !enabled
@@ -34,7 +34,7 @@ namespace Camera2.Middlewares
                 || SceneUtil.IsInMenu 
                 || !HookLeveldata.Is360Level 
                 || HookLevelRotation.Instance == null 
-                || Settings.Type != CameraType.Positionable
+                || !Settings.IsPositionalCam()
             )
             {
                 Reset();
@@ -79,5 +79,9 @@ namespace Camera2.Middlewares
 
             return true;
         }
+
+        public void Post() { }
+
+        public void CamConfigReloaded() { }
     }
 }

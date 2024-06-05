@@ -1,17 +1,17 @@
 ﻿using Camera2.HarmonyPatches;
 using System.Linq;
+using Camera2.Utils;
 using UnityEngine;
 using VRUIControls;
+using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Behaviours
 {
     internal class CamPositioner : MonoBehaviour
     {
-        //private static VRPointer pointer;
         private static VRController controller;
         private static Cam2 grabbedCamera;
         private static Transform camTransform;
-
         private static Vector3 grabStartPos;
         private static Quaternion grabStartRot;
 
@@ -45,7 +45,7 @@ namespace Camera2.Behaviours
 
             //TODO: I should probably move this to use a Transformer...
             grabbedCamera = camera;
-            camTransform = camera.UCamera.transform;
+            camTransform = camera.Camera.transform;
 
             grabStartPos = controller.transform.InverseTransformPoint(camTransform.position);
             grabStartRot = Quaternion.Inverse(controller.rotation) * camTransform.rotation;
@@ -67,14 +67,17 @@ namespace Camera2.Behaviours
 
                 //grabbedCamera.transformchain.BacktrackTo(grabbedCamera.transformer, ref p, ref r);
 
-                grabbedCamera.Transformer.Position = p;
-
-                //grabbedCamera.transformer.rotation = r;
-                Snap(ref r.x);
-                Snap(ref r.y);
-                Snap(ref r.z);
-                
-                grabbedCamera.Transformer.Rotation = Quaternion.Euler(r.x, r.y, r.z);
+                grabbedCamera.Transformer.Position = p;                
+                // do not update rotation on follower type cam
+                if (grabbedCamera.Settings.Type != CameraType.Follower)
+                {
+                    //grabbedCamera.transformer.rotation = r;
+                    Snap(ref r.x);
+                    Snap(ref r.y);
+                    Snap(ref r.z);
+                    
+                    grabbedCamera.Transformer.Rotation = Quaternion.Euler(r.x, r.y, r.z);
+                }
 
                 grabbedCamera.TransformChain.Calculate();
 
@@ -107,7 +110,7 @@ namespace Camera2.Behaviours
             {
                 return;
             }
-
+            
             grabbedCamera.Settings.TargetPos = grabbedCamera.Transformer.Position;
             grabbedCamera.Settings.TargetRot = grabbedCamera.Transformer.Rotation.eulerAngles;
 

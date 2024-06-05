@@ -30,7 +30,7 @@ namespace Camera2.SDK
                 _fov = value;
                 if (IsValid)
                 {
-                    _cam.UCamera.fieldOfView = _fov;
+                    _cam.Camera.fieldOfView = _fov;
                 }
             }
         }

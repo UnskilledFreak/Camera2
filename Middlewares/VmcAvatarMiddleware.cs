@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Camera2.Middlewares
 {
-    internal class VmcAvatar : CamMiddleware, IMHandler
+    internal class VmcAvatarMiddleware : CamMiddleware, IMHandler
     {
         private static OscClient sender;
 
@@ -13,7 +13,9 @@ namespace Camera2.Middlewares
         private Vector3 _prevPos;
         private Quaternion _prevRot;
 
-        public new void Post()
+        public bool Pre() => true;
+
+        public void Post()
         {
             if (Cam.Settings.VmcProtocol.Mode == VmcMode.Disabled)
             {
@@ -40,5 +42,7 @@ namespace Camera2.Middlewares
                 _prevRot = Cam.TransformChain.Rotation;
             }
         }
+
+        public void CamConfigReloaded() { }
     }
 }

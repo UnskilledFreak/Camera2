@@ -9,7 +9,9 @@ namespace Camera2.Configuration
         public float Position = 10f;
         public float Rotation = 4f;
         public bool FollowReplayPosition = true;
-
+        //public bool FollowerDistanceEnabled = true;
+        //public float FollowerDistance = 3f;
+        
         private bool _pivotingOffset = true;
         public string TargetParent { get; set; } = "";
         public bool PivotingOffset

@@ -17,8 +17,8 @@ namespace Camera2.UI
             }
             catch (Exception ex)
             {
-                Plugin.Log?.Error($"Error Invoking PropertyChanged: {ex.Message}");
-                Plugin.Log?.Error(ex);
+                Plugin.Log.Error($"Error Invoking PropertyChanged: {ex.Message}");
+                Plugin.Log.Error(ex);
             }
         }
 

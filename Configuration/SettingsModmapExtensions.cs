@@ -1,5 +1,4 @@
-﻿using Camera2.Enums;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
 namespace Camera2.Configuration
 {

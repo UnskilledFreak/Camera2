@@ -59,9 +59,9 @@ namespace Camera2.Behaviours
         {
             var size = small ? Cam.Settings.PreviewScreenSize : Math.Min(Cam.Settings.PreviewScreenSize * 2f, 4);
 
-            _camPreview.transform.localScale = Cam.UCamera.aspect > 1f 
-                ? new Vector3(size, size / Cam.UCamera.aspect, 0) 
-                : new Vector3(size * Cam.UCamera.aspect, size, 0);
+            _camPreview.transform.localScale = Cam.Camera.aspect > 1f 
+                ? new Vector3(size, size / Cam.Camera.aspect, 0) 
+                : new Vector3(size * Cam.Camera.aspect, size, 0);
 
             _camOrigin.transform.localScale = Cam.Settings.WorldCamUnderScreen 
                 ? new Vector3(0.08f, 0.08f, 0.2f) 

@@ -28,7 +28,7 @@ namespace Camera2.Behaviours
             if (enabled && Plugin.ShaderMatLuminanceKey)
             {
                 Plugin.ShaderMatLuminanceKey.SetFloat(Threshold, Settings.PostProcessing.TransparencyThreshold);
-                Plugin.ShaderMatLuminanceKey.SetFloat(HasDepth, _cam.UCamera.depthTextureMode != DepthTextureMode.None ? 1 : 0);
+                Plugin.ShaderMatLuminanceKey.SetFloat(HasDepth, _cam.Camera.depthTextureMode != DepthTextureMode.None ? 1 : 0);
 
                 if (_cam.IsCurrentlySelectedInSettings)
                 {

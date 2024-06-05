@@ -9,18 +9,23 @@ using System.Collections.Generic;
 using System.Linq;
 using Camera2.Enums;
 using UnityEngine;
-using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Behaviours
 {
     internal class Cam2 : MonoBehaviour
     {
-        private static readonly HashSet<string> CameraBehavioursToDestroy = new HashSet<string>() { "AudioListener", "LIV", "MainCamera", "MeshCollider" };
-        
+        private static readonly HashSet<string> CameraBehavioursToDestroy = new HashSet<string>
+        {
+            "AudioListener", 
+            "LIV", 
+            "MainCamera", 
+            "MeshCollider"
+        };
+
         internal string Name { get; private set; }
         internal string ConfigPath => ConfigUtil.GetCameraPath(Name);
         internal bool IsCurrentlySelectedInSettings => Coordinator.Instance && Coordinator.Instance.SettingsView.isActiveAndEnabled && SettingsView.CurrentCam == this;
-        internal Camera UCamera { get; private set; }
+        internal Camera Camera { get; private set; }
         internal CameraSettings Settings { get; private set; }
         internal RenderTexture RenderTexture { get; private set; }
         internal CameraDesktopView PreviewImage { get; private set; }
@@ -30,12 +35,20 @@ namespace Camera2.Behaviours
         internal TransformChain TransformChain;
         internal float TimeSinceLastRender { get; private set; }
         internal bool Destroying { get; private set; }
-
         private ParentShield _shield;
 
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
+        }
+
+        public void LogInfo(string message) => Plugin.Log.Info($"Cam '{Name}': {message}"); 
+        public void LogDebug(string message) => Plugin.Log.Debug($"Cam '{Name}': {message}"); 
+        public void LogError(string message) => Plugin.Log.Error($"Cam '{Name}': {message}"); 
+        public void LogError(Exception exception)
+        {
+            Plugin.Log.Error($"Cam '{Name}': Exception!");
+            Plugin.Log.Error(exception);
         }
 
         public void SetOrigin(Transform parent, bool startFromParentTransform = true, bool unparentOnDisable = true)
@@ -65,13 +78,13 @@ namespace Camera2.Behaviours
 
             Settings.ApplyPositionAndRotation();
         }
-        
+
         internal void UpdateRenderTextureAndView()
         {
-            var w = (int)Math.Round(Settings.ViewRect.Width * Screen.width * Settings.RenderScale);
-            var h = (int)Math.Round(Settings.ViewRect.Height * Screen.height * Settings.RenderScale);
+            var round = (int)Math.Round(Settings.ViewRect.Width * Screen.width * Settings.RenderScale);
+            var height = (int)Math.Round(Settings.ViewRect.Height * Screen.height * Settings.RenderScale);
 
-            var sizeChanged = RenderTexture == null || RenderTexture.width != w || RenderTexture.height != h || RenderTexture.antiAliasing != Settings.AntiAliasing;
+            var sizeChanged = RenderTexture == null || RenderTexture.width != round || RenderTexture.height != height || RenderTexture.antiAliasing != Settings.AntiAliasing;
 
             if (sizeChanged)
             {
@@ -80,15 +93,15 @@ namespace Camera2.Behaviours
                     RenderTexture.Release();
                 }
 
-                RenderTexture = new RenderTexture(w, h, 24)
+                RenderTexture = new RenderTexture(round, height, 24)
                 {
                     //, RenderTextureFormat.ARGB32
                     useMipMap = false, antiAliasing = Settings.AntiAliasing, anisoLevel = 1, useDynamicScale = false
                 };
 
-                UCamera.aspect = (float)w / (float)h;
-                UCamera.targetTexture = RenderTexture;
-                
+                Camera.aspect = (float)round / height;
+                Camera.targetTexture = RenderTexture;
+
                 if (WorldCam != null)
                 {
                     WorldCam.SetSource(this);
@@ -110,22 +123,25 @@ namespace Camera2.Behaviours
                 return;
             }
 
-            var doShowCam = Settings.IsPositionalCam() 
-                            && Settings.WorldCamVisibility != WorldCamVisibility.Hidden 
-                            && (Settings.WorldCamVisibility != WorldCamVisibility.HiddenWhilePlaying || !SceneUtil.IsSongPlaying);
+            var doShowCam = Settings.IsPositionalCam()
+                            && Settings.WorldCamVisibility != WorldCamVisibility.Hidden
+                            && (
+                                Settings.WorldCamVisibility != WorldCamVisibility.HiddenWhilePlaying
+                                || !SceneUtil.IsSongPlaying
+                            );
 
             WorldCam.gameObject.SetActive(doShowCam || (SettingsView.CurrentCam == this && Settings.IsPositionalCam()));
         }
 
         internal void UpdateDepthTextureActive()
         {
-            if (UCamera != null)
+            if (Camera != null)
             {
-                UCamera.depthTextureMode = InitOnMainAvailable.useDepthTexture || Settings?.PostProcessing.ForceDepthTexture == true ? DepthTextureMode.Depth : DepthTextureMode.None;
+                Camera.depthTextureMode = InitOnMainAvailable.useDepthTexture || Settings?.PostProcessing.ForceDepthTexture == true ? DepthTextureMode.Depth : DepthTextureMode.None;
             }
         }
 
-        public void Init(string camName, CameraDesktopView presentor = null, bool loadConfig = false, bool rename = false)
+        public void Init(string camName, CameraDesktopView cameraDesktopView = null, bool loadConfig = false, bool rename = false)
         {
             if (Name != null)
             {
@@ -144,23 +160,23 @@ namespace Camera2.Behaviours
             }
 
             Name = camName;
-            PreviewImage = presentor;
+            PreviewImage = cameraDesktopView;
 
             var camClone = Instantiate(SceneUtil.GetMainCameraButReally(), Vector3.zero, Quaternion.identity, transform);
             camClone.name = "Cam";
 
-            UCamera = camClone.GetComponent<Camera>();
-            UCamera.farClipPlane = 5000f;
-            UCamera.enabled = false;
-            UCamera.tag = "Untagged";
-            UCamera.clearFlags = CameraClearFlags.SolidColor;
-            UCamera.stereoTargetEye = StereoTargetEyeMask.None;
-            
+            Camera = camClone.GetComponent<Camera>();
+            Camera.farClipPlane = 5000f;
+            Camera.enabled = false;
+            Camera.tag = "Untagged";
+            Camera.clearFlags = CameraClearFlags.SolidColor;
+            Camera.stereoTargetEye = StereoTargetEyeMask.None;
+
             UpdateDepthTextureActive();
 
-            TransformChain = new TransformChain(transform, UCamera.transform);
+            TransformChain = new TransformChain(transform, Camera.transform);
             Transformer = TransformChain.AddOrGet("Position", TransformerOrders.PositionOffset, false);
-            
+
             foreach (Transform child in camClone.transform)
             {
                 Destroy(child.gameObject);
@@ -174,23 +190,32 @@ namespace Camera2.Behaviours
                 }
             }
 
-
             //Cloning post process stuff to make it controlable on a per camera basis
             //BloomShite.InstantiateBloomForCamera(UCamera).tag = null;
             //typeof(VisualEffectsController)
             //.GetField("_depthTextureEnabled", BindingFlags.Instance | BindingFlags.NonPublic)
             //.SetValue(camClone.GetComponent<VisualEffectsController>(), new BoolSO() { value = UCamera.depthTextureMode != DepthTextureMode.None });
 
-
             WorldCam = new GameObject("WorldCam").AddComponent<PositionableCam>();
             WorldCam.transform.parent = camClone.transform;
 
             Settings = new CameraSettings(this);
             Settings.Load(loadConfig);
-
-            Middlewares = new[] { MakeMiddleware<Multiplayer>(), MakeMiddleware<FPSLimiter>(), MakeMiddleware<SmoothFollow>(), MakeMiddleware<ModMapExtensions>(), MakeMiddleware<Follow360>(), MakeMiddleware<MovementScriptProcessor>(), MakeMiddleware<VmcAvatar>() };
-
+            
+            Middlewares = new[]
+            {
+                MakeMiddleware<MultiplayerMiddleware>(), 
+                MakeMiddleware<FpsLimiterMiddleware>(), 
+                MakeMiddleware<SmoothFollowMiddleware>(),
+                MakeMiddleware<ModMapExtensionsMiddleware>(), 
+                MakeMiddleware<FollowerMiddleware>(), 
+                MakeMiddleware<Follow360Middleware>(), 
+                MakeMiddleware<MovementScriptProcessorMiddleware>(), 
+                MakeMiddleware<VmcAvatarMiddleware>()
+            };
             camClone.AddComponent<CamPostProcessor>().Init(this);
+            
+            LogInfo("loaded");
         }
 
         private IMHandler MakeMiddleware<T>() where T : CamMiddleware, IMHandler
@@ -202,7 +227,7 @@ namespace Camera2.Behaviours
         {
             TimeSinceLastRender += Time.deltaTime;
 
-            if (UCamera && RenderTexture)
+            if (Camera && RenderTexture)
             {
                 PrepareMiddleWareRender();
             }
@@ -210,7 +235,7 @@ namespace Camera2.Behaviours
 
         internal void PrepareMiddleWareRender(bool forceRender = false)
         {
-            if (!UCamera || !RenderTexture || Middlewares == null)
+            if (!Camera || !RenderTexture || Middlewares == null)
             {
                 return;
             }
@@ -221,17 +246,17 @@ namespace Camera2.Behaviours
             }
 
             TransformChain.Calculate();
-            UCamera.enabled = true;
+            Camera.enabled = true;
 
             if (forceRender)
             {
-                UCamera.Render();
+                Camera.Render();
             }
         }
 
         internal void PostprocessCompleted()
         {
-            UCamera.enabled = false;
+            Camera.enabled = false;
 
             foreach (var t in Middlewares)
             {
@@ -246,7 +271,7 @@ namespace Camera2.Behaviours
 
         private void OnEnable()
         {
-            // Force a render here so we dont end up with a stale image after having just enabled this camera
+            // Force a render here, so we don't end up with a stale image after having just enabled this camera
             PrepareMiddleWareRender(true);
             if (PreviewImage != null)
             {
@@ -265,7 +290,7 @@ namespace Camera2.Behaviours
 
             ShowWorldCamIfNecessary();
         }
-        
+
         private void OnDestroy()
         {
             Destroying = true;

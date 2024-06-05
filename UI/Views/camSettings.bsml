@@ -50,11 +50,11 @@
         </vertical>
     </tab>
 
-    <tab tags='tabs' tab-name='Attaching' id='attachingTab'>
+    <tab tags='tabs' tab-name='Target' id='attachingTab'>
         <vertical horizontal-fit='PreferredSize' vertical-fit='PreferredSize'>
             <modifier-container child-expand-width='true' horizontal-fit='PreferredSize'>
                 <horizontal preferred-width="90">
-                    <text text="Target to attach to" color="#CCC" font-size="4" align="Center"></text>
+                    <text text="Target to attach to or look at" color="#CCC" font-size="4" align="Center"></text>
                 </horizontal>
                 <string-setting id='attachedTarget' text='Target' value='TargetParent' bind-value='true' apply-on-change='true'
                                 hover-hint='Insert the absolute path to any GameObject here'/>
@@ -160,7 +160,7 @@
     <tab tags='tabs' tab-name='Misc'>
         <vertical horizontal-fit='PreferredSize' vertical-fit='PreferredSize' spacing='5'>
             <horizontal preferred-width="90">
-                <text color="#CCC" font-size="3.6" align="Center" word-wrapping="true"
+                <text color="#CCC" font-size="2" align="Center" word-wrapping="true"
                       text="ⓘ These are settings which normally would only be configurable via the config because I dont want them to clutter the UI, but now they live here"
                 />
             </horizontal>
@@ -174,13 +174,13 @@
                 <checkbox text='Enable Movementscript in Menu' value='MiscMovementScriptEnableInMenu' bind-value='true' apply-on-change='true'
                           hover-hint='If the Camera has a Movement Script assigned this will make it so it doesnt run just while in Songs but also while in the Menu'
                 />
+                <slider-setting text='Near Clip Plane' value='VisibilityNearZ' min='0.01' max='5' increment='0.01' bind-value='true' apply-on-change='true' show-buttons='true'/>
                 <horizontal preferred-width="90" pad-top="3">
                     <text color="#EEC" font-size="4" align="Center" word-wrapping="true"
                           text="⚠ Do not set a FPS limit unless you either absolutely need to, or understand the consequences. Check the Camera Configuration Wiki page for more details."
                     />
                 </horizontal>
                 <slider-setting text='FPS Limit (0 = off)' min='0' max='240' increment='1' integer-only='true' value='FpsLimit' bind-value='true' apply-on-change='true'/>
-                <slider-setting text='Near Clip Plane' value='VisibilityNearZ' min='0.01' max='5' increment='0.01' bind-value='true' apply-on-change='true' show-buttons='true'/>
             </modifier-container>
         </vertical>
     </tab>

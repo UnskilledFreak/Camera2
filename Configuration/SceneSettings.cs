@@ -67,9 +67,6 @@ namespace Camera2.Configuration
             
             Save();
 
-            // AAaaaa I hate this being here. This needs to go to some better place IMO
-            UI.SpaghettiUI.ScenesSwitchUI.Update();
-
             ScenesManager.LoadGameScene(forceReload: true);
         }
 

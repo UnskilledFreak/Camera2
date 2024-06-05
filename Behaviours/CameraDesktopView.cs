@@ -63,7 +63,7 @@ namespace Camera2.Behaviours
         public new void Awake()
         {
             Rect = transform as RectTransform;
-            Rect.pivot = Rect.sizeDelta = new Vector2(0, 0);
+            Rect!.pivot = Rect.sizeDelta = new Vector2(0, 0);
         }
 
         public void SetSource(Cam2 cam)

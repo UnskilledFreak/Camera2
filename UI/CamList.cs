@@ -158,18 +158,18 @@ namespace Camera2.UI
         {
             var cam = GetNewCam("Follower Cam");
 
-            //cam.Settings.Type = CameraType.Follower;
-            cam.Settings.Type = CameraType.Positionable;
+            cam.Settings.Type = CameraType.Follower;
             cam.Settings.FOV = 75;
             cam.Settings.TargetPos = new UnityEngine.Vector3(1.93f, 2.32f, -2.45f);
-            //cam.Settings.TargetRot = new UnityEngine.Vector3(16.48f, 335.78f, 0.81f);
+            cam.Settings.TargetRot = new UnityEngine.Vector3(16.48f, 335.78f, 0.81f);
 
             cam.Settings.SmoothFollow.FollowReplayPosition = false;
-            cam.Settings.SmoothFollow.Limits.RotZ = "0:0";
-            cam.Settings.SmoothFollow.Position = 8f;
-            cam.Settings.SmoothFollow.Rotation = 3f;
+            cam.Settings.SmoothFollow.Position = 15f;
+            cam.Settings.SmoothFollow.Rotation = 6f;
+            cam.Settings.SmoothFollow.TargetParent = "NalulunaCatController/NalulunaCat(Clone)/Cat/Root";
+            //cam.Settings.SmoothFollow.PivotingOffset = false;
 
-            cam.Settings.VisibleObjects.Avatar = AvatarVisibility.ForceVisibleInFP;
+            cam.Settings.VisibleObjects.Avatar = AvatarVisibility.Visible;
             cam.Settings.VisibleObjects.UI = false;
 
             AddCam(cam);

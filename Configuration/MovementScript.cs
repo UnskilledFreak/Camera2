@@ -107,7 +107,7 @@ namespace Camera2.Configuration
                 }
 
                 File.Move(scriptPath, $"{scriptPath}.cameraPlusFormat");
-                File.WriteAllText(scriptPath, JsonConvert.SerializeObject(script, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Ignore }));
+                File.WriteAllText(scriptPath, JsonConvert.SerializeObject(script, Formatting.Indented, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore }));
             }
 
             script.PopulateTimes();

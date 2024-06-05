@@ -6,7 +6,7 @@ using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Middlewares
 {
-    internal class ModMapExtensions : CamMiddleware, IMHandler
+    internal class ModMapExtensionsMiddleware : CamMiddleware, IMHandler
     {
         //private static Type NoodlePlayerTrack;
         private static Transform globNoodleOrigin;
@@ -18,13 +18,13 @@ namespace Camera2.Middlewares
             //NoodlePlayerTrack ??= IPA.Loader.PluginManager.GetPluginFromId("NoodleExtensions")?.Assembly.GetType("NoodleExtensions.Animation.PlayerTrack");
         }
 
-        public new bool Pre()
+        public bool Pre()
         {
             // We want to parent FP cams as well so that the noodle translations are applied instantly and don't get smoothed out by SmoothFollow
             if (
                 enabled 
                 && HookLeveldata.IsModdedMap
-                && (Settings.ModMapExtensions.MoveWithMap || Settings.Type != CameraType.Positionable)
+                && (Settings.ModMapExtensions.MoveWithMap || !Settings.IsPositionalCam())
             )
             {
                 if (_noodleOrigin is null)
@@ -44,7 +44,7 @@ namespace Camera2.Middlewares
                 if (_noodleOrigin != null)
                 {
                     // If we are not yet attached, and we don't have a parent that's active yet, try to get one!
-                    _mapMovementTransformer ??= Cam.TransformChain.AddOrGet("ModMapExt", TransformerOrders.ModmapParenting);
+                    _mapMovementTransformer ??= Cam.TransformChain.AddOrGet("ModMapExt", TransformerOrders.ModMapParenting);
 
                     _mapMovementTransformer.Position = _noodleOrigin.localPosition;
                     _mapMovementTransformer.Rotation = _noodleOrigin.localRotation;
@@ -64,5 +64,9 @@ namespace Camera2.Middlewares
 
             return true;
         }
+
+        public void Post() { }
+
+        public void CamConfigReloaded() { }
     }
 }

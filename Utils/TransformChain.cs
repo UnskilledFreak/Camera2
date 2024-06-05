@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Camera2.Utils
@@ -14,42 +15,32 @@ namespace Camera2.Utils
         private readonly Transform _targetBase;
         private readonly Transform _target;
 
-        private void Resort(bool calculate = true)
-        {
-            _transformers.Sort((a, b) => a.Order - b.Order);
-
-            if (calculate)
-            {
-                Calculate();
-            }
-        }
-
         public TransformChain(Transform targetBase, Transform target = null)
         {
             _targetBase = targetBase;
             _target = target;
         }
 
-        public Transformer AddOrGet(string name, int order = 0, bool sortIn = true)
+        public Transformer AddOrGet(string name, int order, bool sortIn = true)
         {
-            if (_transformerMap.TryGetValue(name, out var t))
+            if (_transformerMap.TryGetValue(name, out var transformer))
             {
-                return t;
+                return transformer;
             }
 
-            t = new Transformer { Order = order };
+            transformer = new Transformer { Order = order };
 
-            _transformers.Add(t);
-            _transformerMap.Add(name, t);
+            _transformers.Add(transformer);
+            _transformerMap.Add(name, transformer);
 
             if (sortIn)
             {
                 Resort(false);
             }
 
-            return t;
+            return transformer;
         }
-        
+
         public void Calculate(bool apply = true)
         {
             if (_transformers.Count == 0)
@@ -62,28 +53,39 @@ namespace Camera2.Utils
             Position = _targetBase.position;
             Rotation = _targetBase.rotation;
 
-            for (var i = 0; i != _transformers.Count; i++)
+            // this is a hack but since transformers are using offsets this won't work easily,
+            // and it will save performance as well
+            var followerTransformer = _transformers.FirstOrDefault(x => x.Order == TransformerOrders.Follower);
+            if (followerTransformer != null)
             {
-                var x = _transformers[i];
-
-                if (x.Position != Vector3.zero)
+                // load positioner because otherwise grab won't work
+                var positionTransformer = _transformers.FirstOrDefault(x => x.Order == TransformerOrders.PositionOffset);
+                Position = positionTransformer?.Position ?? followerTransformer.Position;
+                Rotation = followerTransformer.Rotation;
+            }
+            else
+            {
+                foreach (var transformer in _transformers.Where(x => x.Order != TransformerOrders.Follower))
                 {
-                    Position += x.ApplyAsAbsolute ? x.Position : Rotation * x.Position;
-                }
+                    if (transformer.Position != Vector3.zero)
+                    {
+                        Position += transformer.ApplyAsAbsolute ? transformer.Position : Rotation * transformer.Position;
+                    }
 
-                if (x.Rotation != Quaternion.identity)
-                {
-                    if (!x.ApplyAsAbsolute)
+                    if (transformer.Rotation == Quaternion.identity)
                     {
-                        Rotation *= x.Rotation;
-                    } else
+                        continue;
+                    }
+
+                    if (transformer.ApplyAsAbsolute)
                     {
-                        Rotation = x.Rotation * Rotation;
+                        Rotation = transformer.Rotation * Rotation;
+                    }
+                    else
+                    {
+                        Rotation *= transformer.Rotation;
                     }
                 }
-
-                x.PositionSum = Position;
-                x.RotationSum = Rotation;
             }
 
             if (_target == null || !apply)
@@ -93,6 +95,16 @@ namespace Camera2.Utils
 
             _target.position = Position;
             _target.rotation = Rotation;
+        }
+
+        private void Resort(bool calculate = true)
+        {
+            _transformers.Sort((a, b) => a.Order - b.Order);
+
+            if (calculate)
+            {
+                Calculate();
+            }
         }
     }
 }

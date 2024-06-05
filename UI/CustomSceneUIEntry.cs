@@ -16,7 +16,8 @@ namespace Camera2.UI
             _bg = null;
         }
 
-        private string InnerName => Name ?? "Switch to default scene";
+        [UsedImplicitly]
+        public string InnerName => Name ?? "Switch to default scene";
 
         private bool Exists => ScenesManager.Settings.CustomScenes.ContainsKey(InnerName);
         [UsedImplicitly]

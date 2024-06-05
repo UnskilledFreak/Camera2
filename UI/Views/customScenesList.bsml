@@ -4,7 +4,7 @@
 			<custom-list id='customScenesList' select-cell='SwitchToCustomScene' contents='scenes'>
 				<vertical id='bgContainer' bg='round-rect-panel' pad='1' horizontal-fit='Unconstrained'>
 					<horizontal>
-						<text text='~name' align='MidlineLeft' font-size='3'/>
+						<text text='~InnerName' align='MidlineLeft' font-size='3'/>
 						<text text='~CamCount' align='TopRight' font-size='2.5'/>
 					</horizontal>
 					<horizontal>

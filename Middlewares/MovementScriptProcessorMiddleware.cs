@@ -9,7 +9,7 @@ using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Middlewares
 {
-    internal class MovementScriptProcessor : CamMiddleware, IMHandler
+    internal class MovementScriptProcessorMiddleware : CamMiddleware, IMHandler
     {
         private static readonly System.Random RandomSource = new System.Random();
 
@@ -47,19 +47,22 @@ namespace Camera2.Middlewares
             _loadedScript = null;
             _frameIndex = 0;
             _lastFov = 0f;
-            Cam.UCamera.fieldOfView = Settings.FOV;
+            Cam.Camera.fieldOfView = Settings.FOV;
         }
 
-        public new void CamConfigReloaded() => Reset();
+        public void Post() { }
+
+        public void CamConfigReloaded() => Reset();
 
         public void OnDisable() => Reset();
 
-        public new bool Pre()
+        public bool Pre()
         {
             if (
                 Settings.MovementScript.ScriptList.Length == 0
                 || (!SceneUtil.IsInSong && !Settings.MovementScript.EnableInMenu)
                 || Cam.Settings.Type == CameraType.FirstPerson
+                || Cam.Settings.Type == CameraType.Follower
             )
             {
                 Reset();
@@ -84,11 +87,11 @@ namespace Camera2.Middlewares
                     return true;
                 }
 
-                _lastFov = Cam.UCamera.fieldOfView;
+                _lastFov = Cam.Camera.fieldOfView;
 
-                Plugin.Log.Info($"Applying Movement script {scriptToUse} for camera {Cam.Name}");
+                Cam.LogInfo($"Applying Movement script {scriptToUse} for camera {Cam.Name}");
 
-                _scriptTransformer ??= Cam.TransformChain.AddOrGet("MovementScript");
+                _scriptTransformer ??= Cam.TransformChain.AddOrGet("MovementScript", TransformerOrders.MovementScriptProcessor);
             }
 
             if (_loadedScript.SyncToSong && SceneUtil.IsInSong)
@@ -152,7 +155,7 @@ namespace Camera2.Middlewares
                     _lastRot = _scriptTransformer.Rotation = TargetFrame.Rotation;
                     if (TargetFrame.FOV > 0)
                     {
-                        _lastFov = Cam.UCamera.fieldOfView = TargetFrame.FOV;
+                        _lastFov = Cam.Camera.fieldOfView = TargetFrame.FOV;
                     }
                 }
                 else if (TargetFrame.StartTime <= _currentAnimationTime)
@@ -169,7 +172,7 @@ namespace Camera2.Middlewares
 
                     if (TargetFrame.FOV > 0f)
                     {
-                        Cam.UCamera.fieldOfView = Mathf.LerpUnclamped(_lastFov, TargetFrame.FOV, frameProgress);
+                        Cam.Camera.fieldOfView = Mathf.LerpUnclamped(_lastFov, TargetFrame.FOV, frameProgress);
                     }
 
                     break;
