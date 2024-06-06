@@ -1,5 +1,6 @@
 ﻿using Camera2.HarmonyPatches;
 using System.Linq;
+using Camera2.Utils;
 using UnityEngine;
 using VRUIControls;
 using CameraType = Camera2.Enums.CameraType;
@@ -10,7 +11,7 @@ namespace Camera2.Behaviours
     {
         private static VRController controller;
         private static Cam2 grabbedCamera;
-        private static Transform camTransform;
+        private static Transformer transformer;
         private static Vector3 grabStartPos;
         private static Quaternion grabStartRot;
 
@@ -42,13 +43,12 @@ namespace Camera2.Behaviours
                 return;
             }
 
-            //TODO: I should probably move this to use a Transformer...
             grabbedCamera = camera;
-            camTransform = camera.Camera.transform;
-
-            grabStartPos = controller.transform.InverseTransformPoint(camTransform.position);
-            grabStartRot = Quaternion.Inverse(controller.rotation) * camTransform.rotation;
-
+            transformer = grabbedCamera.TransformChain.AddOrGet("Position", TransformerOrders.PositionOffset);
+            
+            grabStartPos = controller.transform.InverseTransformPoint(transformer.Position);
+            grabStartRot = Quaternion.Inverse(controller.rotation) * transformer.Rotation;
+            
             grabbedCamera.WorldCam.SetPreviewPositionAndSize(false);
         }
 
@@ -64,13 +64,10 @@ namespace Camera2.Behaviours
                 var p = controller.transform.TransformPoint(grabStartPos);
                 var r = (controller.rotation * grabStartRot).eulerAngles;
 
-                //grabbedCamera.transformchain.BacktrackTo(grabbedCamera.transformer, ref p, ref r);
-
                 grabbedCamera.Transformer.Position = p;                
-                // do not update rotation on follower type cam
+                // do not update rotation on follower type cam since it does look at something
                 if (grabbedCamera.Settings.Type != CameraType.Follower)
                 {
-                    //grabbedCamera.transformer.rotation = r;
                     Snap(ref r.x);
                     Snap(ref r.y);
                     Snap(ref r.z);
