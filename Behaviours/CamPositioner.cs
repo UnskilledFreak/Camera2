@@ -44,7 +44,7 @@ namespace Camera2.Behaviours
             }
 
             grabbedCamera = camera;
-            transformer = grabbedCamera.TransformChain.AddOrGet("Position", TransformerOrders.PositionOffset);
+            transformer = grabbedCamera.TransformChain.AddOrGet("Position", TransformerOrders.PositionOffset, false);
             
             grabStartPos = controller.transform.InverseTransformPoint(transformer.Position);
             grabStartRot = Quaternion.Inverse(controller.rotation) * transformer.Rotation;
