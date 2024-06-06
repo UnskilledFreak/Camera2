@@ -59,7 +59,7 @@
                 </horizontal>
                 -->
                 <string-setting id='attachedTarget' text='Target' value='TargetParent' bind-value='true' apply-on-change='true'
-                                hover-hint='Insert the absolute path to any GameObject here'/>
+                                hover-hint='Insert a path or name of any GameObject here'/>
                 <button text="Templates" click-event="targetTemplateModal"/>
                 <horizontal preferred-width="90">
                     <text text="Offsets" color="#CCC" font-size="3" align="Center"></text>
