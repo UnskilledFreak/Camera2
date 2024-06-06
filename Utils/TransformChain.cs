@@ -6,8 +6,7 @@ namespace Camera2.Utils
 {
     internal class TransformChain
     {
-        private readonly List<Transformer> _transformers = new List<Transformer>();
-        private readonly Dictionary<string, Transformer> _transformerMap = new Dictionary<string, Transformer>();
+        private Dictionary<string, Transformer> _transformers = new Dictionary<string, Transformer>();
 
         public Vector3 Position { get; private set; }
         public Quaternion Rotation { get; private set; }
@@ -23,15 +22,14 @@ namespace Camera2.Utils
 
         public Transformer AddOrGet(string name, int order, bool sortIn = true)
         {
-            if (_transformerMap.TryGetValue(name, out var transformer))
+            if (_transformers.TryGetValue(name, out var transformer))
             {
                 return transformer;
             }
 
             transformer = new Transformer { Order = order };
 
-            _transformers.Add(transformer);
-            _transformerMap.Add(name, transformer);
+            _transformers.Add(name, transformer);
 
             if (sortIn)
             {
@@ -54,22 +52,28 @@ namespace Camera2.Utils
             Rotation = _targetBase.rotation;
 
             // this is a hack but since transformers are using offsets this won't work easily,
-            // and it will save performance as well
-            var followerTransformer = _transformers.FirstOrDefault(x => x.Order == TransformerOrders.Follower);
-            if (followerTransformer != null)
+            // and it will save performance as well, will find a solution later
+            if (_transformers.TryGetValue("Follower", out var followTransformer))
             {
-                // load positioner because otherwise grab won't work
-                var positionTransformer = _transformers.FirstOrDefault(x => x.Order == TransformerOrders.PositionOffset);
-                Position = positionTransformer?.Position ?? followerTransformer.Position;
-                Rotation = followerTransformer.Rotation;
+                // use the positioner, otherwise grab won't work
+                Position = _transformers["Position"]?.Position ?? followTransformer.Position;
+                Rotation = followTransformer.Rotation;
             }
             else
             {
-                foreach (var transformer in _transformers.Where(x => x.Order != TransformerOrders.Follower))
+                foreach (var mapper in _transformers.Where(x => x.Key != "Follower"))
                 {
+                    var transformer = mapper.Value;
                     if (transformer.Position != Vector3.zero)
                     {
-                        Position += transformer.ApplyAsAbsolute ? transformer.Position : Rotation * transformer.Position;
+                        if (transformer.ApplyAsAbsolute)
+                        {
+                            Position = transformer.Position;
+                        }
+                        else
+                        {
+                            Position += Rotation * transformer.Position;
+                        }
                     }
 
                     if (transformer.Rotation == Quaternion.identity)
@@ -99,7 +103,8 @@ namespace Camera2.Utils
 
         private void Resort(bool calculate = true)
         {
-            _transformers.Sort((a, b) => a.Order - b.Order);
+            _transformers = _transformers.OrderBy(x => x.Value.Order)
+                .ToDictionary(x => x.Key, x => x.Value);
 
             if (calculate)
             {
