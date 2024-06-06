@@ -65,6 +65,9 @@ namespace Camera2.UI
         [UIComponent("attachingTab")] [UsedImplicitly]
         public Tab attachingTab;
 
+        [UIComponent("positionTab")] [UsedImplicitly]
+        public Tab positionTab;
+
         [UIComponent("viewRectTab")] [UsedImplicitly]
         public Tab viewRectTab;
 
@@ -519,6 +522,10 @@ namespace Camera2.UI
         [UsedImplicitly]
         public void TargetNalulunaCatHead() => SetNewTarget("Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head");
 
+        [UIAction("TargetLookAtPointer")]
+        [UsedImplicitly]
+        public void TargetLookAtPointer() => SetNewTarget("VRLaserPointer(Clone)");
+
         #endregion
 
         private void SetNewTarget(string target)
@@ -634,6 +641,7 @@ namespace Camera2.UI
             smoothFollowTab.IsVisible = Type == CameraType.FirstPerson;
             follow360Tab.IsVisible = CurrentCam.Settings.IsPositionalCam();
             attachingTab.IsVisible = Type == CameraType.Attached || Type == CameraType.Follower;
+            positionTab.IsVisible = Type != CameraType.FirstPerson;
 
             // Apparently this is the best possible way to programmatically switch the selected tab
             tabSelector.textSegmentedControl.SelectCellWithNumber(0);
