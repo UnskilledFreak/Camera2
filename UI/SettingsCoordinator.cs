@@ -14,6 +14,7 @@ namespace Camera2.UI
         internal SettingsView SettingsView;
         internal CamList CamList;
         private PreviewView _previewView;
+        private Cam2 _lastSelected;
 
         public void Awake()
         {
@@ -37,6 +38,7 @@ namespace Camera2.UI
 
         public void ShowSettingsForCam(Cam2 cam, bool reselect = false)
         {
+            _lastSelected = cam;
             SetTitle($"{Plugin.Name} | {cam.Name}");
 
             if (!SettingsView.SetCam(cam) && !reselect)
@@ -61,7 +63,7 @@ namespace Camera2.UI
                         CamList.Init();
                     }
 
-                    ShowSettingsForCam(CamManager.Cams.Values.First());
+                    ShowSettingsForCam(_lastSelected);
                     return;
                 }
 

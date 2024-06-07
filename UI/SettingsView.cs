@@ -638,7 +638,7 @@ namespace Camera2.UI
 
             viewRectTab.IsVisible = false;
 
-            SettingsCoordinator.Instance.ShowSettingsForCam(CamManager.Cams.Values.First());
+            SettingsCoordinator.Instance.ShowSettingsForCam(CamManager.Cams.Values.OrderByDescending(x => x.Settings.Layer).First());
         }
 
         private void ToggleSettingVisibility()
