@@ -525,6 +525,22 @@ namespace Camera2.UI
         [UIAction("TargetLookAtPointer")]
         [UsedImplicitly]
         public void TargetLookAtPointer() => SetNewTarget("VRLaserPointer(Clone)");
+        
+        [UIAction("TargetRightPanel")]
+        [UsedImplicitly]
+        public void TargetRightPanel() => SetNewTarget("RightPanel");
+        
+        [UIAction("TargetLeftPanel")]
+        [UsedImplicitly]
+        public void TargetLeftPanel() => SetNewTarget("LeftPanel");
+        
+        [UIAction("TargetEnergyBar")]
+        [UsedImplicitly]
+        public void TargetEnergyBar() => SetNewTarget("EnergyPanel");
+        
+        [UIAction("TargetScore")]
+        [UsedImplicitly]
+        public void TargetScore() => SetNewTarget("ScoreCanvas");
 
         #endregion
 

@@ -212,6 +212,10 @@
         <vertical spacing='1.5' pad-bottom='2' preferred-width='60'>
             <primary-button on-click='TargetAvatarsHead' text='Avatar -> Head' click-event='CloseTargetModal' horizontal-fit='Unconstrained'/>
             <primary-button on-click='TargetLookAtPointer' text='Look at Pointer' click-event='CloseTargetModal' horizontal-fit='Unconstrained'/>
+            <primary-button on-click='TargetRightPanel' text='Right Panel' click-event='CloseTargetModal' horizontal-fit='Unconstrained'/>
+            <primary-button on-click='TargetLeftPanel' text='Left Panel' click-event='CloseTargetModal' horizontal-fit='Unconstrained'/>
+            <primary-button on-click='TargetEnergyBar' text='Energy Bar' click-event='CloseTargetModal' horizontal-fit='Unconstrained'/>
+            <primary-button on-click='TargetScore' text='Score' click-event='CloseTargetModal' horizontal-fit='Unconstrained'/>
             <primary-button on-click='TargetCatHead' text='NalulunaCat -> Head' click-event='CloseTargetModal' horizontal-fit='Unconstrained'/>
         </vertical>
         <button text='Cancel' click-event='CloseTargetModal'/>
