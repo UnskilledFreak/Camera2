@@ -51,44 +51,25 @@ namespace Camera2.Utils
             Position = _targetBase.position;
             Rotation = _targetBase.rotation;
 
-            // this is a hack but since transformers are using offsets this won't work easily,
-            // and it will save performance as well, will find a solution later
-            if (_transformers.TryGetValue("Follower", out var followTransformer))
+            foreach (var transformer in _transformers.Select(mapper => mapper.Value))
             {
-                // use the positioner, otherwise grab won't work
-                Position = _transformers["Position"]?.Position ?? followTransformer.Position;
-                Rotation = followTransformer.Rotation;
-            }
-            else
-            {
-                foreach (var mapper in _transformers.Where(x => x.Key != "Follower"))
+                if (transformer.Position != Vector3.zero)
                 {
-                    var transformer = mapper.Value;
-                    if (transformer.Position != Vector3.zero)
-                    {
-                        if (transformer.ApplyAsAbsolute)
-                        {
-                            Position = transformer.Position;
-                        }
-                        else
-                        {
-                            Position += Rotation * transformer.Position;
-                        }
-                    }
+                    Position += transformer.ApplyAsAbsolute ? transformer.Position : Rotation * transformer.Position;
+                }
 
-                    if (transformer.Rotation == Quaternion.identity)
-                    {
-                        continue;
-                    }
+                if (transformer.Rotation == Quaternion.identity)
+                {
+                    continue;
+                }
 
-                    if (transformer.ApplyAsAbsolute)
-                    {
-                        Rotation = transformer.Rotation * Rotation;
-                    }
-                    else
-                    {
-                        Rotation *= transformer.Rotation;
-                    }
+                if (transformer.ApplyAsAbsolute)
+                {
+                    Rotation = Quaternion.Inverse(Rotation) * transformer.Rotation;
+                }
+                else
+                {
+                    Rotation *= transformer.Rotation;
                 }
             }
 

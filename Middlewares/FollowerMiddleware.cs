@@ -24,21 +24,24 @@ namespace Camera2.Middlewares
 
             if (_transformer == null)
             {
+                Settings.SmoothFollow.UseLocalPosition = false;
+                TeleportOnNextFrame = true;
+                
                 _transformer = Cam.TransformChain.AddOrGet("Follower", TransformerOrders.Follower);
                 _transformer.ApplyAsAbsolute = true;
-                TeleportOnNextFrame = true;
             }
 
             // use the real position, no offset here
             if (_childTransform == null)
             {
-                _childTransform = Cam.transform.GetChild(0).transform;
+                _childTransform = Cam.Camera.transform;
             }
 
             // have to negate direction because cams are somehow flipped
             var direction = -(_childTransform.localPosition - Settings.Parent.position);
             var lookRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(Settings.TargetRot);
-            _transformer.Position = Settings.TargetPos;
+            
+            _transformer.Position = Vector3.zero;
 
             if (TeleportOnNextFrame)
             {

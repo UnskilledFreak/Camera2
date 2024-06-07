@@ -11,9 +11,9 @@ namespace Camera2.Behaviours
     {
         private static VRController controller;
         private static Cam2 grabbedCamera;
-        private static Transformer transformer;
         private static Vector3 grabStartPos;
         private static Quaternion grabStartRot;
+        private static bool isGrabbingCam;
 
         public void Awake()
         {
@@ -22,7 +22,7 @@ namespace Camera2.Behaviours
 
         public static void BeingDragCamera(Cam2 camera)
         {
-            if (grabbedCamera != null)
+            if (isGrabbingCam)
             {
                 FinishCameraMove();
             }
@@ -44,35 +44,35 @@ namespace Camera2.Behaviours
             }
 
             grabbedCamera = camera;
-            transformer = grabbedCamera.TransformChain.AddOrGet("Position", TransformerOrders.PositionOffset, false);
+            isGrabbingCam = true;
             
-            grabStartPos = controller.transform.InverseTransformPoint(transformer.Position);
-            grabStartRot = Quaternion.Inverse(controller.rotation) * transformer.Rotation;
+            grabStartPos = controller.transform.InverseTransformPoint(grabbedCamera.Transformer.Position);
+            grabStartRot = Quaternion.Inverse(controller.rotation) * grabbedCamera.Transformer.Rotation;
             
             grabbedCamera.WorldCam.SetPreviewPositionAndSize(false);
         }
 
         public void Update()
         {
-            if (grabbedCamera == null)
+            if (!isGrabbingCam)
             {
                 return;
             }
 
             if (controller != null && grabbedCamera.WorldCam.isActiveAndEnabled)
             {
-                var p = controller.transform.TransformPoint(grabStartPos);
-                var r = (controller.rotation * grabStartRot).eulerAngles;
+                var position = controller.transform.TransformPoint(grabStartPos);
+                var rotation = (controller.rotation * grabStartRot).eulerAngles;
 
-                grabbedCamera.Transformer.Position = p;                
-                // do not update rotation on follower type cam since it does look at something
+                grabbedCamera.Transformer.Position = position;                
+                // do not update rotation on follower type, will result in weird behavior otherwise
                 if (grabbedCamera.Settings.Type != CameraType.Follower)
                 {
-                    Snap(ref r.x);
-                    Snap(ref r.y);
-                    Snap(ref r.z);
+                    Snap(ref rotation.x);
+                    Snap(ref rotation.y);
+                    Snap(ref rotation.z);
                     
-                    grabbedCamera.Transformer.Rotation = Quaternion.Euler(r.x, r.y, r.z);
+                    grabbedCamera.Transformer.Rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
                 }
 
                 grabbedCamera.TransformChain.Calculate();
@@ -102,7 +102,7 @@ namespace Camera2.Behaviours
 
         private static void FinishCameraMove()
         {
-            if (grabbedCamera == null)
+            if (!isGrabbingCam)
             {
                 return;
             }
@@ -117,6 +117,7 @@ namespace Camera2.Behaviours
             grabbedCamera.Settings.Save();
 
             grabbedCamera = null;
+            isGrabbingCam = false;
         }
     }
 }
