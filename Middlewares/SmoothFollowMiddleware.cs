@@ -64,9 +64,8 @@ namespace Camera2.Middlewares
                     switch (Settings.Type)
                     {
                         case CameraType.FirstPerson:
-                            var a = Camera.main;
-                            Parent = parentToUse = a == null ? null : a.transform;
-                            // this is because ScoreSaber uses absolute positioning, thanks for explaining...
+                            var mainCamera = Camera.main;
+                            Parent = parentToUse = mainCamera == null ? null : mainCamera.transform;
                             Settings.SmoothFollow.UseLocalPosition = !ScoreSaber.IsInReplayProp;
                             break;
                         case CameraType.Attached:
