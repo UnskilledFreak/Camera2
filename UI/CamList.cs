@@ -163,7 +163,6 @@ namespace Camera2.UI
             cam.Settings.Type = CameraType.Follower;
             cam.Settings.FOV = 75;
             cam.Settings.TargetPos = new Vector3(1.93f, 2.32f, -2.45f);
-            cam.Settings.TargetRot = Vector3.zero;
 
             cam.Settings.SmoothFollow.FollowReplayPosition = false;
             cam.Settings.SmoothFollow.Position = 15f;
@@ -172,7 +171,6 @@ namespace Camera2.UI
             cam.Settings.SmoothFollow.PivotingOffset = false;
 
             cam.Settings.VisibleObjects.Avatar = AvatarVisibility.Visible;
-            //cam.Settings.VisibleObjects.Walls = WallVisibility.Hidden;
 
             AddCam(cam);
         }

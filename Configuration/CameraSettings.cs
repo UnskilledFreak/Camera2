@@ -216,6 +216,7 @@ namespace Camera2.Configuration
                 }
 
                 var tmp = GameObject.Find(SmoothFollow.TargetParent)?.transform;
+                /*
                 if (tmp == null)
                 {
                     Cam.LogError("target not found: " + SmoothFollow.TargetParent);
@@ -224,6 +225,7 @@ namespace Camera2.Configuration
                 {
                     Cam.LogDebug("target found: " + SmoothFollow.TargetParent);
                 }
+                */
                     
                 _parent = tmp;
 
