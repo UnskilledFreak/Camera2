@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Camera2.Extensions;
 using Camera2.HarmonyPatches;
 using Camera2.Interfaces;
 using Camera2.SDK;
@@ -93,13 +94,6 @@ namespace Camera2.Middlewares
                             targetPosition = (HookRoomAdjust.rotation * targetPosition) + HookRoomAdjust.position;
                             targetRotation = HookRoomAdjust.rotation * targetRotation;
                         }
-                        else
-                        {
-                            //var parentsParent = parentToUse.parent;
-                            //var parentsParentLocalRotation = parentsParent.rotation;
-                            //targetPosition += parentsParent.localPosition;
-                            //targetRotation *= Quaternion.Inverse(parentsParentLocalRotation);
-                        }
                     }
                 }
                 else
@@ -166,55 +160,20 @@ namespace Camera2.Middlewares
 
         private void CalculateLimits(ref Vector3 targetPosition, ref Quaternion targetRotation)
         {
-            // TODO: This is kinda shit
-            var l = Settings.SmoothFollow.Limits;
-
-            if (!float.IsNegativeInfinity(l.PosXMin) || !float.IsPositiveInfinity(l.PosXMax))
-            {
-                targetPosition.x = Mathf.Clamp(targetPosition.x, l.PosXMin, l.PosXMax);
-            }
-
-            if (!float.IsNegativeInfinity(l.PosYMin) || !float.IsPositiveInfinity(l.PosYMax))
-            {
-                targetPosition.y = Mathf.Clamp(targetPosition.y, l.PosYMin, l.PosYMax);
-            }
-
-            if (!float.IsNegativeInfinity(l.PosZMin) || !float.IsPositiveInfinity(l.PosZMax))
-            {
-                targetPosition.z = Mathf.Clamp(targetPosition.z, l.PosZMin, l.PosZMax);
-            }
+            targetPosition.InBoundary(
+                Settings.SmoothFollow.Limits.PosVectorX,
+                Settings.SmoothFollow.Limits.PosVectorY,
+                Settings.SmoothFollow.Limits.PosVectorZ
+            );
 
             var eulerAngles = targetRotation.eulerAngles;
-
-            if (!float.IsNegativeInfinity(l.RotXMin) || !float.IsPositiveInfinity(l.RotXMax))
-            {
-                eulerAngles.x = ClampAngle(eulerAngles.x, l.RotXMin, l.RotXMax);
-            }
-
-            if (!float.IsNegativeInfinity(l.RotYMin) || !float.IsPositiveInfinity(l.RotYMax))
-            {
-                eulerAngles.y = ClampAngle(eulerAngles.y, l.RotYMin, l.RotYMax);
-            }
-
-            if (!float.IsNegativeInfinity(l.RotZMin) || !float.IsPositiveInfinity(l.RotZMax))
-            {
-                eulerAngles.z = ClampAngle(eulerAngles.z, l.RotZMin, l.RotZMax);
-            }
+            eulerAngles.InBoundary(
+                Settings.SmoothFollow.Limits.RotVectorX,
+                Settings.SmoothFollow.Limits.RotVectorY,
+                Settings.SmoothFollow.Limits.RotVectorZ
+            );
 
             targetRotation.eulerAngles = eulerAngles;
-        }
-
-        private static float ClampAngle(float angle, float from, float to)
-        {
-            // accepts e.g. -80, 80
-            if (angle < 0f)
-            {
-                angle = 360 + angle;
-            }
-
-            return angle > 180f
-                ? Math.Max(angle, 360 + from)
-                : Math.Min(angle, to);
         }
     }
 }

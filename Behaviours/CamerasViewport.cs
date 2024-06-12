@@ -53,7 +53,7 @@ namespace Camera2.Behaviours
             {
                 var d = new Rect(camScreen.Rect.position, camScreen.Rect.rect.size);
 
-                if (d.Contains(point) && (!camScreen.Cam.Settings.IsScreenLocked || UI.SettingsView.CurrentCam == camScreen.Cam))
+                if (d.Contains(point) && (!camScreen.Cam.Settings.IsScreenLocked || UI.CamSettings.CurrentCam == camScreen.Cam))
                 {
                     var relativeCursorPos = point - d.position;
 
@@ -123,9 +123,9 @@ namespace Camera2.Behaviours
             var curRes = new Vector2(Screen.width, Screen.height);
             if (_lastScreenRes != Vector2.zero)
             {
-                foreach (var pair in CamManager.Cams)
+                foreach (var cam in CamManager.Cams)
                 {
-                    pair.Value.UpdateRenderTextureAndView();
+                    cam.UpdateRenderTextureAndView();
                 }
             }
 

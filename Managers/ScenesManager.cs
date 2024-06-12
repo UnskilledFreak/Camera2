@@ -139,7 +139,7 @@ namespace Camera2.Managers
 
             if (scene == SceneTypes.Menu && toLoad.Count == 0)
             {
-                toLoad = CamManager.Cams.Keys.ToList();
+                toLoad = CamManager.Cams.Select(x => x.Name).ToList();
             }
 
             SwitchToCamList(toLoad);
@@ -154,7 +154,7 @@ namespace Camera2.Managers
                 return;
             }
 
-            if (!scene.Any(CamManager.Cams.ContainsKey))
+            if (scene.All(x => CamManager.GetCameraByName(x) == null))
             {
                 return;
             }
@@ -178,16 +178,16 @@ namespace Camera2.Managers
              */
             foreach (var cam in CamManager.Cams)
             {
-                if (cam.Value == null)
+                if (cam == null)
                 {
                     continue;
                 }
 
-                var isContained = cams?.Contains(cam.Key);
+                var isContained = cams?.Contains(cam.Name);
 
-                var camShouldBeActive = (activateAllWhenEmpty && isContained != false) || isContained == true || UI.SettingsView.CurrentCam == cam.Value;
+                var camShouldBeActive = (activateAllWhenEmpty && isContained != false) || isContained == true || UI.CamSettings.CurrentCam == cam;
 
-                cam.Value.gameObject.SetActive(camShouldBeActive);
+                cam.gameObject.SetActive(camShouldBeActive);
             }
 
             GL.Clear(true, true, Color.black);
@@ -199,7 +199,7 @@ namespace Camera2.Managers
         {
             return Settings.Scenes.Count == 0 
                 ? SceneTypes.Menu 
-                : types.FirstOrDefault(type => Settings.Scenes[type].Any(CamManager.Cams.ContainsKey));
+                : types.FirstOrDefault(type => Settings.Scenes[type].Any(x => CamManager.GetCameraByName(x) != null));
         }
     }
 }

@@ -19,10 +19,10 @@ namespace Camera2.Utils
 
         public static GameObject GetMainCameraButReally()
         {
-            var a = Camera.main;
-            return a == null
+            var mainCamera = Camera.main;
+            return mainCamera == null
                 ? GameObject.FindGameObjectsWithTag("MainCamera")[0]
-                : a.gameObject;
+                : mainCamera.gameObject;
         }
 
 
@@ -65,7 +65,7 @@ namespace Camera2.Utils
             TransparentWalls.MakeWallsOpaqueForMainCam();
             CamManager.ApplyCameraValues(worldCam: true);
 
-            if (CamManager.Cams.Values.All(x => x.Settings.VisibleObjects.Floor))
+            if (CamManager.Cams.All(x => x.Settings.VisibleObjects.Floor))
             {
                 return;
             }

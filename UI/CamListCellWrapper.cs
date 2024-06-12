@@ -18,7 +18,7 @@ namespace Camera2.UI
         [UsedImplicitly]
         private string Details => $"{Cam.Settings.Type}, assigned to {SceneCount} {(SceneCount == 1 ? "Scene" : "Scenes")}";
         [UsedImplicitly]
-        private string LayerUIText => $"Layer {Cam.Settings.Layer}{(CamManager.Cams.Values.Count(x => x.Settings.Layer == Cam.Settings.Layer) > 1 ? " <color=#d5a145>⚠</color>" : "")}";
+        private string LayerUIText => $"Layer {Cam.Settings.Layer}{(CamManager.Cams.Count(x => x.Settings.Layer == Cam.Settings.Layer) > 1 ? " <color=#d5a145>⚠</color>" : "")}";
 
         [UIComponent("bgContainer")]
         [UsedImplicitly]

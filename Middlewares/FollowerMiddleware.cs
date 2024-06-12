@@ -1,4 +1,5 @@
-﻿using Camera2.Interfaces;
+﻿using Camera2.Enums;
+using Camera2.Interfaces;
 using Camera2.Utils;
 using UnityEngine;
 using CameraType = Camera2.Enums.CameraType;
@@ -24,8 +25,9 @@ namespace Camera2.Middlewares
 
             if (_transformer == null)
             {
-                Settings.SmoothFollow.UseLocalPosition = false;
                 TeleportOnNextFrame = true;
+                // why do I have to reset those two here?
+                Settings.SmoothFollow.UseLocalPosition = false;
                 
                 _transformer = Cam.TransformChain.AddOrGet("Follower", TransformerOrders.Follower);
                 _transformer.ApplyAsAbsolute = true;
@@ -37,10 +39,34 @@ namespace Camera2.Middlewares
                 _childTransform = Cam.Camera.transform;
             }
 
-            // have to negate direction because cams are somehow flipped
-            var direction = -(_childTransform.localPosition - Settings.Parent.position);
-            var lookRotation = Quaternion.LookRotation(direction) * Quaternion.Euler(Settings.TargetRot);
-            
+            var targetPosition = -(_childTransform.localPosition - Settings.Parent.position);
+            if (Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
+            {
+                Vector3 direction;
+                switch (Settings.SmoothFollow.FollowerOffsetPositionRelativeType)
+                {
+                    default:
+                    case FollowerPositionOffsetType.Forward:
+                        direction = Settings.Parent.forward;
+                        break;
+                    case FollowerPositionOffsetType.Right:
+                        direction = Settings.Parent.right;
+                        break;
+                    case FollowerPositionOffsetType.Up:
+                        direction = Settings.Parent.up;
+                        break;
+                }
+                targetPosition += Settings.SmoothFollow.FollowerOffsetPositionIsRelative 
+                    ? Vector3.Scale(direction, Settings.TargetRot) 
+                    : Settings.TargetRot;
+            }
+
+            var lookRotation = Quaternion.LookRotation(targetPosition);
+            if (!Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition && !Settings.SmoothFollow.FollowerOffsetPositionIsRelative)
+            {
+                lookRotation *= Quaternion.Inverse(Quaternion.Euler(Settings.TargetRot));
+            }
+
             _transformer.Position = Vector3.zero;
 
             if (TeleportOnNextFrame)
@@ -60,6 +86,7 @@ namespace Camera2.Middlewares
 
         public void CamConfigReloaded()
         {
+            Settings.ParentChange();
             _childTransform = null;
         }
     }

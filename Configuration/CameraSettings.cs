@@ -215,6 +215,7 @@ namespace Camera2.Configuration
                     return _parent;
                 }
 
+                // todo :: check if tmp.gameObject.activeInHierarchy
                 var tmp = GameObject.Find(SmoothFollow.TargetParent)?.transform;
                 /*
                 if (tmp == null)
@@ -226,15 +227,14 @@ namespace Camera2.Configuration
                     Cam.LogDebug("target found: " + SmoothFollow.TargetParent);
                 }
                 */
-                    
+
                 _parent = tmp;
 
                 return _parent;
             }
         }
-        
-        [JsonIgnore]
-        private Transform _parent;
+
+        [JsonIgnore] private Transform _parent;
 
         private bool IsLoaded { get; set; }
         private CameraType _type = CameraType.FirstPerson;
@@ -294,16 +294,32 @@ namespace Camera2.Configuration
             }
             else
             {
-                Layer = CamManager.Cams.Count == 0 
-                    ? 1 
-                    : CamManager.Cams.Max(x => x.Value.Settings.Layer) + 1;
+                Layer = CamManager.Cams.Count == 0
+                    ? 1
+                    : CamManager.Cams.Max(x => x.Settings.Layer) + 1;
             }
 
             // We always save after loading, even if it's a fresh load. This will make sure to migrate configs after updates.
             Save();
 
+            // fix target rot on follower
+            if (TargetRot.x > 180)
+            {
+                _targetRot.x -= 360;
+            }
+
+            if (TargetRot.y > 180)
+            {
+                _targetRot.y -= 360;
+            }
+
+            if (TargetRot.z > 180)
+            {
+                _targetRot.z -= 360;
+            }
+
             ViewRect ??= new ScreenRect(0, 0, 1, 1, false);
-            
+
             ApplyPositionAndRotation();
             ApplyLayerBitmask();
             Cam.UpdateRenderTextureAndView();
@@ -345,7 +361,10 @@ namespace Camera2.Configuration
         public void ApplyPositionAndRotation()
         {
             Cam.Transformer.Position = TargetPos;
-            Cam.Transformer.RotationEuler = TargetRot;
+            if (Type != CameraType.Follower)
+            {
+                Cam.Transformer.RotationEuler = TargetRot;
+            }
 
             // Force pivoting offset for 360 Levels - Non-Pivoting offset on 360 levels just looks outright trash
             Cam.Transformer.ApplyAsAbsolute = !IsPositionalCam() && !SmoothFollow.PivotingOffset && !HookLeveldata.Is360Level;
@@ -428,7 +447,7 @@ namespace Camera2.Configuration
             }
         }
 
-        public void SetViewRect(float? x, float? y, float? width, float? height)
+        public void SetViewRect(float? x = null, float? y = null, float? width = null, float? height = null)
         {
             ViewRect.X = x ?? ViewRect.X;
             ViewRect.Y = y ?? ViewRect.Y;

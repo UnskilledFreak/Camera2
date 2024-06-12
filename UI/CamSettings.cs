@@ -17,10 +17,12 @@ using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.UI
 {
-    internal class SettingsView : BSMLResourceViewController
+    internal class CamSettings : BSMLResourceViewController
     {
         public override string ResourceName => "Camera2.UI.Views.camSettings.bsml";
         internal static Cam2 CurrentCam { get; private set; }
+
+        private static int lastTabSelectedIndex;
 
         [UsedImplicitly]
         //private static readonly List<object> Types = new List<object> { CameraType.FirstPerson, CameraType.Positionable };
@@ -31,6 +33,7 @@ namespace Camera2.UI
         [UsedImplicitly] private static readonly List<object> VisibilitiesWalls = Enum.GetValues(typeof(WallVisibility)).Cast<object>().ToList();
         [UsedImplicitly] private static readonly List<object> VisibilitiesNotes = Enum.GetValues(typeof(NoteVisibility)).Cast<object>().ToList();
         [UsedImplicitly] private static readonly List<object> VisibilitiesAvatar = Enum.GetValues(typeof(AvatarVisibility)).Cast<object>().ToList();
+        [UsedImplicitly] private static readonly List<object> FollowerRelativeTypes = Enum.GetValues(typeof(FollowerPositionOffsetType)).Cast<object>().ToList();
 
         [UsedImplicitly] private static string[] props;
 
@@ -38,40 +41,49 @@ namespace Camera2.UI
 
         #region UI Components
 
-        [UIComponent("zOffsetSlider")] [UsedImplicitly]
+        [UIComponent("pivotingOffsetToggle"), UsedImplicitly]
+        public ToggleSetting pivotingOffsetToggle;
+        
+        [UIComponent("followerRotAsPosToggle"), UsedImplicitly]
+        public ToggleSetting followerRotAsPosToggle;
+        
+        [UIComponent("followerPosRelativeToggle"), UsedImplicitly]
+        public ToggleSetting followerPosRelativeToggle;
+
+        [UIComponent("zOffsetSlider"), UsedImplicitly]
         public SliderSetting zOffsetSlider;
 
-        [UIComponent("xRotationSlider")] [UsedImplicitly]
+        [UIComponent("xRotationSlider"), UsedImplicitly]
         public SliderSetting xRotationSlider;
 
-        [UIComponent("pivotingOffsetToggle")] [UsedImplicitly]
-        public ToggleSetting pivotingOffsetToggle;
-
-        [UIComponent("previewSizeSlider")] [UsedImplicitly]
+        [UIComponent("previewSizeSlider"), UsedImplicitly]
         public SliderSetting previewSizeSlider;
 
-        [UIComponent("modMapExtMoveWithMapCheckbox")] [UsedImplicitly]
+        [UIComponent("modMapExtMoveWithMapCheckbox"), UsedImplicitly]
         public ToggleSetting modMapExtMoveWithMapSlider;
 
-        [UIComponent("worldCamVisibilityInput")] [UsedImplicitly]
+        [UIComponent("worldCamVisibilityInput"), UsedImplicitly]
         public LayoutElement worldCamVisibilityObj;
 
-        [UIComponent("smoothFollowTab")] [UsedImplicitly]
+        [UIComponent("followerRelativeTypeInput"), UsedImplicitly]
+        public LayoutElement followerRelativeTypeInput;
+
+        [UIComponent("smoothFollowTab"), UsedImplicitly]
         public Tab smoothFollowTab;
 
-        [UIComponent("follow360Tab")] [UsedImplicitly]
+        [UIComponent("follow360Tab"), UsedImplicitly]
         public Tab follow360Tab;
 
-        [UIComponent("attachingTab")] [UsedImplicitly]
+        [UIComponent("attachingTab"), UsedImplicitly]
         public Tab attachingTab;
 
-        [UIComponent("positionTab")] [UsedImplicitly]
+        [UIComponent("positionTab"), UsedImplicitly]
         public Tab positionTab;
 
-        [UIComponent("viewRectTab")] [UsedImplicitly]
+        [UIComponent("viewRectTab"), UsedImplicitly]
         public Tab viewRectTab;
 
-        [UIComponent("tabSelector")] [UsedImplicitly]
+        [UIComponent("tabSelector"), UsedImplicitly]
         public TabSelector tabSelector;
 
         #endregion
@@ -86,7 +98,7 @@ namespace Camera2.UI
             get => CurrentCam.Name;
             set
             {
-                if (CamManager.RenameCamera(CurrentCam, value))
+                if (CurrentCam.Rename(value))
                 {
                     SettingsCoordinator.Instance.CamList.list.tableView.ReloadData();
                 }
@@ -101,20 +113,23 @@ namespace Camera2.UI
             get => CurrentCam.Settings.Type;
             set
             {
-                // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
+                CurrentCam.Transformer.ApplyAsAbsolute = false;
                 switch (value)
                 {
-                    // When switching to FP reset Rot / Pos so that the previous TP values arent used as the FP offset
+                    // When switching to FP reset Rot / Pos so that the previous TP values aren't used as the FP offset
                     case CameraType.FirstPerson:
+                    case CameraType.Attached:
                         CurrentCam.Settings.TargetPos = new Vector3(0, 0, 0);
-                        NotifyPropertyChanged("zOffset");
+                        NotifyPropertyChanged(nameof(ZOffset));
                         break;
                     case CameraType.Positionable:
                     case CameraType.Follower:
+                    default:
                         CurrentCam.Settings.TargetPos = new Vector3(0, 1.5f, 1f);
+                        CurrentCam.Transformer.ApplyAsAbsolute = value == CameraType.Follower;
                         break;
                 }
-
+                
                 CurrentCam.Settings.TargetRot = Vector3.zero;
                 CurrentCam.Settings.Type = value;
                 ToggleSettingVisibility();
@@ -270,8 +285,7 @@ namespace Camera2.UI
                 }
                 else
                 {
-                    CurrentCam.Settings.SmoothFollow.Limits.RotZMin = float.NegativeInfinity;
-                    CurrentCam.Settings.SmoothFollow.Limits.RotZMax = float.PositiveInfinity;
+                    CurrentCam.Settings.SmoothFollow.Limits.RotVectorZ = new Vector2(float.NegativeInfinity, float.PositiveInfinity);
                 }
             }
         }
@@ -350,28 +364,28 @@ namespace Camera2.UI
         internal float ViewRectX
         {
             get => CurrentCam.Settings.ViewRect.X;
-            set => CurrentCam.Settings.SetViewRect(value, null, null, null);
+            set => CurrentCam.Settings.SetViewRect(value);
         }
 
         [UsedImplicitly]
         internal float ViewRectY
         {
             get => CurrentCam.Settings.ViewRect.Y;
-            set => CurrentCam.Settings.SetViewRect(null, value, null, null);
+            set => CurrentCam.Settings.SetViewRect(y: value);
         }
 
         [UsedImplicitly]
         internal float ViewRectWidth
         {
             get => CurrentCam.Settings.ViewRect.Width;
-            set => CurrentCam.Settings.SetViewRect(null, null, value, null);
+            set => CurrentCam.Settings.SetViewRect(width: value);
         }
 
         [UsedImplicitly]
         internal float ViewRectHeight
         {
             get => CurrentCam.Settings.ViewRect.Height;
-            set => CurrentCam.Settings.SetViewRect(null, null, null, value);
+            set => CurrentCam.Settings.SetViewRect(height: value);
         }
 
         [UsedImplicitly]
@@ -498,6 +512,39 @@ namespace Camera2.UI
             }
         }
 
+        [UsedImplicitly]
+        internal bool FollowerRotAsPos
+        {
+            get => CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition;
+            set
+            {
+                CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal bool FollowerPosRelative
+        {
+            get => CurrentCam.Settings.SmoothFollow.FollowerOffsetPositionIsRelative;
+            set
+            {
+                CurrentCam.Settings.SmoothFollow.FollowerOffsetPositionIsRelative = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal FollowerPositionOffsetType FollowerRelativeType
+        {
+            get => CurrentCam.Settings.SmoothFollow.FollowerOffsetPositionRelativeType;
+            set
+            {
+                CurrentCam.Settings.SmoothFollow.FollowerOffsetPositionRelativeType = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region UI Buttons
@@ -548,15 +595,15 @@ namespace Camera2.UI
         {
             CurrentCam.Settings.SmoothFollow.TargetParent = target;
             CurrentCam.Settings.ParentChange();
-            NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(TargetParent));
         }
 
         public void Awake()
         {
             // Don't really care which cam it is, this is just for BSML to init
-            CurrentCam = CamManager.Cams.Values.First();
+            CurrentCam = CamManager.Cams.First();
 
-            props ??= typeof(SettingsView).GetProperties(BindingFlags.Instance | BindingFlags.NonPublic)
+            props ??= typeof(CamSettings).GetProperties(BindingFlags.Instance | BindingFlags.NonPublic)
                 .Select(x => x.Name)
                 .ToArray();
 
@@ -564,6 +611,11 @@ namespace Camera2.UI
                 .Cast<SceneTypes>()
                 .Select(x => new SceneToggle { Type = x, Host = this })
                 .ToArray();
+        }
+
+        internal void ReselectLastTab()
+        {
+            SelectTab(lastTabSelectedIndex);
         }
 
         internal bool SetCam(Cam2 newCam)
@@ -601,7 +653,7 @@ namespace Camera2.UI
 
             foreach (var x in _scenes)
             {
-                x.NotifyPropertyChanged("Val");
+                x.NotifyPropertyChanged(nameof(x.Val));
             }
 
             return true;
@@ -637,8 +689,13 @@ namespace Camera2.UI
             }
 
             viewRectTab.IsVisible = false;
+            
+            tabSelector.textSegmentedControl.didSelectCellEvent += (control, index) =>
+            {
+                lastTabSelectedIndex = index;
+            };
 
-            SettingsCoordinator.Instance.ShowSettingsForCam(CamManager.Cams.Values.OrderByDescending(x => x.Settings.Layer).First());
+            SettingsCoordinator.Instance.ShowSettingsForCam(CamManager.Cams.OrderByDescending(x => x.Settings.Layer).First());
         }
 
         private void ToggleSettingVisibility()
@@ -651,6 +708,9 @@ namespace Camera2.UI
             zOffsetSlider.gameObject.SetActive(Type == CameraType.FirstPerson);
             xRotationSlider.gameObject.SetActive(Type == CameraType.FirstPerson);
             pivotingOffsetToggle.gameObject.SetActive(Type == CameraType.FirstPerson);
+            followerRotAsPosToggle.gameObject.SetActive(Type == CameraType.Follower);
+            followerPosRelativeToggle.gameObject.SetActive(Type == CameraType.Follower);
+            followerRelativeTypeInput.gameObject.SetActive(Type == CameraType.Follower);
             previewSizeSlider.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             modMapExtMoveWithMapSlider.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             worldCamVisibilityObj.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
@@ -659,9 +719,27 @@ namespace Camera2.UI
             attachingTab.IsVisible = Type == CameraType.Attached || Type == CameraType.Follower;
             positionTab.IsVisible = Type != CameraType.FirstPerson;
 
+            SelectTab(0);
+        }
+
+        private void SelectTab(int index)
+        {
             // Apparently this is the best possible way to programmatically switch the selected tab
-            tabSelector.textSegmentedControl.SelectCellWithNumber(0);
-            AccessTools.Method(typeof(TabSelector), "TabSelected").Invoke(tabSelector, new object[] { tabSelector.textSegmentedControl, 0 });
+            tabSelector.textSegmentedControl.SelectCellWithNumber(index);
+            AccessTools.Method(typeof(TabSelector), "TabSelected").Invoke(tabSelector, new object[] { tabSelector.textSegmentedControl, index });
+
+            // oof... hard code
+            if (index != 2)
+            {
+                return;
+            }
+
+            NotifyPropertyChanged(nameof(TargetPosX));
+            NotifyPropertyChanged(nameof(TargetPosY));
+            NotifyPropertyChanged(nameof(TargetPosZ));
+            NotifyPropertyChanged(nameof(TargetRotX));
+            NotifyPropertyChanged(nameof(TargetRotY));
+            NotifyPropertyChanged(nameof(TargetRotZ));
         }
 
         private static Vector3 GetUnOverridenPosition()
@@ -687,14 +765,12 @@ namespace Camera2.UI
         private static void SetAndUpdateUnOverridenPosition(float? x = null, float? y = null, float? z = null)
         {
             CurrentCam.Settings.TargetPos = UpdateVector(GetUnOverridenPosition(), x, y, z);
-            ;
             CurrentCam.Settings.ApplyPositionAndRotation();
         }
 
         private static void SetAndUpdateUnOverridenRotation(float? x = null, float? y = null, float? z = null)
         {
             CurrentCam.Settings.TargetRot = UpdateVector(GetUnOverridenRotation(), x, y, z);
-            ;
             CurrentCam.Settings.ApplyPositionAndRotation();
         }
 

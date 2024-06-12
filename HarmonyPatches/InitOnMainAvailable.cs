@@ -32,7 +32,7 @@ namespace Camera2.HarmonyPatches
             }
             else
             {
-                foreach (var cam in CamManager.Cams.Values)
+                foreach (var cam in CamManager.Cams)
                 {
                     cam.UpdateDepthTextureActive();
                 }

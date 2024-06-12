@@ -21,34 +21,35 @@ namespace Camera2.Middlewares
         {
             // We want to parent FP cams as well so that the noodle translations are applied instantly and don't get smoothed out by SmoothFollow
             if (
-                enabled 
-                && HookLeveldata.IsModdedMap
-                && (Settings.ModMapExtensions.MoveWithMap || !Settings.IsPositionalCam())
-            )
+                !enabled
+                || !HookLeveldata.IsModdedMap
+                || (!Settings.ModMapExtensions.MoveWithMap && Settings.IsPositionalCam()))
             {
-                if (_noodleOrigin is null)
-                {
-                    // Unity moment
-                    if (globNoodleOrigin == null)
-                    {
-                        globNoodleOrigin = null;
-                    }
+                return true;
+            }
 
-                    // This stinks
-                    _noodleOrigin = globNoodleOrigin ?? (GameObject.Find("NoodlePlayerTrackHead") ?? GameObject.Find("NoodlePlayerTrackRoot"))?.transform;
-                    globNoodleOrigin = _noodleOrigin;
+            if (_noodleOrigin is null)
+            {
+                // Unity moment
+                if (globNoodleOrigin == null)
+                {
+                    globNoodleOrigin = null;
                 }
 
-                // Noodle maps do not *necessarily* have a player track if it not actually used
-                if (_noodleOrigin != null)
-                {
-                    // If we are not yet attached, and we don't have a parent that's active yet, try to get one!
-                    _mapMovementTransformer ??= Cam.TransformChain.AddOrGet("ModMapExt", TransformerOrders.ModMapParenting);
+                // This stinks
+                _noodleOrigin = globNoodleOrigin ?? (GameObject.Find("NoodlePlayerTrackHead") ?? GameObject.Find("NoodlePlayerTrackRoot"))?.transform;
+                globNoodleOrigin = _noodleOrigin;
+            }
 
-                    _mapMovementTransformer.Position = _noodleOrigin.localPosition;
-                    _mapMovementTransformer.Rotation = _noodleOrigin.localRotation;
-                    return true;
-                }
+            // Noodle maps do not *necessarily* have a player track if it not actually used
+            if (_noodleOrigin != null)
+            {
+                // If we are not yet attached, and we don't have a parent that's active yet, try to get one!
+                _mapMovementTransformer ??= Cam.TransformChain.AddOrGet("ModMapExt", TransformerOrders.ModMapParenting);
+
+                _mapMovementTransformer.Position = _noodleOrigin.localPosition;
+                _mapMovementTransformer.Rotation = _noodleOrigin.localRotation;
+                return true;
             }
 
             if (_noodleOrigin is null)

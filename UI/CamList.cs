@@ -23,7 +23,7 @@ namespace Camera2.UI
 
         public override string ResourceName => "Camera2.UI.Views.camList.bsml";
 
-        [UsedImplicitly] private string _cam2Version = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak";
+        [UsedImplicitly] private string _cam2Version = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak Version 0.2.1";
 
         [UIComponent("deleteButton")] [UsedImplicitly]
         public NoTransitionsButton deleteButton;
@@ -46,7 +46,7 @@ namespace Camera2.UI
         {
             _listData.Clear();
 
-            _listData.AddRange(CamManager.Cams.Values.Select(x => new CamListCellWrapper(x)));
+            _listData.AddRange(CamManager.Cams.Select(x => new CamListCellWrapper(x)));
             UpdateCamListUI();
         }
 
@@ -178,17 +178,17 @@ namespace Camera2.UI
         [UsedImplicitly]
         private void DeleteCam()
         {
-            _listData.Remove(_listData.Find(x => x.Cam == SettingsView.CurrentCam));
-            CamManager.DeleteCamera(SettingsView.CurrentCam);
+            _listData.Remove(_listData.Find(x => x.Cam == CamSettings.CurrentCam));
+            CamManager.DeleteCamera(CamSettings.CurrentCam);
             UpdateCamListUI();
             SettingsCoordinator.Instance.ShowSettingsForCam(ListDataOrdered.First().Cam);
         }
 
         private static void ChangeLayer(int diff)
         {
-            SettingsView.CurrentCam.Settings.Layer += diff;
+            CamSettings.CurrentCam.Settings.Layer += diff;
             SettingsCoordinator.Instance.CamList.UpdateCamListUI();
-            SettingsCoordinator.Instance.ShowSettingsForCam(SettingsView.CurrentCam, true);
+            SettingsCoordinator.Instance.ShowSettingsForCam(CamSettings.CurrentCam, true);
         }
 
         [UsedImplicitly]
@@ -198,7 +198,7 @@ namespace Camera2.UI
         private void LayerDecrease() => ChangeLayer(-1);
 
         [UsedImplicitly]
-        private void UnlockCamPosTab() => SettingsCoordinator.Instance.SettingsView.viewRectTab.IsVisible = true;
+        private void UnlockCamPosTab() => SettingsCoordinator.Instance.CamSettings.viewRectTab.IsVisible = true;
 
         [UsedImplicitly]
         private void ShowGithub() => Process.Start("https://github.com/kinsi55/CS_BeatSaber_Camera2");

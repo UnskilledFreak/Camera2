@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Camera2.Enums;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.XR;
 using Object = UnityEngine.Object;
@@ -13,7 +14,7 @@ namespace Camera2.Managers
 {
     internal static class CamManager
     {
-        public static Dictionary<string, Cam2> Cams { get; private set; } = new Dictionary<string, Cam2>();
+        public static List<Cam2> Cams { get; private set; } = new List<Cam2>();
         internal static CamerasViewport CustomScreen { get; private set; }
         public static int BaseCullingMask { get; internal set; }
         public static int ClearedBaseCullingMask { get; private set; }
@@ -40,6 +41,9 @@ namespace Camera2.Managers
 
             UI.SpaghettiUI.Init();
         }
+
+        [CanBeNull]
+        public static Cam2 GetCameraByName(string name) => Cams.FirstOrDefault(x => x.Name == name);
 
         public static void CompleteReload()
         {
@@ -77,10 +81,10 @@ namespace Camera2.Managers
 
             if (reload)
             {
-                foreach (var deletedCam in Cams.Where(x => !loadedNames.Contains(x.Key)))
+                foreach (var deletedCam in Cams.Where(x => !loadedNames.Contains(x.Name)))
                 {
-                    Object.Destroy(deletedCam.Value);
-                    Cams.Remove(deletedCam.Key);
+                    Object.Destroy(deletedCam);
+                    Cams.Remove(deletedCam);
                 }
             }
 
@@ -105,7 +109,7 @@ namespace Camera2.Managers
          */
         public static void ApplyCameraValues(bool viewLayer = false, bool bitMask = false, bool worldCam = false, bool posRot = false)
         {
-            var collection = viewLayer ? Cams.Values.OrderBy(x => x.IsCurrentlySelectedInSettings ? int.MaxValue : x.Settings.Layer).AsEnumerable() : Cams.Values;
+            var collection = viewLayer ? Cams.OrderBy(x => x.IsCurrentlySelectedInSettings ? int.MaxValue : x.Settings.Layer).AsEnumerable() : Cams;
 
             foreach (var cam in collection)
             {
@@ -133,7 +137,8 @@ namespace Camera2.Managers
 
         private static Cam2 InitCamera(string name, bool loadConfig = true, bool reload = false)
         {
-            if (Cams.TryGetValue(name, out var cam))
+            var cam = Cams.FirstOrDefault(x => x.Name == name);
+            if (cam != null)
             {
                 if (!reload)
                 {
@@ -156,7 +161,7 @@ namespace Camera2.Managers
                 throw;
             }
 
-            Cams[name] = cam;
+            Cams.Add(cam);
 
             //Newly added cameras should always be the last child and thus on top
             //ApplyCameraValues(viewLayer: true);
@@ -169,7 +174,7 @@ namespace Camera2.Managers
             var nameToUse = namePrefix;
             var i = 2;
 
-            while (Cams.ContainsKey(nameToUse))
+            while (Cams.FirstOrDefault(x => x.name == nameToUse) != null)
             {
                 nameToUse = $"{namePrefix}{i++}";
             }
@@ -179,17 +184,12 @@ namespace Camera2.Managers
 
         public static void DeleteCamera(Cam2 cam)
         {
-            if (!Cams.Values.Contains(cam))
+            if (!Cams.Contains(cam))
             {
                 return;
             }
-
-            if (Cams[cam.Name] != cam)
-            {
-                return;
-            }
-
-            Cams.Remove(cam.Name);
+            
+            Cams.Remove(cam);
 
             var cfgPath = ConfigUtil.GetCameraPath(cam.Name);
 
@@ -202,58 +202,15 @@ namespace Camera2.Managers
 
             foreach (var x in ScenesManager.Settings.Scenes.Values.Where(x => x.Contains(cam.Name)))
             {
-                x.RemoveAll(x => x == cam.Name);
+                x.RemoveAll(z => z == cam.Name);
             }
 
             foreach (var x in ScenesManager.Settings.CustomScenes.Values.Where(x => x.Contains(cam.Name)))
             {
-                x.RemoveAll(x => x == cam.Name);
+                x.RemoveAll(z => z == cam.Name);
             }
 
             ScenesManager.Settings.Save();
-        }
-
-        public static bool RenameCamera(Cam2 cam, string newName)
-        {
-            if (Cams.ContainsKey(newName))
-            {
-                return false;
-            }
-
-            if (!Cams.ContainsValue(cam))
-            {
-                return false;
-            }
-
-            newName = string.Concat(newName.Split(Path.GetInvalidFileNameChars())).Trim();
-
-            if (newName.Length == 0)
-            {
-                return false;
-            }
-
-            var oldName = cam.Name;
-
-            if (newName == oldName)
-            {
-                return true;
-            }
-
-            Cams[newName] = cam;
-            Cams.Remove(oldName);
-
-            foreach (var scene in ScenesManager.Settings.Scenes.Values.Where(scene => scene.Contains(oldName)))
-            {
-                scene.Add(newName);
-                scene.Remove(oldName);
-            }
-
-            cam.Settings.Save();
-            File.Move(cam.ConfigPath, ConfigUtil.GetCameraPath(newName));
-            cam.Init(newName, rename: true);
-            ScenesManager.Settings.Save();
-
-            return true;
         }
     }
 }

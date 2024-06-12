@@ -73,7 +73,7 @@ namespace Camera2.HarmonyPatches
                     var srr = Screen.currentResolution.refreshRate;
                     cap = -1;
 
-                    foreach (var cam in CamManager.Cams.Values.Where(x => x.gameObject.activeInHierarchy))
+                    foreach (var cam in CamManager.Cams.Where(x => x.gameObject.activeInHierarchy))
                     {
                         if (cam.Settings.FPSLimiter.FPSLimit <= 0 || cam.Settings.FPSLimiter.FPSLimit == srr)
                         {

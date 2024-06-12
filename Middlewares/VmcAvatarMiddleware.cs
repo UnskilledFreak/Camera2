@@ -32,10 +32,12 @@ namespace Camera2.Middlewares
                 sender ??= new OscClient(Cam.Settings.VmcProtocol.Address);
 
                 sender.SendCamPos(Cam);
-            } catch
+            }
+            catch
             {
                 // ignored
-            } finally
+            }
+            finally
             {
                 _prevFov = Cam.Settings.FOV;
                 _prevPos = Cam.TransformChain.Position;

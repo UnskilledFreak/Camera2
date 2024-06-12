@@ -12,13 +12,13 @@ namespace Camera2.SDK
         /// names of all cameras available
         /// </summary>
         [UsedImplicitly]
-        public static IEnumerable<string> Available => CamManager.Cams.Keys.AsEnumerable();
+        public static IEnumerable<string> Available => CamManager.Cams.Select(x => x.Name).AsEnumerable();
 
         /// <summary>
         /// Names of all cameras which are currently active
         /// </summary>
         [UsedImplicitly]
-        public static IEnumerable<string> Active => CamManager.Cams.Values.Where(x => x.gameObject.activeSelf).Select(x => x.Name);
+        public static IEnumerable<string> Active => CamManager.Cams.Where(x => x.gameObject.activeSelf).Select(x => x.Name);
 
         /// <summary>
         /// Enables or disables a given camera
@@ -28,7 +28,7 @@ namespace Camera2.SDK
         [UsedImplicitly]
         public static void SetCameraActive(string cameraName, bool active = false)
         {
-            CamManager.Cams[cameraName]?.gameObject.SetActive(active);
+            CamManager.GetCameraByName(cameraName)?.gameObject.SetActive(active);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Camera2.SDK
         [UsedImplicitly]
         public static CameraType? GetCameraType(string cameraName)
         {
-            return CamManager.Cams[cameraName]?.Settings.Type;
+            return CamManager.GetCameraByName(cameraName)?.Settings.Type;
         }
     }
 }

@@ -2,7 +2,7 @@
 	"$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
 	"id": "Camera2",
 	"name": "Camera2",
-	"author": "Kinsi55",
+	"author": "Kinsi55 & UnskilledFreak",
 	"version": "0.6.108",
 	"description": "Why helping others when you can be a jerk?",
 	"gameVersion": "1.29.1",

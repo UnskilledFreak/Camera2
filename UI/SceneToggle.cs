@@ -6,7 +6,7 @@ namespace Camera2.UI
 {
     internal class SceneToggle : NotifiableSettingsObj
     {
-        internal SettingsView Host;
+        internal CamSettings Host;
         internal SceneTypes Type;
 
         [UsedImplicitly]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Camera2.Configuration
 {
@@ -9,71 +10,60 @@ namespace Camera2.Configuration
     {
         private static readonly IFormatProvider Formater = CultureInfo.InvariantCulture.NumberFormat;
 
-        public float RotXMin = float.NegativeInfinity;
-        public float RotXMax = float.PositiveInfinity;
+        public Vector2 PosVectorX = new Vector2(float.NegativeInfinity, float.PositiveInfinity);
+        public Vector2 PosVectorY = new Vector2(float.NegativeInfinity, float.PositiveInfinity);
+        public Vector2 PosVectorZ = new Vector2(float.NegativeInfinity, float.PositiveInfinity);
 
-        public float RotYMin = float.NegativeInfinity;
-        public float RotYMax = float.PositiveInfinity;
-
-        public float RotZMin = float.NegativeInfinity;
-        public float RotZMax = float.PositiveInfinity;
-
-
-        public float PosXMin = float.NegativeInfinity;
-        public float PosXMax = float.PositiveInfinity;
-
-        public float PosYMin = float.NegativeInfinity;
-        public float PosYMax = float.PositiveInfinity;
-
-        public float PosZMin = float.NegativeInfinity;
-        public float PosZMax = float.PositiveInfinity;
+        public Vector2 RotVectorX = new Vector2(float.NegativeInfinity, float.PositiveInfinity);
+        public Vector2 RotVectorY = new Vector2(float.NegativeInfinity, float.PositiveInfinity);
+        public Vector2 RotVectorZ = new Vector2(float.NegativeInfinity, float.PositiveInfinity);
 
         [JsonProperty("pos_x")]
         public string PosX
         {
-            get => string.Format(Formater, "{0}:{1}", PosXMin, PosXMax);
-            set => ParseInto(ref PosXMin, ref PosXMax, value);
+            get => string.Format(Formater, "{0}:{1}", PosVectorX.x, PosVectorX.y);
+            set => ParseInto(PosVectorX, value);
         }
 
         [JsonProperty("pos_y")]
         public string PosY
         {
-            get => string.Format(Formater, "{0}:{1}", PosYMin, PosYMax); 
-            set => ParseInto(ref PosYMin, ref PosYMax, value);
+            get => string.Format(Formater, "{0}:{1}", PosVectorY.x, PosVectorY.y);
+            set => ParseInto(PosVectorY, value);
         }
 
         [JsonProperty("pos_z")]
         public string PosZ
         {
-            get => string.Format(Formater, "{0}:{1}", PosZMin, PosZMax); 
-            set => ParseInto(ref PosZMin, ref PosZMax, value);
+            get => string.Format(Formater, "{0}:{1}", PosVectorZ.x, PosVectorZ.y);
+            set => ParseInto(PosVectorZ, value);
         }
 
         [JsonProperty("rot_x")]
         public string RotX
         {
-            get => string.Format(Formater, "{0}:{1}", RotXMin, RotXMax); 
-            set => ParseInto(ref RotXMin, ref RotXMax, value);
+            get => string.Format(Formater, "{0}:{1}", RotVectorX.x, RotVectorX.y);
+            set => ParseInto(RotVectorX, value);
         }
 
         [JsonProperty("rot_y")]
         public string RotY
         {
-            get => string.Format(Formater, "{0}:{1}", RotYMin, RotYMax); 
-            set => ParseInto(ref RotYMin, ref RotYMax, value);
+            get => string.Format(Formater, "{0}:{1}", RotVectorY.x, RotVectorY.y);
+            set => ParseInto(RotVectorX, value);
         }
 
         [JsonProperty("rot_z")]
         public string RotZ
         {
-            get => string.Format(Formater, "{0}:{1}", RotZMin, RotZMax); 
-            set => ParseInto(ref RotZMin, ref RotZMax, value);
+            get => string.Format(Formater, "{0}:{1}", RotVectorZ.x, RotVectorZ.y);
+            set => ParseInto(RotVectorX, value);
         }
 
-        private static void ParseInto(ref float min, ref float max, string val)
+        private static void ParseInto(Vector2 vector2, string val)
         {
-            min = float.NegativeInfinity;
-            max = float.PositiveInfinity;
+            vector2.x = float.NegativeInfinity;
+            vector2.y = float.PositiveInfinity;
 
             if (string.IsNullOrEmpty(val))
             {
@@ -82,14 +72,14 @@ namespace Camera2.Configuration
 
             var spl = val.Split(':');
 
-            if (!float.TryParse(spl[0], NumberStyles.Float, Formater, out min))
+            if (!float.TryParse(spl[0], NumberStyles.Float, Formater, out vector2.x))
             {
-                max = float.PositiveInfinity;
+                vector2.x = float.PositiveInfinity;
             }
 
-            if (spl.Length == 1 || !float.TryParse(spl[1], NumberStyles.Float, Formater, out max))
+            if (spl.Length == 1 || !float.TryParse(spl[1], NumberStyles.Float, Formater, out vector2.y))
             {
-                max = float.PositiveInfinity;
+                vector2.y = float.PositiveInfinity;
             }
         }
     }

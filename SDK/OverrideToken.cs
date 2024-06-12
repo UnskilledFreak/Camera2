@@ -52,7 +52,8 @@ namespace Camera2.SDK
                 return null;
             }
 
-            if (!CamManager.Cams.TryGetValue(camName, out var cam))
+            var cam = CamManager.GetCameraByName(camName);
+            if (cam == null)
             {
                 return null;
             }
@@ -82,7 +83,7 @@ namespace Camera2.SDK
         /// Returns if the camera instance that this OverrideToken was created for still exists
         /// </summary>
         [UsedImplicitly]
-        public bool IsValid => _cam != null && CamManager.Cams.ContainsKey(CamName);
+        public bool IsValid => _cam != null && CamManager.GetCameraByName(CamName) != null;
 
         /// <summary>
         /// Closes this OverrideToken and returns the camera's values back to their default

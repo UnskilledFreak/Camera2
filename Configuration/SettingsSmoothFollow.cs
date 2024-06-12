@@ -1,4 +1,5 @@
-﻿using Camera2.Utils;
+﻿using Camera2.Enums;
+using Camera2.Utils;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -9,8 +10,9 @@ namespace Camera2.Configuration
         public float Position = 10f;
         public float Rotation = 4f;
         public bool FollowReplayPosition = true;
-        //public bool FollowerDistanceEnabled = true;
-        //public float FollowerDistance = 3f;
+        public bool FollowerUseOffsetRotationAsPosition = false;
+        public bool FollowerOffsetPositionIsRelative = false;
+        public FollowerPositionOffsetType FollowerOffsetPositionRelativeType = FollowerPositionOffsetType.Forward;
         
         private bool _pivotingOffset = true;
         public string TargetParent { get; set; } = "";

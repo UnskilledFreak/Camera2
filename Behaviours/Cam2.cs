@@ -6,25 +6,21 @@ using Camera2.UI;
 using Camera2.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Camera2.Enums;
+using Camera2.Managers;
 using UnityEngine;
 
 namespace Camera2.Behaviours
 {
     internal class Cam2 : MonoBehaviour
     {
-        private static readonly HashSet<string> CameraBehavioursToDestroy = new HashSet<string>
-        {
-            "AudioListener", 
-            "LIV", 
-            "MainCamera", 
-            "MeshCollider"
-        };
+        private static readonly HashSet<string> CameraBehavioursToDestroy = new HashSet<string> { "AudioListener", "LIV", "MainCamera", "MeshCollider" };
 
         internal string Name { get; private set; }
         internal string ConfigPath => ConfigUtil.GetCameraPath(Name);
-        internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.SettingsView.isActiveAndEnabled && SettingsView.CurrentCam == this;
+        internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.CamSettings.isActiveAndEnabled && CamSettings.CurrentCam == this;
         internal Camera Camera { get; private set; }
         internal CameraSettings Settings { get; private set; }
         internal RenderTexture RenderTexture { get; private set; }
@@ -42,13 +38,41 @@ namespace Camera2.Behaviours
             DontDestroyOnLoad(gameObject);
         }
 
-        public void LogInfo(string message) => Plugin.Log.Info($"Cam '{Name}': {message}"); 
-        public void LogDebug(string message) => Plugin.Log.Debug($"Cam '{Name}': {message}"); 
-        public void LogError(string message) => Plugin.Log.Error($"Cam '{Name}': {message}"); 
+        public void LogInfo(string message) => Plugin.Log.Info($"Cam '{Name}': {message}");
+        public void LogDebug(string message) => Plugin.Log.Debug($"Cam '{Name}': {message}");
+        public void LogError(string message) => Plugin.Log.Error($"Cam '{Name}': {message}");
+
         public void LogError(Exception exception)
         {
             Plugin.Log.Error($"Cam '{Name}': Exception!");
             Plugin.Log.Error(exception);
+        }
+
+        public bool Rename(string newName)
+        {
+            newName = string.Concat(newName.Split(Path.GetInvalidFileNameChars())).Trim();
+            if (newName.Length == 0)
+            {
+                return false;
+            }
+
+            if (newName == Name)
+            {
+                return true;
+            }
+
+            foreach (var scene in ScenesManager.Settings.Scenes.Values.Where(scene => scene.Contains(Name)))
+            {
+                scene.Remove(Name);
+                scene.Add(newName);
+            }
+
+            Settings.Save();
+            File.Move(ConfigPath, ConfigUtil.GetCameraPath(newName));
+            Init(newName, rename: true);
+            ScenesManager.Settings.Save();
+
+            return true;
         }
 
         public void SetOrigin(Transform parent, bool startFromParentTransform = true, bool unparentOnDisable = true)
@@ -130,7 +154,7 @@ namespace Camera2.Behaviours
                                 || !SceneUtil.IsSongPlaying
                             );
 
-            WorldCam.gameObject.SetActive(doShowCam || (SettingsView.CurrentCam == this && Settings.IsPositionalCam()));
+            WorldCam.gameObject.SetActive(doShowCam || (CamSettings.CurrentCam == this && Settings.IsPositionalCam()));
         }
 
         internal void UpdateDepthTextureActive()
@@ -201,20 +225,20 @@ namespace Camera2.Behaviours
 
             Settings = new CameraSettings(this);
             Settings.Load(loadConfig);
-            
+
             Middlewares = new[]
             {
                 MakeMiddleware<MultiplayerMiddleware>(), 
-                MakeMiddleware<FpsLimiterMiddleware>(), 
+                MakeMiddleware<FpsLimiterMiddleware>(),
                 MakeMiddleware<SmoothFollowMiddleware>(),
-                MakeMiddleware<ModMapExtensionsMiddleware>(), 
-                MakeMiddleware<FollowerMiddleware>(), 
-                MakeMiddleware<Follow360Middleware>(), 
-                MakeMiddleware<MovementScriptProcessorMiddleware>(), 
+                MakeMiddleware<ModMapExtensionsMiddleware>(),
+                MakeMiddleware<Follow360Middleware>(),
+                MakeMiddleware<FollowerMiddleware>(),
+                MakeMiddleware<MovementScriptProcessorMiddleware>(),
                 MakeMiddleware<VmcAvatarMiddleware>()
             };
             camClone.AddComponent<CamPostProcessor>().Init(this);
-            
+
             LogInfo("loaded");
         }
 

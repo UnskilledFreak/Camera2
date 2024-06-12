@@ -11,10 +11,11 @@ namespace Camera2.UI
     {
         internal static SettingsCoordinator Instance { get; private set; }
 
-        internal SettingsView SettingsView;
+        internal CamSettings CamSettings;
         internal CamList CamList;
         private PreviewView _previewView;
         private Cam2 _lastSelected;
+        private bool _isActive;
 
         public void Awake()
         {
@@ -25,9 +26,9 @@ namespace Camera2.UI
                 CamList = BeatSaberUI.CreateViewController<CamList>();
             }
 
-            if (SettingsView == null)
+            if (CamSettings == null)
             {
-                SettingsView = BeatSaberUI.CreateViewController<SettingsView>();
+                CamSettings = BeatSaberUI.CreateViewController<CamSettings>();
             }
 
             if (_previewView == null)
@@ -38,10 +39,15 @@ namespace Camera2.UI
 
         public void ShowSettingsForCam(Cam2 cam, bool reselect = false)
         {
-            _lastSelected = cam;
+            if (!_isActive)
+            {
+                return;
+            }
+            
             SetTitle($"{Plugin.Name} | {cam.Name}");
 
-            if (!SettingsView.SetCam(cam) && !reselect)
+            _lastSelected = cam;
+            if (!CamSettings.SetCam(cam) && !reselect)
             {
                 return;
             }
@@ -50,10 +56,16 @@ namespace Camera2.UI
 
             CamList.list.tableView.SelectCellWithIdx(cellIndex);
             CamList.list.tableView.ScrollToCellWithIdx(cellIndex, TableView.ScrollPositionType.Center, false);
+
+            if (reselect)
+            {
+                CamSettings.ReselectLastTab();
+            }
         }
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
+            _isActive = true;
             try
             {
                 if (!firstActivation)
@@ -69,7 +81,7 @@ namespace Camera2.UI
 
                 showBackButton = true;
 
-                ProvideInitialViewControllers(SettingsView, CamList, null, _previewView);
+                ProvideInitialViewControllers(CamSettings, CamList, null, _previewView);
             }
             catch (Exception ex)
             {
@@ -79,9 +91,10 @@ namespace Camera2.UI
 
         protected override void BackButtonWasPressed(ViewController topViewController)
         {
-            SettingsView.SetCam(null);
+            CamSettings.SetCam(null);
             ScenesManager.LoadGameScene(forceReload: true);
             BeatSaberUI.MainFlowCoordinator.DismissFlowCoordinator(this);
+            _isActive = false;
         }
     }
 }
