@@ -15,7 +15,7 @@ using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.UI
 {
-    class CamList : BSMLResourceViewController
+    internal class CamList : BSMLResourceViewController
     {
         private List<object> Cams => ListDataOrdered.ToList<object>();
 
@@ -25,10 +25,10 @@ namespace Camera2.UI
 
         [UsedImplicitly] private string _cam2Version = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak Version 0.2.1";
 
-        [UIComponent("deleteButton")] [UsedImplicitly]
+        [UIComponent("deleteButton"), UsedImplicitly]
         public NoTransitionsButton deleteButton;
 
-        [UIComponent("camList")] [UsedImplicitly]
+        [UIComponent("camList"), UsedImplicitly]
         public CustomCellListTableData list;
 
         public IEnumerable<CamListCellWrapper> ListDataOrdered => _listData.OrderByDescending(x => x.Cam.Settings.Layer);

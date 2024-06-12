@@ -9,7 +9,7 @@ namespace Camera2.Managers
 {
     internal static class MovementScriptManager
     {
-        public static Dictionary<string, MovementScript> MovementScripts { get; private set; } = new Dictionary<string, MovementScript>();
+        public static Dictionary<string, MovementScript> MovementScripts { get; } = new Dictionary<string, MovementScript>();
 
         public static void LoadMovementScripts(bool reload = false)
         {
@@ -36,7 +36,7 @@ namespace Camera2.Managers
 
                         Plugin.Log.Info($"Loaded Movement script {name}");
                         Plugin.Log.Info($"Sync to song: {script.SyncToSong}");
-                        Plugin.Log.Info($"Duration: {script.ScriptDuration} ({script.Frames.Count()} frames)");
+                        Plugin.Log.Info($"Duration: {script.ScriptDuration} ({script.Frames.Count} frames)");
 
                         MovementScripts[name] = script;
 

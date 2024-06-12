@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Camera2.UI
 {
-    class CustomScenesSwitchUI
+    internal class CustomScenesSwitchUI
     {
         [UIComponent("customScenesList")]
         [UsedImplicitly]

@@ -59,19 +59,19 @@ namespace Camera2.Behaviours
 
                     if (relativeCursorPos.y <= GrabberSize && relativeCursorPos.x >= d.width - GrabberSize)
                     {
-                        actionAtPoint = CamAction.Resize_BR;
+                        actionAtPoint = CamAction.ResizeBR;
                     }
                     else if (relativeCursorPos.y >= d.height - GrabberSize && relativeCursorPos.x >= d.width - GrabberSize)
                     {
-                        actionAtPoint = CamAction.Resize_TR;
+                        actionAtPoint = CamAction.ResizeTR;
                     }
                     else if (relativeCursorPos.y >= d.height - GrabberSize && relativeCursorPos.x <= GrabberSize)
                     {
-                        actionAtPoint = CamAction.Resize_TL;
+                        actionAtPoint = CamAction.ResizeTL;
                     }
                     else if (relativeCursorPos.y <= GrabberSize && relativeCursorPos.x <= GrabberSize)
                     {
-                        actionAtPoint = CamAction.Resize_BL;
+                        actionAtPoint = CamAction.ResizeBL;
                     }
                     else
                     {
@@ -176,12 +176,12 @@ namespace Camera2.Behaviours
                 // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
                 switch (_possibleAction)
                 {
-                    case CamAction.Resize_BR:
-                    case CamAction.Resize_TL:
+                    case CamAction.ResizeBR:
+                    case CamAction.ResizeTL:
                         WinAPI.SetCursor(WindowsCursor.IdcSizeNwSe);
                         break;
-                    case CamAction.Resize_BL:
-                    case CamAction.Resize_TR:
+                    case CamAction.ResizeBL:
+                    case CamAction.ResizeTR:
                         WinAPI.SetCursor(WindowsCursor.IdcSizeNeSw);
                         break;
                 }

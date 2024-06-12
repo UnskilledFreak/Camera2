@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Camera2.Extensions;
 using Camera2.HarmonyPatches;
 using Camera2.Interfaces;

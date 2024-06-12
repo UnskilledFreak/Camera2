@@ -7,7 +7,7 @@ namespace Camera2.UI
 {
     internal class CustomSceneUIEntry
     {
-        public string Name { get; private set; }
+        public string Name { get; }
 
 
         public CustomSceneUIEntry(string name)

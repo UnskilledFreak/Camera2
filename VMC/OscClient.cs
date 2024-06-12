@@ -3,12 +3,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Camera2.Behaviours;
+using JetBrains.Annotations;
 
 namespace Camera2.VMC
 {
     internal class OscClient : IDisposable
     {
         private readonly Socket _socket;
+        private bool _disposed;
 
         public OscClient(IPEndPoint destination)
         {
@@ -21,6 +23,8 @@ namespace Camera2.VMC
 
             _socket.Connect(destination);
         }
+
+        ~OscClient() => Dispose(false);
 
         public void Dispose()
         {
@@ -65,16 +69,13 @@ namespace Camera2.VMC
             _socket.Send(Buffer);
         }
 
-        bool _disposed;
-
-        void Dispose(bool disposing)
+        [UsedImplicitly]
+        public void Dispose(bool disposing)
         {
             if (!_disposed && (_disposed = true) && disposing)
             {
                 _socket?.Close();
             }
         }
-
-        ~OscClient() => Dispose(false);
     }
 }

@@ -4,6 +4,6 @@
     {
         Visible = 0,
         HiddenWhilePlaying = 1,
-        Hidden = 2,
+        Hidden = 2
     }
 }

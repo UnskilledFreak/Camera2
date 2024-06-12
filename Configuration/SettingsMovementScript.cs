@@ -2,8 +2,8 @@
 {
     internal class SettingsMovementScript : CameraSubSettings
     {
-        public string[] ScriptList { get; set; } = new string[] { };
+        public string[] ScriptList { get; set; } = { };
         public bool FromOrigin { get; set; } = true;
-        public bool EnableInMenu { get; set; } = false;
+        public bool EnableInMenu { get; set; }
     }
 }

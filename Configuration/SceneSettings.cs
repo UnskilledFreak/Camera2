@@ -36,7 +36,7 @@ namespace Camera2.Configuration
                 {
                     if (!_wasLoaded)
                     {
-                        Plugin.Log.Error($"Failed to load Scenes config, it has been reset:");
+                        Plugin.Log.Error("Failed to load Scenes config, it has been reset:");
                         Plugin.Log.Error(ex);
 
                         if (File.Exists($"{ConfigUtil.ScenesCfg}.corrupted"))

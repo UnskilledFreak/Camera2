@@ -46,7 +46,7 @@ namespace Camera2.Configuration
 
         [JsonProperty("loop")] public bool Loop { get; private set; } = true;
 
-        public List<Frame> Frames { get; private set; } = new List<Frame>();
+        public List<Frame> Frames { get; } = new List<Frame>();
 
         [JsonIgnore] public float ScriptDuration { get; private set; }
 

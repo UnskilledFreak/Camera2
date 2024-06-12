@@ -17,7 +17,7 @@ namespace Camera2.Configuration
 {
     internal class CameraSettings
     {
-        internal Cam2 Cam { get; private set; }
+        internal Cam2 Cam { get; }
 
         internal OverrideToken OverrideToken;
 
@@ -400,7 +400,9 @@ namespace Camera2.Configuration
             {
                 maskBuilder |= VisibilityMasks.Avatar;
 
-                maskBuilder |= (Type == CameraType.FirstPerson && VisibleObjects.Avatar != AvatarVisibility.ForceVisibleInFP) ? VisibilityMasks.FirstPersonAvatar : VisibilityMasks.ThirdPersonAvatar;
+                maskBuilder |= Type == CameraType.FirstPerson && VisibleObjects.Avatar != AvatarVisibility.ForceVisibleInFP 
+                    ? VisibilityMasks.FirstPersonAvatar 
+                    : VisibilityMasks.ThirdPersonAvatar;
             }
 
             if (VisibleObjects.Floor)

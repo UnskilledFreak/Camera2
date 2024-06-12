@@ -26,7 +26,7 @@ namespace Camera2.HarmonyPatches
 
             IsModdedMap = ModMapUtil.IsModdedMap(difficultyBeatmap);
             Is360Level = difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic.containsRotationEvents;
-            IsWallMap = ModMapUtil.IsProbablyWallmap(difficultyBeatmap);
+            IsWallMap = ModMapUtil.IsProbablyWallMap(difficultyBeatmap);
         }
 
         internal static void Reset()

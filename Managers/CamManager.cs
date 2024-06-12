@@ -14,7 +14,7 @@ namespace Camera2.Managers
 {
     internal static class CamManager
     {
-        public static List<Cam2> Cams { get; private set; } = new List<Cam2>();
+        public static List<Cam2> Cams { get; } = new List<Cam2>();
         internal static CamerasViewport CustomScreen { get; private set; }
         public static int BaseCullingMask { get; internal set; }
         public static int ClearedBaseCullingMask { get; private set; }
@@ -137,12 +137,12 @@ namespace Camera2.Managers
 
         private static Cam2 InitCamera(string name, bool loadConfig = true, bool reload = false)
         {
-            var cam = Cams.FirstOrDefault(x => x.Name == name);
+            var cam = GetCameraByName(name);
             if (cam != null)
             {
                 if (!reload)
                 {
-                    throw new Exception("Already exists??");
+                    throw new Exception("unable to create new cam, it already exists");
                 }
 
                 cam.Settings.Reload();
@@ -174,9 +174,9 @@ namespace Camera2.Managers
             var nameToUse = namePrefix;
             var i = 2;
 
-            while (Cams.FirstOrDefault(x => x.name == nameToUse) != null)
+            while (GetCameraByName(nameToUse) != null)
             {
-                nameToUse = $"{namePrefix}{i++}";
+                nameToUse = $"{namePrefix} {i++}";
             }
 
             return InitCamera(nameToUse, false);

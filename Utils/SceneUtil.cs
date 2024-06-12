@@ -19,10 +19,7 @@ namespace Camera2.Utils
 
         public static GameObject GetMainCameraButReally()
         {
-            var mainCamera = Camera.main;
-            return mainCamera == null
-                ? GameObject.FindGameObjectsWithTag("MainCamera")[0]
-                : mainCamera.gameObject;
+            return Camera.main?.gameObject ?? GameObject.FindGameObjectsWithTag("MainCamera")[0];
         }
 
 

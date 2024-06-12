@@ -19,12 +19,15 @@ namespace Camera2.SDK
         private static readonly Dictionary<string, OverrideToken> Tokens = new Dictionary<string, OverrideToken>();
 
         private float _fov;
-        public Vector3 Position { get; set; }
-        public Vector3 Rotation { get; set; }
+        public Vector3 Position { get; [UsedImplicitly] set; }
+        public Vector3 Rotation { get; [UsedImplicitly] set; }
+
+        public GameObjects VisibleObjects { get; private set; }
 
         public float FOV
         {
             get => _fov;
+            [UsedImplicitly]
             set
             {
                 _fov = value;
@@ -34,8 +37,6 @@ namespace Camera2.SDK
                 }
             }
         }
-
-        public GameObjects VisibleObjects { get; private set; }
 
         /// <summary>
         /// Request an OverrideToken for the camera with the given name.
@@ -65,19 +66,8 @@ namespace Camera2.SDK
             return Tokens[camName] = token;
         }
 
+        [UsedImplicitly]
         internal static OverrideToken GetTokenForCamera(Cam2 cam) => GetTokenForCamera(cam.Name);
-
-        private OverrideToken(Cam2 cam)
-        {
-            _cam = cam;
-            CamName = cam.Name;
-            Position = new Vector3(cam.Settings.TargetPos.x, cam.Settings.TargetPos.y, cam.Settings.TargetPos.z);
-            Rotation = new Vector3(cam.Settings.TargetRot.x, cam.Settings.TargetRot.y, cam.Settings.TargetRot.z);
-            _fov = cam.Settings.FOV;
-            VisibleObjects = cam.Settings.VisibleObjects.GetCopy();
-
-            cam.Settings.OverrideToken = this;
-        }
 
         /// <summary>
         /// Returns if the camera instance that this OverrideToken was created for still exists
@@ -130,6 +120,18 @@ namespace Camera2.SDK
             {
                 _cam.Settings.ApplyLayerBitmask();
             }
+        }
+
+        private OverrideToken(Cam2 cam)
+        {
+            _cam = cam;
+            CamName = cam.Name;
+            Position = new Vector3(cam.Settings.TargetPos.x, cam.Settings.TargetPos.y, cam.Settings.TargetPos.z);
+            Rotation = new Vector3(cam.Settings.TargetRot.x, cam.Settings.TargetRot.y, cam.Settings.TargetRot.z);
+            _fov = cam.Settings.FOV;
+            VisibleObjects = cam.Settings.VisibleObjects.GetCopy();
+
+            cam.Settings.OverrideToken = this;
         }
     }
 }
