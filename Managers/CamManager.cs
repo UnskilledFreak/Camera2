@@ -162,7 +162,7 @@ namespace Camera2.Managers
             }
 
             Cams.Add(cam);
-
+            
             //Newly added cameras should always be the last child and thus on top
             //ApplyCameraValues(viewLayer: true);
 

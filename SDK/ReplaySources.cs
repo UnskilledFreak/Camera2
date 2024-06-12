@@ -13,7 +13,7 @@ namespace Camera2.SDK
 
         public static void Unregister(ISource source) => Sources.Remove(source);
 
-        // this needs to be here because BeatLeader adapted Kinsi's spaghetti code
+        // this needs to be here because BeatLeader adapted Kinsi55's spaghetti code
         // also funny that they used reflections and not the SDK, talking about not working SDK.... yikes
         [UsedImplicitly]
         public class GenericSource : ISource

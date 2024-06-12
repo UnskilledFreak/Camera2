@@ -16,21 +16,26 @@ namespace Camera2.Behaviours
 {
     internal class Cam2 : MonoBehaviour
     {
-        private static readonly HashSet<string> CameraBehavioursToDestroy = new HashSet<string> { "AudioListener", "LIV", "MainCamera", "MeshCollider" };
+        private static readonly HashSet<string> CameraBehavioursToDestroy = new HashSet<string>
+        {
+            "AudioListener", 
+            "LIV", 
+            "MainCamera", 
+            "MeshCollider"
+        };
 
         internal string Name { get; private set; }
-        internal string ConfigPath => ConfigUtil.GetCameraPath(Name);
-        internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.CamSettings.isActiveAndEnabled && CamSettings.CurrentCam == this;
         internal Camera Camera { get; private set; }
         internal CameraSettings Settings { get; private set; }
         internal RenderTexture RenderTexture { get; private set; }
         internal CameraDesktopView PreviewImage { get; private set; }
         internal PositionableCam WorldCam { get; private set; }
         internal IMHandler[] Middlewares { get; private set; }
-        internal Transformer Transformer;
-        internal TransformChain TransformChain;
         internal float TimeSinceLastRender { get; private set; }
         internal bool Destroying { get; private set; }
+        
+        internal Transformer Transformer;
+        internal TransformChain TransformChain;
         private ParentShield _shield;
 
         public void Awake()
@@ -47,6 +52,10 @@ namespace Camera2.Behaviours
             Plugin.Log.Error($"Cam '{Name}': Exception!");
             Plugin.Log.Error(exception);
         }
+        
+        internal string ConfigPath => ConfigUtil.GetCameraPath(Name);
+        
+        internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.CamSettings.isActiveAndEnabled && CamSettings.CurrentCam == this;
 
         public bool Rename(string newName)
         {

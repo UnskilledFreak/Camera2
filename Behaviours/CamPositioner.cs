@@ -110,8 +110,6 @@ namespace Camera2.Behaviours
             grabbedCamera.Settings.TargetPos = grabbedCamera.Transformer.Position;
             grabbedCamera.Settings.TargetRot = grabbedCamera.Transformer.Rotation.eulerAngles;
 
-            grabbedCamera.Settings.TargetRot -= new Vector3(180f, 180f, 180f);
-
             grabbedCamera.Settings.ApplyPositionAndRotation();
 
             grabbedCamera.WorldCam.SetPreviewPositionAndSize();

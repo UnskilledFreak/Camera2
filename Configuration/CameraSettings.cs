@@ -21,6 +21,17 @@ namespace Camera2.Configuration
 
         internal OverrideToken OverrideToken;
 
+        private bool IsLoaded { get; set; }
+        private CameraType _type = CameraType.FirstPerson;
+        private WorldCamVisibility _worldCamVisibility = WorldCamVisibility.HiddenWhilePlaying;
+        private float _previewScreenSize = 0.3f;
+        private bool _worldCamUnderScreen = true;
+        private float _fov;
+        private int _antiAliasing = 2;
+        private float _renderScale = 1.3f;
+        private Vector3 _targetPos = Vector3.zero;
+        private Vector3 _targetRot = Vector3.zero;
+
         internal bool IsScreenLocked
         {
             get => ViewRect.Locked;
@@ -236,17 +247,6 @@ namespace Camera2.Configuration
 
         [JsonIgnore] private Transform _parent;
 
-        private bool IsLoaded { get; set; }
-        private CameraType _type = CameraType.FirstPerson;
-        private WorldCamVisibility _worldCamVisibility = WorldCamVisibility.HiddenWhilePlaying;
-        private float _previewScreenSize = 0.3f;
-        private bool _worldCamUnderScreen = true;
-        private float _fov;
-        private int _antiAliasing = 2;
-        private float _renderScale = 1.3f;
-        private Vector3 _targetPos = Vector3.zero;
-        private Vector3 _targetRot = Vector3.zero;
-
         public SettingsMultiplayer Multiplayer { get; private set; }
         public SettingsSmoothFollow SmoothFollow { get; private set; }
         public SettingsModmapExtensions ModMapExtensions { get; private set; }
@@ -302,22 +302,6 @@ namespace Camera2.Configuration
             // We always save after loading, even if it's a fresh load. This will make sure to migrate configs after updates.
             Save();
 
-            // fix target rot on follower
-            if (TargetRot.x > 180)
-            {
-                _targetRot.x -= 360;
-            }
-
-            if (TargetRot.y > 180)
-            {
-                _targetRot.y -= 360;
-            }
-
-            if (TargetRot.z > 180)
-            {
-                _targetRot.z -= 360;
-            }
-
             ViewRect ??= new ScreenRect(0, 0, 1, 1, false);
 
             ApplyPositionAndRotation();
@@ -367,7 +351,7 @@ namespace Camera2.Configuration
             }
 
             // Force pivoting offset for 360 Levels - Non-Pivoting offset on 360 levels just looks outright trash
-            Cam.Transformer.ApplyAsAbsolute = Type == CameraType.Follower 
+            Cam.Transformer.ApplyAsAbsolute = Type == CameraType.Follower
                                               || (!IsPositionalCam() && !SmoothFollow.PivotingOffset && !HookLeveldata.Is360Level);
         }
 
@@ -400,8 +384,8 @@ namespace Camera2.Configuration
             {
                 maskBuilder |= VisibilityMasks.Avatar;
 
-                maskBuilder |= Type == CameraType.FirstPerson && VisibleObjects.Avatar != AvatarVisibility.ForceVisibleInFP 
-                    ? VisibilityMasks.FirstPersonAvatar 
+                maskBuilder |= Type == CameraType.FirstPerson && VisibleObjects.Avatar != AvatarVisibility.ForceVisibleInFP
+                    ? VisibilityMasks.FirstPersonAvatar
                     : VisibilityMasks.ThirdPersonAvatar;
             }
 

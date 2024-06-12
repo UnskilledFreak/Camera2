@@ -127,12 +127,13 @@ namespace Camera2.UI
                     default:
                         CurrentCam.Settings.TargetPos = new Vector3(0, 1.5f, 1f);
                         CurrentCam.Transformer.ApplyAsAbsolute = value == CameraType.Follower;
+                        CurrentCam.Settings.TargetRot = Vector3.zero;
                         break;
                 }
                 
-                CurrentCam.Settings.TargetRot = Vector3.zero;
                 CurrentCam.Settings.Type = value;
                 ToggleSettingVisibility();
+                NotifyTargetPosRotChanged();
             }
         }
 
@@ -471,10 +472,10 @@ namespace Camera2.UI
         [UsedImplicitly]
         internal float TargetRotX
         {
-            get => GetUnOverridenRotation().x;
+            get => GetNiceRotationNumber(GetUnOverridenRotation().x);
             set
             {
-                SetAndUpdateUnOverridenRotation(value);
+                SetAndUpdateUnOverridenRotation(SetFromNiceRotationNumber(value));
                 NotifyPropertyChanged();
             }
         }
@@ -482,10 +483,10 @@ namespace Camera2.UI
         [UsedImplicitly]
         internal float TargetRotY
         {
-            get => GetUnOverridenRotation().y;
+            get => GetNiceRotationNumber(GetUnOverridenRotation().y);
             set
             {
-                SetAndUpdateUnOverridenRotation(y: value);
+                SetAndUpdateUnOverridenRotation(y: SetFromNiceRotationNumber(value));
                 NotifyPropertyChanged();
             }
         }
@@ -493,10 +494,10 @@ namespace Camera2.UI
         [UsedImplicitly]
         internal float TargetRotZ
         {
-            get => GetUnOverridenRotation().z;
+            get => GetNiceRotationNumber(GetUnOverridenRotation().z);
             set
             {
-                SetAndUpdateUnOverridenRotation(z: value);
+                SetAndUpdateUnOverridenRotation(z: SetFromNiceRotationNumber(value));
                 NotifyPropertyChanged();
             }
         }
@@ -734,6 +735,11 @@ namespace Camera2.UI
                 return;
             }
 
+            NotifyTargetPosRotChanged();
+        }
+
+        private void NotifyTargetPosRotChanged()
+        {
             NotifyPropertyChanged(nameof(TargetPosX));
             NotifyPropertyChanged(nameof(TargetPosY));
             NotifyPropertyChanged(nameof(TargetPosZ));
@@ -792,6 +798,16 @@ namespace Camera2.UI
             }
 
             return vector;
+        }
+
+        private static float GetNiceRotationNumber(float input)
+        {
+            return input > 180 ? input - 360 : input;
+        }
+
+        private static float SetFromNiceRotationNumber(float input)
+        {
+            return input < 0 ? input + 360 : input;
         }
     }
 }
