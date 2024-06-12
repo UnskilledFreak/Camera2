@@ -367,7 +367,8 @@ namespace Camera2.Configuration
             }
 
             // Force pivoting offset for 360 Levels - Non-Pivoting offset on 360 levels just looks outright trash
-            Cam.Transformer.ApplyAsAbsolute = !IsPositionalCam() && !SmoothFollow.PivotingOffset && !HookLeveldata.Is360Level;
+            Cam.Transformer.ApplyAsAbsolute = Type == CameraType.Follower 
+                                              || (!IsPositionalCam() && !SmoothFollow.PivotingOffset && !HookLeveldata.Is360Level);
         }
 
         public void ApplyLayerBitmask()

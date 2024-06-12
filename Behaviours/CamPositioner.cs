@@ -86,17 +86,17 @@ namespace Camera2.Behaviours
             FinishCameraMove();
         }
 
-        private static void Snap(ref float a, float snap = 4f, float step = 45f)
+        private static void Snap(ref float angle, float snap = 4f, float step = 45f)
         {
-            var l = a % step;
+            var left = angle % step;
 
-            if (l <= snap)
+            if (left <= snap)
             {
-                a -= l;
+                angle -= left;
             }
-            else if (l >= step - snap)
+            else if (left >= step - snap)
             {
-                a += step - l;
+                angle += step - left;
             }
         }
 

@@ -26,8 +26,6 @@ namespace Camera2.Middlewares
             if (_transformer == null)
             {
                 TeleportOnNextFrame = true;
-                // why do I have to reset those two here?
-                Settings.SmoothFollow.UseLocalPosition = false;
                 
                 _transformer = Cam.TransformChain.AddOrGet("Follower", TransformerOrders.Follower);
                 _transformer.ApplyAsAbsolute = true;
