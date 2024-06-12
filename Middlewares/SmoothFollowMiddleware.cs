@@ -23,7 +23,7 @@ namespace Camera2.Middlewares
         public void OnEnable()
         {
             /*
-             * If the camera was just enabled we want to teleport the positon / rotation.
+             * If the camera was just enabled we want to teleport the position / rotation.
              * This is useful when you switch to a scene with a first person camera that was
              * not enabled for a while to make it have a "correct" initial position instead
              * of smoothing it to the correct position over time
@@ -35,6 +35,15 @@ namespace Camera2.Middlewares
         {
             if (Settings.IsPositionalCam())
             {
+                // this fixes newly added cams to behave weird when grabbed
+                // also fixes position and rotation offset being applied multiple times when they should not
+                // reason why it is here? when creating a new cam, it will be a FirstPerson type one and
+                // SmoothFollow will add its Transformer to it, maybe it should remove the Transformer?
+                if (Settings.SmoothFollow.Transformer != null)
+                {
+                    Settings.SmoothFollow.Transformer.Position = Vector3.zero;
+                    Settings.SmoothFollow.Transformer.Rotation = Quaternion.identity;
+                }
                 return true;
             }
 
