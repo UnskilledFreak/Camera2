@@ -13,12 +13,9 @@ namespace Camera2.Middlewares
     internal class SmoothFollowMiddleware : CamMiddleware, IMHandler
     {
         private Scene _lastScene;
-
-        private Transform Parent
-        {
-            get => Settings.SmoothFollow.Parent;
-            set => Settings.SmoothFollow.Parent = value;
-        }
+        private Transform _parent;
+        private Transformer _transformer;
+        private bool _useLocalPosition;
 
         public void OnEnable()
         {
@@ -33,17 +30,12 @@ namespace Camera2.Middlewares
 
         public bool Pre()
         {
+            // only handle first person and attached types
             if (Settings.IsPositionalCam())
             {
-                // this fixes newly added cams to behave weird when grabbed
-                // also fixes position and rotation offset being applied multiple times when they should not
-                // reason why it is here? when creating a new cam, it will be a FirstPerson type one and
-                // SmoothFollow will add its Transformer to it, maybe it should remove the Transformer?
-                if (Settings.SmoothFollow.Transformer != null)
-                {
-                    Settings.SmoothFollow.Transformer.Position = Vector3.zero;
-                    Settings.SmoothFollow.Transformer.Rotation = Quaternion.identity;
-                }
+                Cam.TransformChain.Remove("SmoothFollow");
+                _transformer = null;
+                _parent = null;
                 return true;
             }
 
@@ -54,7 +46,7 @@ namespace Camera2.Middlewares
             {
                 parentToUse = HookFPFCToggle.fpfcTransform;
                 currentReplaySource = null;
-                Settings.SmoothFollow.UseLocalPosition = HookFPFCToggle.isSiraSettingLocalPostionYes;
+                _useLocalPosition = HookFPFCToggle.isSiraSettingLocalPostionYes;
             }
 
             Vector3 targetPosition;
@@ -64,7 +56,7 @@ namespace Camera2.Middlewares
             {
                 if (parentToUse == null)
                 {
-                    parentToUse = Parent;
+                    parentToUse = _parent;
                 }
 
                 if (parentToUse == null || !parentToUse.gameObject.activeInHierarchy)
@@ -74,12 +66,12 @@ namespace Camera2.Middlewares
                     {
                         case CameraType.FirstPerson:
                             var mainCamera = Camera.main;
-                            Parent = parentToUse = mainCamera == null ? null : mainCamera.transform;
-                            Settings.SmoothFollow.UseLocalPosition = !ScoreSaber.IsInReplayProp;
+                            _parent = parentToUse = mainCamera == null ? null : mainCamera.transform;
+                            _useLocalPosition = !ScoreSaber.IsInReplayProp;
                             break;
                         case CameraType.Attached:
-                            Parent = parentToUse = Settings.Parent;
-                            Settings.SmoothFollow.UseLocalPosition = false;
+                            _parent = parentToUse = Settings.Parent;
+                            _useLocalPosition = false;
                             break;
                     }
                 }
@@ -90,7 +82,7 @@ namespace Camera2.Middlewares
                     return false;
                 }
 
-                if (Settings.SmoothFollow.UseLocalPosition)
+                if (_useLocalPosition)
                 {
                     targetPosition = parentToUse.localPosition;
                     targetRotation = parentToUse.localRotation;
@@ -126,27 +118,25 @@ namespace Camera2.Middlewares
                 TeleportOnNextFrame = _lastScene != SceneUtil.CurrentScene || (HookFPFCToggle.isInFPFC && currentReplaySource == null);
             }
 
-            if (Settings.SmoothFollow.Transformer == null)
+            if (_transformer == null)
             {
-                Settings.SmoothFollow.Transformer = Cam.TransformChain.AddOrGet("SmoothFollow", TransformerOrders.SmoothFollow);
+                _transformer = Cam.TransformChain.AddOrGet("SmoothFollow", TransformerOrders.SmoothFollow);
                 TeleportOnNextFrame = true;
             }
-
-            var theTransform = Settings.SmoothFollow.Transformer;
 
             // If we switched scenes (E.g. left / entered a song) we want to snap to the correct position before smoothing again
             if (TeleportOnNextFrame)
             {
-                theTransform.Position = targetPosition;
-                theTransform.Rotation = targetRotation;
+                _transformer.Position = targetPosition;
+                _transformer.Rotation = targetRotation;
 
                 _lastScene = SceneUtil.CurrentScene;
                 TeleportOnNextFrame = false;
             }
             else
             {
-                theTransform.Position = Vector3.Lerp(theTransform.Position, targetPosition, Cam.TimeSinceLastRender * Settings.SmoothFollow.Position);
-                theTransform.Rotation = Quaternion.Slerp(theTransform.Rotation, targetRotation, Cam.TimeSinceLastRender * Settings.SmoothFollow.Rotation);
+                _transformer.Position = Vector3.Lerp(_transformer.Position, targetPosition, Cam.TimeSinceLastRender * Settings.SmoothFollow.Position);
+                _transformer.Rotation = Quaternion.Slerp(_transformer.Rotation, targetRotation, Cam.TimeSinceLastRender * Settings.SmoothFollow.Rotation);
             }
 
             return true;

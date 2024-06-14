@@ -10,6 +10,7 @@ using Camera2.Behaviours;
 using Camera2.Enums;
 using Camera2.Managers;
 using HarmonyLib;
+using HMUI;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,7 +26,6 @@ namespace Camera2.UI
         private static int lastTabSelectedIndex;
 
         [UsedImplicitly]
-        //private static readonly List<object> Types = new List<object> { CameraType.FirstPerson, CameraType.Positionable };
         public static readonly List<object> Types = Enum.GetValues(typeof(CameraType)).Cast<object>().ToList();
 
         [UsedImplicitly] private static readonly List<object> AntiAliasingLevels = new List<object> { 1, 2, 4, 8 };
@@ -43,10 +43,10 @@ namespace Camera2.UI
 
         [UIComponent("pivotingOffsetToggle"), UsedImplicitly]
         public ToggleSetting pivotingOffsetToggle;
-        
+
         [UIComponent("followerRotAsPosToggle"), UsedImplicitly]
         public ToggleSetting followerRotAsPosToggle;
-        
+
         [UIComponent("followerPosRelativeToggle"), UsedImplicitly]
         public ToggleSetting followerPosRelativeToggle;
 
@@ -58,6 +58,15 @@ namespace Camera2.UI
 
         [UIComponent("previewSizeSlider"), UsedImplicitly]
         public SliderSetting previewSizeSlider;
+
+        [UIComponent("posRotOffsetXSlider"), UsedImplicitly]
+        public SliderSetting posRotXSlider;
+
+        [UIComponent("posRotOffsetYSlider"), UsedImplicitly]
+        public SliderSetting posRotYSlider;
+
+        [UIComponent("posRotOffsetZSlider"), UsedImplicitly]
+        public SliderSetting posRotZSlider;
 
         [UIComponent("modMapExtMoveWithMapCheckbox"), UsedImplicitly]
         public ToggleSetting modMapExtMoveWithMapSlider;
@@ -126,14 +135,16 @@ namespace Camera2.UI
                     case CameraType.Follower:
                     default:
                         CurrentCam.Settings.TargetPos = new Vector3(0, 1.5f, 1f);
-                        CurrentCam.Transformer.ApplyAsAbsolute = value == CameraType.Follower;
                         CurrentCam.Settings.TargetRot = Vector3.zero;
+                        CurrentCam.Transformer.ApplyAsAbsolute = value == CameraType.Follower;
                         break;
                 }
-                
+
                 CurrentCam.Settings.Type = value;
+                CurrentCam.Settings.ParentReset();
                 ToggleSettingVisibility();
                 NotifyTargetPosRotChanged();
+                NotifyPropertyChanged(nameof(TargetParent));
             }
         }
 
@@ -431,7 +442,7 @@ namespace Camera2.UI
             set
             {
                 CurrentCam.Settings.SmoothFollow.TargetParent = value;
-                CurrentCam.Settings.ParentChange();
+                CurrentCam.Settings.ParentReset();
                 NotifyPropertyChanged();
             }
         }
@@ -520,7 +531,10 @@ namespace Camera2.UI
             set
             {
                 CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition = value;
+                CurrentCam.Settings.TargetRot = Vector3.zero;
                 NotifyPropertyChanged();
+                NotifyTargetPosRotChanged();
+                SetRotationOffsetText();
             }
         }
 
@@ -573,19 +587,19 @@ namespace Camera2.UI
         [UIAction("TargetLookAtPointer")]
         [UsedImplicitly]
         public void TargetLookAtPointer() => SetNewTarget("VRLaserPointer(Clone)");
-        
+
         [UIAction("TargetRightPanel")]
         [UsedImplicitly]
         public void TargetRightPanel() => SetNewTarget("RightPanel");
-        
+
         [UIAction("TargetLeftPanel")]
         [UsedImplicitly]
         public void TargetLeftPanel() => SetNewTarget("LeftPanel");
-        
+
         [UIAction("TargetEnergyBar")]
         [UsedImplicitly]
         public void TargetEnergyBar() => SetNewTarget("EnergyPanel");
-        
+
         [UIAction("TargetScore")]
         [UsedImplicitly]
         public void TargetScore() => SetNewTarget("ScoreCanvas");
@@ -595,7 +609,7 @@ namespace Camera2.UI
         private void SetNewTarget(string target)
         {
             CurrentCam.Settings.SmoothFollow.TargetParent = target;
-            CurrentCam.Settings.ParentChange();
+            CurrentCam.Settings.ParentReset();
             NotifyPropertyChanged(nameof(TargetParent));
         }
 
@@ -656,6 +670,8 @@ namespace Camera2.UI
             {
                 x.NotifyPropertyChanged(nameof(x.Val));
             }
+            
+            SetRotationOffsetText();
 
             return true;
         }
@@ -690,7 +706,7 @@ namespace Camera2.UI
             }
 
             viewRectTab.IsVisible = false;
-            
+
             tabSelector.textSegmentedControl.didSelectCellEvent += (control, index) =>
             {
                 lastTabSelectedIndex = index;
@@ -748,6 +764,13 @@ namespace Camera2.UI
             NotifyPropertyChanged(nameof(TargetRotZ));
         }
 
+        private void SetRotationOffsetText()
+        {
+            ChangeSliderText(posRotXSlider, CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition ? "Look at Position X" : "Rotation X");
+            ChangeSliderText(posRotYSlider, CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition ? "Look at Position Y" : "Rotation Y");
+            ChangeSliderText(posRotZSlider, CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition ? "Look at Position Z" : "Rotation Z");
+        }
+
         private static Vector3 GetUnOverridenPosition()
         {
             var ret = Vector3.zero;
@@ -802,12 +825,21 @@ namespace Camera2.UI
 
         private static float GetNiceRotationNumber(float input)
         {
-            return input > 180 ? input - 360 : input;
+            return CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition
+                ? input
+                : input > 180f ? input - 360f : input;
         }
 
         private static float SetFromNiceRotationNumber(float input)
         {
-            return input < 0 ? input + 360 : input;
+            return CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition
+                ? input
+                : Mathf.Clamp(input < 0f ? input + 360f : input, 0f, 359.99f);
+        }
+
+        private static void ChangeSliderText(SliderSetting sliderSetting, string newText)
+        {
+            sliderSetting.gameObject.transform.GetChild(0).GetComponent<CurvedTextMeshPro>().text = newText;
         }
     }
 }

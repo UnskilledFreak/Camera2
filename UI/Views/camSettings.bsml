@@ -59,9 +59,9 @@
                 <slider-setting text="Position X" min="-10" max="10" increment="0.01" show-buttons="true" value="TargetPosX" bind-value="true" apply-on-change="true"/>
                 <slider-setting text="Position Y" min="-10" max="10" increment="0.01" show-buttons="true" value="TargetPosY" bind-value="true" apply-on-change="true"/>
                 <slider-setting text="Position Z" min="-10" max="10" increment="0.01" show-buttons="true" value="TargetPosZ" bind-value="true" apply-on-change="true"/>
-                <slider-setting text="Rotation X" min="-179.9" max="180" increment="0.01" show-buttons="true" value="TargetRotX" bind-value="true" apply-on-change="true"/>
-                <slider-setting text="Rotation Y" min="-179.9" max="180" increment="0.01" show-buttons="true" value="TargetRotY" bind-value="true" apply-on-change="true"/>
-                <slider-setting text="Rotation Z" min="-179.9" max="180" increment="0.01" show-buttons="true" value="TargetRotZ" bind-value="true" apply-on-change="true"/>
+                <slider-setting id="posRotOffsetXSlider" text="Rotation X" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotX" bind-value="true" apply-on-change="true"/>
+                <slider-setting id="posRotOffsetYSlider" text="Rotation Y" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotY" bind-value="true" apply-on-change="true"/>
+                <slider-setting id="posRotOffsetZSlider" text="Rotation Z" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotZ" bind-value="true" apply-on-change="true"/>
                 <checkbox id="followerRotAsPosToggle" text="Use Rotation as Look-At Position Offset" value="FollowerRotAsPos" bind-value="true" apply-on-change="true"/>
                 <checkbox id="followerPosRelativeToggle" text="Use Look-At Rotation Position Offset relatively" value="FollowerPosRelative" bind-value="true" apply-on-change="true"/>
                 <dropdown-list-setting id="followerRelativeTypeInput" text="Relative Offset Type" value="FollowerRelativeType" choices="FollowerRelativeTypes" bind-value="true" apply-on-change="true"/>

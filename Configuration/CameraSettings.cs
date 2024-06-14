@@ -32,6 +32,17 @@ namespace Camera2.Configuration
         private Vector3 _targetPos = Vector3.zero;
         private Vector3 _targetRot = Vector3.zero;
 
+        [JsonIgnore] private Transform _parent;
+
+        public SettingsMultiplayer Multiplayer { get; private set; }
+        public SettingsSmoothFollow SmoothFollow { get; private set; }
+        public SettingsModmapExtensions ModMapExtensions { get; private set; }
+        public SettingsFollow360 Follow360 { get; private set; }
+        public SettingsVmcAvatar VmcProtocol { get; private set; }
+        public SettingsFPSLimiter FPSLimiter { get; private set; }
+        public SettingsPostProcessing PostProcessing { get; private set; }
+        public SettingsMovementScript MovementScript { get; private set; } = new SettingsMovementScript();
+
         internal bool IsScreenLocked
         {
             get => ViewRect.Locked;
@@ -245,17 +256,6 @@ namespace Camera2.Configuration
             }
         }
 
-        [JsonIgnore] private Transform _parent;
-
-        public SettingsMultiplayer Multiplayer { get; private set; }
-        public SettingsSmoothFollow SmoothFollow { get; private set; }
-        public SettingsModmapExtensions ModMapExtensions { get; private set; }
-        public SettingsFollow360 Follow360 { get; private set; }
-        public SettingsVmcAvatar VmcProtocol { get; private set; }
-        public SettingsFPSLimiter FPSLimiter { get; private set; }
-        public SettingsPostProcessing PostProcessing { get; private set; }
-        public SettingsMovementScript MovementScript { get; private set; } = new SettingsMovementScript();
-
         public CameraSettings(Cam2 cam)
         {
             Cam = cam;
@@ -271,7 +271,7 @@ namespace Camera2.Configuration
             PostProcessing = CameraSubSettings.GetFor<SettingsPostProcessing>(this);
         }
 
-        public void ParentChange()
+        public void ParentReset()
         {
             _parent = null;
         }

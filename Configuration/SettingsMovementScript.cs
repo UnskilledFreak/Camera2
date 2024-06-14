@@ -1,4 +1,6 @@
-﻿namespace Camera2.Configuration
+﻿using Newtonsoft.Json;
+
+namespace Camera2.Configuration
 {
     internal class SettingsMovementScript : CameraSubSettings
     {

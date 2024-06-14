@@ -11,6 +11,11 @@ namespace Camera2.Middlewares
 
         public bool Pre()
         {
+            if (!SceneUtil.IsInMultiplayer)
+            {
+                Cam.TransformChain.Remove("MultiplayerOrigin");
+                _origin = null;
+            }
             /*
              * TODO: This should *eventually* (™) allow to set the origin of this camera to another player
              * which is not us, which would allow to have third and first person cameras which work in the
@@ -18,7 +23,7 @@ namespace Camera2.Middlewares
              */
             var x = HookMultiplayerSpectatorController.instance;
 
-            if (!SceneUtil.IsInMultiplayer || !SceneUtil.IsInSong || x == null || !Settings.Multiplayer.FollowSpectatorPlatform)
+            if (!SceneUtil.IsInSong || x == null || !Settings.Multiplayer.FollowSpectatorPlatform)
             {
                 if (_origin == null)
                 {

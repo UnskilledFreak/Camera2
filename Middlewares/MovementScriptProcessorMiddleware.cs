@@ -58,11 +58,12 @@ namespace Camera2.Middlewares
 
         public bool Pre()
         {
+            // todo :: make follow work
             if (
                 Settings.MovementScript.ScriptList.Length == 0
                 || (!SceneUtil.IsInSong && !Settings.MovementScript.EnableInMenu)
                 || Cam.Settings.Type == CameraType.FirstPerson
-                || Cam.Settings.Type == CameraType.Follower
+                || Cam.Settings.Type == CameraType.Attached
             )
             {
                 Reset();
@@ -118,6 +119,8 @@ namespace Camera2.Middlewares
             {
                 if (!_loadedScript.Loop)
                 {
+                    Cam.TransformChain.Remove("MovementScript");
+                    _scriptTransformer = null;
                     return true;
                 }
 

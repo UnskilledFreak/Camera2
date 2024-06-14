@@ -25,6 +25,8 @@ namespace Camera2.Middlewares
                 || !HookLeveldata.IsModdedMap
                 || (!Settings.ModMapExtensions.MoveWithMap && Settings.IsPositionalCam()))
             {
+                Cam.TransformChain.Remove("ModMapExt");
+                _mapMovementTransformer = null;
                 return true;
             }
 

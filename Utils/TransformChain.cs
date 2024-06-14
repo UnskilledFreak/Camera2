@@ -20,6 +20,11 @@ namespace Camera2.Utils
             _target = target;
         }
 
+        public string DebugChain()
+        {
+            return "Transformer Chain: " + string.Join(", ", _transformers.OrderBy(x => x.Value.Order).Select(x => x.Key));
+        }
+
         public Transformer AddOrGet(string name, int order, bool sortIn = true)
         {
             if (_transformers.TryGetValue(name, out var transformer))
@@ -38,6 +43,16 @@ namespace Camera2.Utils
 
             return transformer;
         }
+
+        public void Remove(string name)
+        {
+            if (_transformers.ContainsKey(name))
+            {
+                _transformers.Remove(name);
+            }
+        }
+
+        public bool HasMovementScriptTransformer() => _transformers.ContainsKey("MovementScript");
 
         public void Calculate(bool apply = true)
         {

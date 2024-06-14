@@ -22,8 +22,12 @@ namespace Camera2.Middlewares
             }
 
             _currentRotateAmount = 0f;
+            Cam.TransformChain.Remove("Follow360");
+            _rotationApplier = null;
+            /*
             _rotationApplier.Rotation = Quaternion.identity;
             _rotationApplier.Position = Vector3.zero;
+            */
         }
 
         public bool Pre()

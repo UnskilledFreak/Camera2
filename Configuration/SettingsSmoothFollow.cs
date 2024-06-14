@@ -32,9 +32,5 @@ namespace Camera2.Configuration
         }
 
         public readonly CameraBoundsConfig Limits = new CameraBoundsConfig();
-
-        [JsonIgnore] internal bool UseLocalPosition = true;
-        [JsonIgnore] internal Transform Parent;
-        [JsonIgnore] internal Transformer Transformer;
     }
 }

@@ -9,7 +9,7 @@ namespace Camera2.Middlewares
     internal class FollowerMiddleware : CamMiddleware, IMHandler
     {
         private Transformer _transformer;
-        private Transform _childTransform;
+        private bool _wasInMovementScript;
 
         public void OnEnable()
         {
@@ -20,42 +20,39 @@ namespace Camera2.Middlewares
         {
             if (Settings.Type != CameraType.Follower || Settings.Parent == null)
             {
+                Cam.TransformChain.Remove("Follower");
+                _transformer = null;
                 return true;
             }
 
+            // don't track until MovementScript is done
+            if (Cam.TransformChain.HasMovementScriptTransformer())
+            {
+                _wasInMovementScript = true;
+                return true;
+            }
+            
             if (_transformer == null)
             {
                 TeleportOnNextFrame = true;
-                
+
                 _transformer = Cam.TransformChain.AddOrGet("Follower", TransformerOrders.Follower);
                 _transformer.ApplyAsAbsolute = true;
             }
 
-            // use the real position, no offset here
-            if (_childTransform == null)
-            {
-                _childTransform = Cam.Camera.transform;
-            }
-
-            var targetPosition = -(_childTransform.localPosition - Settings.Parent.position);
+            var targetPosition = -(Cam.Camera.transform.localPosition - Settings.Parent.position);
             if (Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
             {
-                Vector3 direction;
-                switch (Settings.SmoothFollow.FollowerOffsetPositionRelativeType)
+                var direction = Settings.SmoothFollow.FollowerOffsetPositionRelativeType switch
                 {
-                    default:
-                    case FollowerPositionOffsetType.Forward:
-                        direction = Settings.Parent.forward;
-                        break;
-                    case FollowerPositionOffsetType.Right:
-                        direction = Settings.Parent.right;
-                        break;
-                    case FollowerPositionOffsetType.Up:
-                        direction = Settings.Parent.up;
-                        break;
-                }
-                targetPosition += Settings.SmoothFollow.FollowerOffsetPositionIsRelative 
-                    ? Vector3.Scale(direction, Settings.TargetRot) 
+                    FollowerPositionOffsetType.Right => Settings.Parent.right,
+                    FollowerPositionOffsetType.Up => Settings.Parent.up,
+                    FollowerPositionOffsetType.Forward => Settings.Parent.forward,
+                    _ => Settings.Parent.forward
+                };
+
+                targetPosition += Settings.SmoothFollow.FollowerOffsetPositionIsRelative
+                    ? Vector3.Scale(direction, Settings.TargetRot)
                     : Settings.TargetRot;
             }
 
@@ -64,8 +61,15 @@ namespace Camera2.Middlewares
             {
                 lookRotation *= Quaternion.Inverse(Quaternion.Euler(Settings.TargetRot));
             }
-
-            _transformer.Position = Vector3.zero;
+            if (_wasInMovementScript)
+            {
+                Cam.Transformer.Position = Settings.TargetPos;
+                _wasInMovementScript = false;
+            }
+            else
+            {
+                _transformer.Position = Vector3.zero;
+            }
 
             if (TeleportOnNextFrame)
             {
@@ -84,8 +88,7 @@ namespace Camera2.Middlewares
 
         public void CamConfigReloaded()
         {
-            Settings.ParentChange();
-            _childTransform = null;
+            Settings.ParentReset();
         }
     }
 }
