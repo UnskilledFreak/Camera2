@@ -11,6 +11,7 @@ using System.Linq;
 using Camera2.Enums;
 using Camera2.Managers;
 using UnityEngine;
+using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Behaviours
 {
@@ -37,6 +38,10 @@ namespace Camera2.Behaviours
         internal Transformer Transformer;
         internal TransformChain TransformChain;
         private ParentShield _shield;
+        
+        internal string ConfigPath => ConfigUtil.GetCameraPath(Name);
+        
+        internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.CamSettings.isActiveAndEnabled && CamSettings.CurrentCam == this;
 
         public void Awake()
         {
@@ -52,10 +57,6 @@ namespace Camera2.Behaviours
             Plugin.Log.Error($"Cam '{Name}': Exception!");
             Plugin.Log.Error(exception);
         }
-        
-        internal string ConfigPath => ConfigUtil.GetCameraPath(Name);
-        
-        internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.CamSettings.isActiveAndEnabled && CamSettings.CurrentCam == this;
 
         public bool Rename(string newName)
         {
@@ -208,7 +209,7 @@ namespace Camera2.Behaviours
             UpdateDepthTextureActive();
 
             TransformChain = new TransformChain(transform, Camera.transform);
-            Transformer = TransformChain.AddOrGet("Position", TransformerOrders.PositionOffset, false);
+            Transformer = TransformChain.AddOrGet(TransformerTypeAndOrder.PositionOffset, false);
 
             foreach (Transform child in camClone.transform)
             {

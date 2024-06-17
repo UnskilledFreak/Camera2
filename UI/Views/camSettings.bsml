@@ -11,8 +11,8 @@
 
             <dropdown-list-setting id="worldCamVisibilityInput" text="Ingame Cam Visibility" value="WorldCamVisibility" choices="WorldCamVisibilities" bind-value="true" apply-on-change="true"/>
             <slider-setting id="previewSizeSlider" text="Ingame preview size" min="0.3" max="3" increment="0.1" value="PreviewSize" bind-value="true" apply-on-change="true" show-buttons="true"/>
-            <slider-setting id="zOffsetSlider" text="Z Offset" min="-2" max="0.5" increment="0.1" value="ZOffset" bind-value="true" apply-on-change="true"/>
-            <slider-setting id="xRotationSlider" text="X Rotation Offset (Pitch)" min="-45" max="45" increment="0.5" value="XRotation" bind-value="true" apply-on-change="true"
+            <slider-setting id="zOffsetSlider" text="Z Offset" min="-2" max="0.5" increment="0.1" value="ZOffset" bind-value="true" apply-on-change="true" show-buttons="true"/>
+            <slider-setting id="xRotationSlider" text="X Rotation Offset (Pitch)" min="-45" max="45" increment="0.5" value="XRotation" bind-value="true" apply-on-change="true" show-buttons="true"
                             hover-hint="If you tend to tilt your head down / up a lot while playing you can use this to make the desktop view look more forward"
             />
             <checkbox id="pivotingOffsetToggle" text="Pivoting Firstperson Offset" value="MiscPivotingOffset" bind-value="true" apply-on-change="true"
@@ -119,7 +119,7 @@
                 <checkbox text="Enabled" value="Follow360MoveWithMap" bind-value="true" apply-on-change="true"
                           hover-hint="Makes it so the Camera follows the Map rotation in 90/360 levels"
                 />
-                <slider-setting text="Rotation Smoothing *" min="0.1" max="50" increment="0.1" value="Follow360Smoothing" bind-value="true" apply-on-change="true"/>
+                <slider-setting text="Rotation Smoothing *" min="0.1" max="50" increment="0.1" value="Follow360Smoothing" bind-value="true" apply-on-change="true" show-buttons="true"/>
             </modifier-container>
             <text text="* Lower value = More smoothing" color="#CCC" font-size="3" align="Center"/>
         </vertical>
@@ -163,7 +163,7 @@
                 <checkbox text="Force Depth Texture" value="PostprocessingForceDepthTexture" bind-value="true" apply-on-change="true"
                           hover-hint="Forces a Depthtexture to be rendered for this Camera, even if your Graphic settings dont need it (Only Smoke needs it). Used by Transparency to better decide what should be transparent"
                 />
-                <slider-setting text="Transparency Threshold *" min="0" max="79.5" increment="0.5" value="PostprocessingTransparencyThreshold" bind-value="true" apply-on-change="true"/>
+                <slider-setting text="Transparency Threshold *" min="0" max="79.5" increment="0.5" value="PostprocessingTransparencyThreshold" bind-value="true" apply-on-change="true" show-buttons="true"/>
             </modifier-container>
             <text text="* Higher = More Transparent, 0 = Off" color="#CCC" font-size="3" align="Center"/>
         </vertical>
@@ -192,17 +192,17 @@
                           text="⚠ Do not set a FPS limit unless you either absolutely need to, or understand the consequences. Check the Camera Configuration Wiki page for more details."
                     />
                 </horizontal>
-                <slider-setting text="FPS Limit (0 = off)" min="0" max="240" increment="1" integer-only="true" value="FpsLimit" bind-value="true" apply-on-change="true"/>
+                <slider-setting text="FPS Limit (0 = off)" min="0" max="240" increment="1" integer-only="true" value="FpsLimit" bind-value="true" apply-on-change="true" show-buttons="true"/>
             </modifier-container>
         </vertical>
     </tab>
 
     <tab tags="tabs" tab-name="Display" horizontal-fit="PreferredSize" id="viewRectTab">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
-            <slider-setting text="X Position (Lower Left corner)" min="0" max="1" increment="0.02" value="ViewRectX" bind-value="true" apply-on-change="true"/>
-            <slider-setting text="Y Position (Lower Left corner)" min="0" max="1" increment="0.02" value="ViewRectY" bind-value="true" apply-on-change="true"/>
-            <slider-setting text="Width" min="0.04" max="1" increment="0.02" value="ViewRectWidth" bind-value="true" apply-on-change="true"/>
-            <slider-setting text="Height" min="0.04" max="1" increment="0.02" value="ViewRectHeight" bind-value="true" apply-on-change="true"/>
+            <slider-setting text="X Position (Lower Left corner)" min="0" max="1" increment="0.02" value="ViewRectX" bind-value="true" apply-on-change="true" show-buttons="true"/>
+            <slider-setting text="Y Position (Lower Left corner)" min="0" max="1" increment="0.02" value="ViewRectY" bind-value="true" apply-on-change="true" show-buttons="true"/>
+            <slider-setting text="Width" min="0.04" max="1" increment="0.02" value="ViewRectWidth" bind-value="true" apply-on-change="true" show-buttons="true"/>
+            <slider-setting text="Height" min="0.04" max="1" increment="0.02" value="ViewRectHeight" bind-value="true" apply-on-change="true" show-buttons="true"/>
         </vertical>
     </tab>
 

@@ -10,31 +10,27 @@ namespace Camera2.HarmonyPatches
     [HarmonyPatch]
     internal static class HookRoomAdjust
     {
-        public static MonoBehaviour instance { get; private set; }
-        public static Vector3 position { get; private set; }
-        public static Quaternion rotation { get; private set; }
-        public static Vector3 eulerAngles { get; private set; }
+        public static Vector3 Position { get; private set; }
+        public static Quaternion Rotation { get; private set; }
 
         [UsedImplicitly]
         // ReSharper disable InconsistentNaming
         private static void Postfix(Vector3SO ____roomCenter, FloatSO ____roomRotation, MethodBase __originalMethod)
         {
-            position = ____roomCenter == null ? Vector3.zero : ____roomCenter;
-            eulerAngles = ____roomRotation == null ? Vector3.zero : new Vector3(0, ____roomRotation, 0);
-            rotation = Quaternion.Euler(eulerAngles);
+            Position = ____roomCenter == null ? Vector3.zero : ____roomCenter;
+            Rotation = Quaternion.Euler(____roomRotation == null ? Vector3.zero : new Vector3(0, ____roomRotation, 0));
 
 #if DEBUG
             Plugin.Log.Warn("HookRoomAdjust.Postfix! " + __originalMethod.Name);
-            Console.WriteLine("pos {0}, rot {1}", position, rotation);
+            Console.WriteLine("pos {0}, rot {1}", Position, Rotation);
 #endif
         }
 
         [UsedImplicitly]
         private static void ApplyCustom(Vector3 position, Quaternion rotation)
         {
-            HookRoomAdjust.position = position;
-            HookRoomAdjust.rotation = rotation;
-            eulerAngles = rotation.eulerAngles;
+            Position = position;
+            Rotation = rotation;
 
 #if DEBUG
             Plugin.Log.Warn("HookRoomAdjust.ApplyCustom!");

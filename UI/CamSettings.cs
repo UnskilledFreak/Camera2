@@ -122,7 +122,7 @@ namespace Camera2.UI
             get => CurrentCam.Settings.Type;
             set
             {
-                CurrentCam.Transformer.ApplyAsAbsolute = false;
+                //CurrentCam.Transformer.ApplyAsAbsolute = value == CameraType.Follower;
                 switch (value)
                 {
                     // When switching to FP reset Rot / Pos so that the previous TP values aren't used as the FP offset
@@ -136,7 +136,6 @@ namespace Camera2.UI
                     default:
                         CurrentCam.Settings.TargetPos = new Vector3(0, 1.5f, 1f);
                         CurrentCam.Settings.TargetRot = Vector3.zero;
-                        CurrentCam.Transformer.ApplyAsAbsolute = value == CameraType.Follower;
                         break;
                 }
 

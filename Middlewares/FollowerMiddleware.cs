@@ -20,7 +20,7 @@ namespace Camera2.Middlewares
         {
             if (Settings.Type != CameraType.Follower || Settings.Parent == null)
             {
-                Cam.TransformChain.Remove("Follower");
+                Cam.TransformChain.Remove(TransformerTypeAndOrder.Follower);
                 _transformer = null;
                 return true;
             }
@@ -31,28 +31,26 @@ namespace Camera2.Middlewares
                 _wasInMovementScript = true;
                 return true;
             }
-            
+
             if (_transformer == null)
             {
                 TeleportOnNextFrame = true;
 
-                _transformer = Cam.TransformChain.AddOrGet("Follower", TransformerOrders.Follower);
+                _transformer = Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.Follower);
                 _transformer.ApplyAsAbsolute = true;
             }
 
             var targetPosition = -(Cam.Camera.transform.localPosition - Settings.Parent.position);
             if (Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
             {
-                var direction = Settings.SmoothFollow.FollowerOffsetPositionRelativeType switch
-                {
-                    FollowerPositionOffsetType.Right => Settings.Parent.right,
-                    FollowerPositionOffsetType.Up => Settings.Parent.up,
-                    FollowerPositionOffsetType.Forward => Settings.Parent.forward,
-                    _ => Settings.Parent.forward
-                };
-
                 targetPosition += Settings.SmoothFollow.FollowerOffsetPositionIsRelative
-                    ? Vector3.Scale(direction, Settings.TargetRot)
+                    ? Vector3.Scale(Settings.SmoothFollow.FollowerOffsetPositionRelativeType switch
+                    {
+                        FollowerPositionOffsetType.Right => Settings.Parent.right,
+                        FollowerPositionOffsetType.Up => Settings.Parent.up,
+                        FollowerPositionOffsetType.Forward => Settings.Parent.forward,
+                        _ => Settings.Parent.forward
+                    }, Settings.TargetRot)
                     : Settings.TargetRot;
             }
 
@@ -61,14 +59,13 @@ namespace Camera2.Middlewares
             {
                 lookRotation *= Quaternion.Inverse(Quaternion.Euler(Settings.TargetRot));
             }
+
+            _transformer.Position = Vector3.zero;
+
             if (_wasInMovementScript)
             {
                 Cam.Transformer.Position = Settings.TargetPos;
                 _wasInMovementScript = false;
-            }
-            else
-            {
-                _transformer.Position = Vector3.zero;
             }
 
             if (TeleportOnNextFrame)

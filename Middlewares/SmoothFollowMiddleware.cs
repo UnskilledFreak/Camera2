@@ -33,7 +33,7 @@ namespace Camera2.Middlewares
             // only handle first person and attached types
             if (Settings.IsPositionalCam())
             {
-                Cam.TransformChain.Remove("SmoothFollow");
+                Cam.TransformChain.Remove(TransformerTypeAndOrder.SmoothFollow);
                 _transformer = null;
                 _parent = null;
                 return true;
@@ -87,12 +87,12 @@ namespace Camera2.Middlewares
                     targetPosition = parentToUse.localPosition;
                     targetRotation = parentToUse.localRotation;
 
-                    if (Settings.Type == CameraType.FirstPerson && (HookRoomAdjust.position != Vector3.zero || HookRoomAdjust.rotation != Quaternion.identity))
+                    if (Settings.Type == CameraType.FirstPerson && (HookRoomAdjust.Position != Vector3.zero || HookRoomAdjust.Rotation != Quaternion.identity))
                     {
                         if (!HookFPFCToggle.isInFPFC)
                         {
-                            targetPosition = (HookRoomAdjust.rotation * targetPosition) + HookRoomAdjust.position;
-                            targetRotation = HookRoomAdjust.rotation * targetRotation;
+                            targetPosition = (HookRoomAdjust.Rotation * targetPosition) + HookRoomAdjust.Position;
+                            targetRotation = HookRoomAdjust.Rotation * targetRotation;
                         }
                     }
                 }
@@ -120,7 +120,7 @@ namespace Camera2.Middlewares
 
             if (_transformer == null)
             {
-                _transformer = Cam.TransformChain.AddOrGet("SmoothFollow", TransformerOrders.SmoothFollow);
+                _transformer = Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.SmoothFollow);
                 TeleportOnNextFrame = true;
             }
 

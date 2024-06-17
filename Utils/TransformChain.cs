@@ -6,7 +6,7 @@ namespace Camera2.Utils
 {
     internal class TransformChain
     {
-        private Dictionary<string, Transformer> _transformers = new Dictionary<string, Transformer>();
+        private Dictionary<TransformerTypeAndOrder, Transformer> _transformers = new Dictionary<TransformerTypeAndOrder, Transformer>();
 
         public Vector3 Position { get; private set; }
         public Quaternion Rotation { get; private set; }
@@ -25,16 +25,16 @@ namespace Camera2.Utils
             return "Transformer Chain: " + string.Join(", ", _transformers.OrderBy(x => x.Value.Order).Select(x => x.Key));
         }
 
-        public Transformer AddOrGet(string name, int order, bool sortIn = true)
+        public Transformer AddOrGet(TransformerTypeAndOrder type, bool sortIn = true)
         {
-            if (_transformers.TryGetValue(name, out var transformer))
+            if (_transformers.TryGetValue(type, out var transformer))
             {
                 return transformer;
             }
 
-            transformer = new Transformer { Order = order };
+            transformer = new Transformer { Order = (int)type };
 
-            _transformers.Add(name, transformer);
+            _transformers.Add(type, transformer);
 
             if (sortIn)
             {
@@ -44,15 +44,15 @@ namespace Camera2.Utils
             return transformer;
         }
 
-        public void Remove(string name)
+        public void Remove(TransformerTypeAndOrder type)
         {
-            if (_transformers.ContainsKey(name))
+            if (_transformers.ContainsKey(type))
             {
-                _transformers.Remove(name);
+                _transformers.Remove(type);
             }
         }
 
-        public bool HasMovementScriptTransformer() => _transformers.ContainsKey("MovementScript");
+        public bool HasMovementScriptTransformer() => _transformers.ContainsKey(TransformerTypeAndOrder.MovementScriptProcessor);
 
         public void Calculate(bool apply = true)
         {
@@ -77,10 +77,10 @@ namespace Camera2.Utils
                 {
                     continue;
                 }
-
+                
                 if (transformer.ApplyAsAbsolute)
                 {
-                    Rotation = Quaternion.Inverse(Rotation) * transformer.Rotation;
+                    Rotation = transformer.Rotation * Rotation;
                 }
                 else
                 {

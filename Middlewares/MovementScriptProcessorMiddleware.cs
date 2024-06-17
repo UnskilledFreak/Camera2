@@ -58,12 +58,10 @@ namespace Camera2.Middlewares
 
         public bool Pre()
         {
-            // todo :: make follow work
             if (
                 Settings.MovementScript.ScriptList.Length == 0
                 || (!SceneUtil.IsInSong && !Settings.MovementScript.EnableInMenu)
-                || Cam.Settings.Type == CameraType.FirstPerson
-                || Cam.Settings.Type == CameraType.Attached
+                || Cam.Settings.Type != CameraType.Positionable
             )
             {
                 Reset();
@@ -92,7 +90,7 @@ namespace Camera2.Middlewares
 
                 Cam.LogInfo($"Applying Movement script {scriptToUse} for camera {Cam.Name}");
 
-                _scriptTransformer ??= Cam.TransformChain.AddOrGet("MovementScript", TransformerOrders.MovementScriptProcessor);
+                _scriptTransformer ??= Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.MovementScriptProcessor);
             }
 
             if (_loadedScript.SyncToSong && SceneUtil.IsInSong)
@@ -119,8 +117,15 @@ namespace Camera2.Middlewares
             {
                 if (!_loadedScript.Loop)
                 {
-                    Cam.TransformChain.Remove("MovementScript");
-                    _scriptTransformer = null;
+                    /*
+                    if (_scriptTransformer != null)
+                    {
+                        Cam.TransformChain.Remove(TransformerOrders.MovementScriptProcessor);
+                        _scriptTransformer = null;
+                        Cam.Transformer.Position = _lastPos;
+                        Cam.Transformer.Rotation = _lastRot;
+                    }
+                    */
                     return true;
                 }
 

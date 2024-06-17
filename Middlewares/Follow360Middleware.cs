@@ -22,12 +22,8 @@ namespace Camera2.Middlewares
             }
 
             _currentRotateAmount = 0f;
-            Cam.TransformChain.Remove("Follow360");
+            Cam.TransformChain.Remove(TransformerTypeAndOrder.Follow360);
             _rotationApplier = null;
-            /*
-            _rotationApplier.Rotation = Quaternion.identity;
-            _rotationApplier.Position = Vector3.zero;
-            */
         }
 
         public bool Pre()
@@ -48,7 +44,7 @@ namespace Camera2.Middlewares
 
             if (_rotationApplier == null)
             {
-                _rotationApplier = Cam.TransformChain.AddOrGet("Follow360", TransformerOrders.Follow360);
+                _rotationApplier = Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.Follow360);
                 _rotationApplier.ApplyAsAbsolute = true;
             }
 
@@ -61,24 +57,23 @@ namespace Camera2.Middlewares
             {
                 return true;
             }
-
+            
             var rotateStep = HookLevelRotation.Instance.targetRotation;
 
             // Make sure we don't spam unnecessary calculations / rotation steps for the last little bit
-            if (Math.Abs(_currentRotateAmount - HookLevelRotation.Instance.targetRotation) > 0.3f)
+            if (Math.Abs(_currentRotateAmount - HookLevelRotation.Instance.targetRotation) > .3f)
             {
                 rotateStep = Mathf.LerpAngle(_currentRotateAmount, HookLevelRotation.Instance.targetRotation, Cam.TimeSinceLastRender * Settings.Follow360.Smoothing);
             }
-
+            
             var rot = Quaternion.Euler(0, rotateStep, 0);
 
-            _rotationApplier.Position = (rot * (Cam.Transformer.Position - HookRoomAdjust.position)) + HookRoomAdjust.position;
-            _rotationApplier.Position -= Cam.Transformer.Position;
+            _rotationApplier.Position = (rot * (Cam.Transformer.Position - HookRoomAdjust.Position)) + HookRoomAdjust.Position - Cam.Transformer.Position;
 
             _rotationApplier.Rotation = Settings.Type == CameraType.Positionable 
                 ? rot 
                 : Quaternion.identity;
-
+            
             _currentRotateAmount = rotateStep;
 
             return true;
