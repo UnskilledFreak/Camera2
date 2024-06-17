@@ -25,8 +25,7 @@ namespace Camera2.UI
 
         private static int lastTabSelectedIndex;
 
-        [UsedImplicitly]
-        public static readonly List<object> Types = Enum.GetValues(typeof(CameraType)).Cast<object>().ToList();
+        [UsedImplicitly] public static readonly List<object> Types = Enum.GetValues(typeof(CameraType)).Cast<object>().ToList();
 
         [UsedImplicitly] private static readonly List<object> AntiAliasingLevels = new List<object> { 1, 2, 4, 8 };
         [UsedImplicitly] private static readonly List<object> WorldCamVisibilities = Enum.GetValues(typeof(WorldCamVisibility)).Cast<object>().ToList();
@@ -669,7 +668,7 @@ namespace Camera2.UI
             {
                 x.NotifyPropertyChanged(nameof(x.Val));
             }
-            
+
             SetRotationOffsetText();
 
             return true;
@@ -824,16 +823,20 @@ namespace Camera2.UI
 
         private static float GetNiceRotationNumber(float input)
         {
+            input += .001f;
             return CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition
-                ? input
-                : input > 180f ? input - 360f : input;
+                    ? input
+                    : input > 180f
+                        ? input - 360f
+                        : input;
         }
 
         private static float SetFromNiceRotationNumber(float input)
         {
+            input += .001f;
             return CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition
-                ? input
-                : Mathf.Clamp(input < 0f ? input + 360f : input, 0f, 359.99f);
+                    ? input
+                    : Mathf.Clamp(input < 0f ? input + 360f : input, 0f, 359.99f);
         }
 
         private static void ChangeSliderText(SliderSetting sliderSetting, string newText)
