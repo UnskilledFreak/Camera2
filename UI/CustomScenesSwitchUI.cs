@@ -10,10 +10,14 @@ namespace Camera2.UI
 {
     internal class CustomScenesSwitchUI
     {
-        [UIComponent("customScenesList")]
-        [UsedImplicitly]
-        private CustomCellListTableData _list;
+        
+#pragma warning disable CS0649
 
+        [UIComponent("customScenesList")] [UsedImplicitly]
+        private CustomCellListTableData _list;
+        
+#pragma warning restore CS0649
+        
         [UIValue("scenes")]
         private static List<object> Scenes => ScenesManager.Settings.CustomScenes.Keys
             .Select(x => new CustomSceneUIEntry(x))

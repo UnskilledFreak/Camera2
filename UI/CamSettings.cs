@@ -38,6 +38,8 @@ namespace Camera2.UI
 
         [UsedImplicitly] private SceneToggle[] _scenes;
 
+#pragma warning disable CS0649
+        
         #region UI Components
 
         [UIComponent("pivotingOffsetToggle"), UsedImplicitly]
@@ -95,6 +97,8 @@ namespace Camera2.UI
         public TabSelector tabSelector;
 
         #endregion
+
+#pragma warning restore CS0649
 
         #region UI Getter and Setter
 
@@ -827,18 +831,18 @@ namespace Camera2.UI
         {
             input += .001f;
             return CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition
-                    ? input
-                    : input > 180f
-                        ? input - 360f
-                        : input;
+                ? input
+                : input > 180f
+                    ? input - 360f
+                    : input;
         }
 
         private static float SetFromNiceRotationNumber(float input)
         {
             input += .001f;
             return CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition
-                    ? input
-                    : Mathf.Clamp(input < 0f ? input + 360f : input, 0f, 359.99f);
+                ? input
+                : Mathf.Clamp(input < 0f ? input + 360f : input, 0f, 359.99f);
         }
 
         private static void ChangeSliderText(SliderSetting sliderSetting, string newText)

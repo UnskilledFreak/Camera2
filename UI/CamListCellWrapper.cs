@@ -20,17 +20,19 @@ namespace Camera2.UI
         [UsedImplicitly]
         private string LayerUIText => $"Layer {Cam.Settings.Layer}{(CamManager.Cams.Count(x => x.Settings.Layer == Cam.Settings.Layer) > 1 ? " <color=#d5a145>⚠</color>" : "")}";
 
-        [UIComponent("bgContainer")]
-        [UsedImplicitly]
+#pragma warning disable CS0649
+        
+        [UIComponent("bgContainer"), UsedImplicitly]
         private ImageView _bg;
+        
+#pragma warning restore CS0649
 
         public CamListCellWrapper(Cam2 cam)
         {
             Cam = cam;
         }
 
-        [UIAction("refresh-visuals")]
-        [UsedImplicitly]
+        [UIAction("refresh-visuals"), UsedImplicitly]
         public void Refresh(bool selected, bool highlighted)
         {
             var x = new UnityEngine.Color(0, 0, 0, 0.45f);

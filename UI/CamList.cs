@@ -24,12 +24,16 @@ namespace Camera2.UI
         public override string ResourceName => "Camera2.UI.Views.camList.bsml";
 
         [UsedImplicitly] private string _cam2Version = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak Version 0.2.1";
-
+        
+#pragma warning disable CS0649
+        
         [UIComponent("deleteButton"), UsedImplicitly]
         public NoTransitionsButton deleteButton;
 
         [UIComponent("camList"), UsedImplicitly]
         public CustomCellListTableData list;
+        
+#pragma warning restore CS0649
 
         public IEnumerable<CamListCellWrapper> ListDataOrdered => _listData.OrderByDescending(x => x.Cam.Settings.Layer);
 
