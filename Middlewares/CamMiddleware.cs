@@ -12,11 +12,24 @@ namespace Camera2.Middlewares
         protected bool TeleportOnNextFrame;
         protected CameraSettings Settings => Cam.Settings;
         protected TransformChain Chain => Cam.TransformChain;
+        protected Transformer Transformer;
 
         public IMHandler Init(Cam2 cam)
         {
             Cam = cam;
             return (IMHandler)this;
+        }
+
+        protected void AddTransformer(TransformerTypeAndOrder type, bool asAbsolute = false)
+        {
+            Transformer = Chain.AddOrGet(type);
+            Transformer.ApplyAsAbsolute = asAbsolute;
+        }
+
+        protected void RemoveTransformer(TransformerTypeAndOrder type)
+        {
+            Chain.Remove(type);
+            Transformer = null;
         }
     }
 }

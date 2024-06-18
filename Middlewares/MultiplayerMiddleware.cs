@@ -7,14 +7,11 @@ namespace Camera2.Middlewares
 {
     internal class MultiplayerMiddleware : CamMiddleware, IMHandler
     {
-        private Transformer _origin;
-
         public bool Pre()
         {
             if (!SceneUtil.IsInMultiplayer)
             {
-                Chain.Remove(TransformerTypeAndOrder.PlayerOrigin);
-                _origin = null;
+                RemoveTransformer(TransformerTypeAndOrder.PlayerOrigin);
             }
             /*
              * TODO: This should *eventually* (™) allow to set the origin of this camera to another player
@@ -25,26 +22,26 @@ namespace Camera2.Middlewares
 
             if (!SceneUtil.IsInSong || x == null || !Settings.Multiplayer.FollowSpectatorPlatform)
             {
-                if (_origin == null)
+                if (Transformer == null)
                 {
                     return true;
                 }
 
-                _origin.Position = Vector3.zero;
-                _origin.Rotation = Quaternion.identity;
+                Transformer.Position = Vector3.zero;
+                Transformer.Rotation = Quaternion.identity;
 
                 return true;
             }
 
-            _origin ??= Chain.AddOrGet(TransformerTypeAndOrder.PlayerOrigin);
+            AddTransformer(TransformerTypeAndOrder.PlayerOrigin);
 
             if (x.currentSpot == null)
             {
                 return true;
             }
 
-            _origin.Position = x.currentSpot.transform.position;
-            _origin.Rotation = x.currentSpot.transform.rotation;
+            Transformer.Position = x.currentSpot.transform.position;
+            Transformer.Rotation = x.currentSpot.transform.rotation;
 
             return true;
         }

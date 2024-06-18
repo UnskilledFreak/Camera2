@@ -11,7 +11,6 @@ namespace Camera2.Middlewares
 {
     internal class MovementScriptProcessorMiddleware : CamMiddleware, IMHandler
     {
-        private Transformer _scriptTransformer;
         private Script _loadedScript;
         private float _currentAnimationTime;
         private int _frameIndex;
@@ -23,10 +22,10 @@ namespace Camera2.Middlewares
 
         private void Reset()
         {
-            if (_scriptTransformer != null)
+            if (Transformer != null)
             {
-                _scriptTransformer.Position = Vector3.zero;
-                _scriptTransformer.Rotation = Quaternion.identity;
+                Transformer.Position = Vector3.zero;
+                Transformer.Rotation = Quaternion.identity;
 
                 if (Settings.MovementScript.FromOrigin)
                 {
@@ -80,7 +79,7 @@ namespace Camera2.Middlewares
 
                 Cam.LogInfo($"Applying Movement script {_loadedScript.Name} for camera {Cam.Name}");
 
-                _scriptTransformer ??= Chain.AddOrGet(TransformerTypeAndOrder.MovementScriptProcessor);
+                AddTransformer(TransformerTypeAndOrder.MovementScriptProcessor);
             }
 
             if (_loadedScript.SyncToSong && SceneUtil.IsInSong)
@@ -149,8 +148,8 @@ namespace Camera2.Middlewares
 
                 if (TargetScriptFrame.TransitionEndTime <= _currentAnimationTime)
                 {
-                    _lastPos = _scriptTransformer.Position = TargetScriptFrame.Position;
-                    _lastRot = _scriptTransformer.Rotation = TargetScriptFrame.Rotation;
+                    _lastPos = Transformer.Position = TargetScriptFrame.Position;
+                    _lastRot = Transformer.Rotation = TargetScriptFrame.Rotation;
                     if (TargetScriptFrame.FOV > 0)
                     {
                         _lastFov = Cam.Camera.fieldOfView = TargetScriptFrame.FOV;
@@ -165,8 +164,8 @@ namespace Camera2.Middlewares
                         frameProgress = Easings.EaseInOutCubic01(frameProgress);
                     }
 
-                    _scriptTransformer.Position = Vector3.LerpUnclamped(_lastPos, TargetScriptFrame.Position, frameProgress);
-                    _scriptTransformer.Rotation = Quaternion.LerpUnclamped(_lastRot, TargetScriptFrame.Rotation, frameProgress);
+                    Transformer.Position = Vector3.LerpUnclamped(_lastPos, TargetScriptFrame.Position, frameProgress);
+                    Transformer.Rotation = Quaternion.LerpUnclamped(_lastRot, TargetScriptFrame.Rotation, frameProgress);
 
                     if (TargetScriptFrame.FOV > 0f)
                     {

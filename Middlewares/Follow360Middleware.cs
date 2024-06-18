@@ -10,20 +10,17 @@ namespace Camera2.Middlewares
     internal class Follow360Middleware : CamMiddleware, IMHandler
     {
         public void OnDisable() => Reset();
-
-        private Transformer _rotationApplier;
         private float _currentRotateAmount;
 
         private void Reset()
         {
-            if (_rotationApplier == null)
+            if (Transformer == null)
             {
                 return;
             }
 
             _currentRotateAmount = 0f;
-            Chain.Remove(TransformerTypeAndOrder.Follow360);
-            _rotationApplier = null;
+            RemoveTransformer(TransformerTypeAndOrder.Follow360);
         }
 
         public bool Pre()
@@ -42,10 +39,9 @@ namespace Camera2.Middlewares
                 return true;
             }
 
-            if (_rotationApplier == null)
+            if (Transformer == null)
             {
-                _rotationApplier = Chain.AddOrGet(TransformerTypeAndOrder.Follow360);
-                _rotationApplier.ApplyAsAbsolute = true;
+                AddTransformer(TransformerTypeAndOrder.Follow360, true);
             }
 
             if (HookLevelRotation.Instance.targetRotation == 0f)
@@ -68,9 +64,9 @@ namespace Camera2.Middlewares
             
             var rot = Quaternion.Euler(0, rotateStep, 0);
 
-            _rotationApplier.Position = (rot * (Cam.Transformer.Position - HookRoomAdjust.Position)) + HookRoomAdjust.Position - Cam.Transformer.Position;
+            Transformer!.Position = (rot * (Cam.Transformer.Position - HookRoomAdjust.Position)) + HookRoomAdjust.Position - Cam.Transformer.Position;
 
-            _rotationApplier.Rotation = Settings.Type == CameraType.Positionable 
+            Transformer.Rotation = Settings.Type == CameraType.Positionable 
                 ? rot 
                 : Quaternion.identity;
             

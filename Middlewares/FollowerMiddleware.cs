@@ -8,7 +8,6 @@ namespace Camera2.Middlewares
 {
     internal class FollowerMiddleware : CamMiddleware, IMHandler
     {
-        private Transformer _transformer;
         private bool _wasInMovementScript;
 
         public void OnEnable()
@@ -20,8 +19,7 @@ namespace Camera2.Middlewares
         {
             if (Settings.Type != CameraType.Follower || Settings.Parent == null)
             {
-                Chain.Remove(TransformerTypeAndOrder.Follower);
-                _transformer = null;
+                RemoveTransformer(TransformerTypeAndOrder.Follower);
                 return true;
             }
 
@@ -32,12 +30,11 @@ namespace Camera2.Middlewares
                 return true;
             }
 
-            if (_transformer == null)
+            if (Transformer == null)
             {
                 TeleportOnNextFrame = true;
 
-                _transformer = Chain.AddOrGet(TransformerTypeAndOrder.Follower);
-                _transformer.ApplyAsAbsolute = true;
+                AddTransformer(TransformerTypeAndOrder.Follower, true);
             }
 
             var targetPosition = -(Cam.Camera.transform.localPosition - Settings.Parent.position);
@@ -60,7 +57,7 @@ namespace Camera2.Middlewares
                 lookRotation *= Quaternion.Inverse(Quaternion.Euler(Settings.TargetRot));
             }
 
-            _transformer.Position = Vector3.zero;
+            Transformer!.Position = Vector3.zero;
 
             if (_wasInMovementScript)
             {
@@ -70,12 +67,12 @@ namespace Camera2.Middlewares
 
             if (TeleportOnNextFrame)
             {
-                _transformer.Rotation = Quaternion.identity;
+                Transformer.Rotation = Quaternion.identity;
                 TeleportOnNextFrame = false;
             }
             else
             {
-                _transformer.Rotation = Quaternion.Slerp(_transformer.Rotation, lookRotation, Cam.TimeSinceLastRender * Settings.SmoothFollow.Rotation);
+                Transformer.Rotation = Quaternion.Slerp(Transformer.Rotation, lookRotation, Cam.TimeSinceLastRender * Settings.SmoothFollow.Rotation);
             }
 
             return true;

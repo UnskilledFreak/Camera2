@@ -14,7 +14,6 @@ namespace Camera2.Middlewares
     {
         private Scene _lastScene;
         private Transform _parent;
-        private Transformer _transformer;
         private bool _useLocalPosition;
 
         public void OnEnable()
@@ -33,8 +32,7 @@ namespace Camera2.Middlewares
             // only handle first person and attached types
             if (Settings.IsPositionalCam())
             {
-                Chain.Remove(TransformerTypeAndOrder.SmoothFollow);
-                _transformer = null;
+                RemoveTransformer(TransformerTypeAndOrder.SmoothFollow);
                 _parent = null;
                 return true;
             }
@@ -118,25 +116,25 @@ namespace Camera2.Middlewares
                 TeleportOnNextFrame = _lastScene != SceneUtil.CurrentScene || (HookFPFCToggle.isInFPFC && currentReplaySource == null);
             }
 
-            if (_transformer == null)
+            if (Transformer == null)
             {
-                _transformer = Chain.AddOrGet(TransformerTypeAndOrder.SmoothFollow);
+                AddTransformer(TransformerTypeAndOrder.SmoothFollow);
                 TeleportOnNextFrame = true;
             }
 
             // If we switched scenes (E.g. left / entered a song) we want to snap to the correct position before smoothing again
             if (TeleportOnNextFrame)
             {
-                _transformer.Position = targetPosition;
-                _transformer.Rotation = targetRotation;
+                Transformer!.Position = targetPosition;
+                Transformer.Rotation = targetRotation;
 
                 _lastScene = SceneUtil.CurrentScene;
                 TeleportOnNextFrame = false;
             }
             else
             {
-                _transformer.Position = Vector3.Lerp(_transformer.Position, targetPosition, Cam.TimeSinceLastRender * Settings.SmoothFollow.Position);
-                _transformer.Rotation = Quaternion.Slerp(_transformer.Rotation, targetRotation, Cam.TimeSinceLastRender * Settings.SmoothFollow.Rotation);
+                Transformer!.Position = Vector3.Lerp(Transformer.Position, targetPosition, Cam.TimeSinceLastRender * Settings.SmoothFollow.Position);
+                Transformer.Rotation = Quaternion.Slerp(Transformer.Rotation, targetRotation, Cam.TimeSinceLastRender * Settings.SmoothFollow.Rotation);
             }
 
             return true;

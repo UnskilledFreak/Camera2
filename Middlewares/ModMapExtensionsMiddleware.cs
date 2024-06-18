@@ -7,10 +7,7 @@ namespace Camera2.Middlewares
 {
     internal class ModMapExtensionsMiddleware : CamMiddleware, IMHandler
     {
-        //private static Type NoodlePlayerTrack;
-        private static Transform globNoodleOrigin;
         private Transform _noodleOrigin;
-        private Transformer _mapMovementTransformer;
 
         public bool Pre()
         {
@@ -21,33 +18,21 @@ namespace Camera2.Middlewares
                 || (!Settings.ModMapExtensions.MoveWithMap && Settings.IsPositionalCam())
             )
             {
-                Chain.Remove(TransformerTypeAndOrder.ModMapParenting);
-                _mapMovementTransformer = null;
+                RemoveTransformer(TransformerTypeAndOrder.ModMapParenting);
                 _noodleOrigin = null;
                 return true;
             }
 
-            if (_noodleOrigin is null)
-            {
-                // Unity moment
-                if (globNoodleOrigin == null)
-                {
-                    globNoodleOrigin = null;
-                }
-
-                // This stinks
-                _noodleOrigin = globNoodleOrigin ?? (GameObject.Find("NoodlePlayerTrackHead") ?? GameObject.Find("NoodlePlayerTrackRoot"))?.transform;
-                globNoodleOrigin = _noodleOrigin;
-            }
+            _noodleOrigin ??= (GameObject.Find("NoodlePlayerTrackHead") ?? GameObject.Find("NoodlePlayerTrackRoot"))?.transform;
 
             // Noodle maps do not *necessarily* have a player track if it not actually used
             if (_noodleOrigin != null)
             {
                 // If we are not yet attached, and we don't have a parent that's active yet, try to get one!
-                _mapMovementTransformer ??= Chain.AddOrGet(TransformerTypeAndOrder.ModMapParenting);
+                AddTransformer(TransformerTypeAndOrder.ModMapParenting);
 
-                _mapMovementTransformer.Position = _noodleOrigin.localPosition;
-                _mapMovementTransformer.Rotation = _noodleOrigin.localRotation;
+                Transformer.Position = _noodleOrigin.localPosition;
+                Transformer.Rotation = _noodleOrigin.localRotation;
 
                 return true;
             }
@@ -57,8 +42,8 @@ namespace Camera2.Middlewares
                 return true;
             }
 
-            _mapMovementTransformer.Position = Vector3.zero;
-            _mapMovementTransformer.Rotation = Quaternion.identity;
+            Transformer.Position = Vector3.zero;
+            Transformer.Rotation = Quaternion.identity;
 
             _noodleOrigin = null;
 
