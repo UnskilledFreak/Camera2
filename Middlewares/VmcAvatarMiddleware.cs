@@ -22,7 +22,7 @@ namespace Camera2.Middlewares
                 return;
             }
 
-            if (_prevFov == Cam.Settings.FOV && _prevPos == Cam.TransformChain.Position && _prevRot == Cam.TransformChain.Rotation)
+            if (_prevFov == Cam.Settings.FOV && _prevPos == Chain.Position && _prevRot == Chain.Rotation)
             {
                 return;
             }
@@ -40,8 +40,8 @@ namespace Camera2.Middlewares
             finally
             {
                 _prevFov = Cam.Settings.FOV;
-                _prevPos = Cam.TransformChain.Position;
-                _prevRot = Cam.TransformChain.Rotation;
+                _prevPos = Chain.Position;
+                _prevRot = Chain.Rotation;
             }
         }
 

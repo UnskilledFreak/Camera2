@@ -1,6 +1,5 @@
 ﻿using Camera2.HarmonyPatches;
 using Camera2.Managers;
-using Camera2.Middlewares;
 using Camera2.Utils;
 using HarmonyLib;
 using IPA;

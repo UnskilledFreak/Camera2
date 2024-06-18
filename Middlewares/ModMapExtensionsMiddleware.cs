@@ -21,7 +21,7 @@ namespace Camera2.Middlewares
                 || (!Settings.ModMapExtensions.MoveWithMap && Settings.IsPositionalCam())
             )
             {
-                Cam.TransformChain.Remove(TransformerTypeAndOrder.ModMapParenting);
+                Chain.Remove(TransformerTypeAndOrder.ModMapParenting);
                 _mapMovementTransformer = null;
                 _noodleOrigin = null;
                 return true;
@@ -44,10 +44,11 @@ namespace Camera2.Middlewares
             if (_noodleOrigin != null)
             {
                 // If we are not yet attached, and we don't have a parent that's active yet, try to get one!
-                _mapMovementTransformer ??= Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.ModMapParenting);
+                _mapMovementTransformer ??= Chain.AddOrGet(TransformerTypeAndOrder.ModMapParenting);
 
                 _mapMovementTransformer.Position = _noodleOrigin.localPosition;
                 _mapMovementTransformer.Rotation = _noodleOrigin.localRotation;
+
                 return true;
             }
 

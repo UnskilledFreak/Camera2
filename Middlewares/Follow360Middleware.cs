@@ -22,7 +22,7 @@ namespace Camera2.Middlewares
             }
 
             _currentRotateAmount = 0f;
-            Cam.TransformChain.Remove(TransformerTypeAndOrder.Follow360);
+            Chain.Remove(TransformerTypeAndOrder.Follow360);
             _rotationApplier = null;
         }
 
@@ -44,7 +44,7 @@ namespace Camera2.Middlewares
 
             if (_rotationApplier == null)
             {
-                _rotationApplier = Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.Follow360);
+                _rotationApplier = Chain.AddOrGet(TransformerTypeAndOrder.Follow360);
                 _rotationApplier.ApplyAsAbsolute = true;
             }
 

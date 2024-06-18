@@ -13,7 +13,7 @@ namespace Camera2.Middlewares
         {
             if (!SceneUtil.IsInMultiplayer)
             {
-                Cam.TransformChain.Remove(TransformerTypeAndOrder.PlayerOrigin);
+                Chain.Remove(TransformerTypeAndOrder.PlayerOrigin);
                 _origin = null;
             }
             /*
@@ -36,7 +36,7 @@ namespace Camera2.Middlewares
                 return true;
             }
 
-            _origin ??= Settings.Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.PlayerOrigin);
+            _origin ??= Chain.AddOrGet(TransformerTypeAndOrder.PlayerOrigin);
 
             if (x.currentSpot == null)
             {

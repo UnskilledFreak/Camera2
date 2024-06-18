@@ -33,7 +33,7 @@ namespace Camera2.Middlewares
             // only handle first person and attached types
             if (Settings.IsPositionalCam())
             {
-                Cam.TransformChain.Remove(TransformerTypeAndOrder.SmoothFollow);
+                Chain.Remove(TransformerTypeAndOrder.SmoothFollow);
                 _transformer = null;
                 _parent = null;
                 return true;
@@ -120,7 +120,7 @@ namespace Camera2.Middlewares
 
             if (_transformer == null)
             {
-                _transformer = Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.SmoothFollow);
+                _transformer = Chain.AddOrGet(TransformerTypeAndOrder.SmoothFollow);
                 TeleportOnNextFrame = true;
             }
 

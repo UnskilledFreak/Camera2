@@ -1,15 +1,26 @@
-﻿using Camera2.Configuration;
-using Camera2.Utils;
+﻿using Camera2.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Camera2.MovementScript;
+using JetBrains.Annotations;
 
 namespace Camera2.Managers
 {
     internal static class MovementScriptManager
     {
-        public static Dictionary<string, MovementScript> MovementScripts { get; } = new Dictionary<string, MovementScript>();
+        private static List<Script> MovementScripts { get; } = new List<Script>();
+        private static readonly Random RandomSource = new Random();
+
+        [CanBeNull]
+        public static Script GetRandomFromPossibles(string[] names)
+        {
+            var possibles = MovementScripts.Where(x => names.Contains(x.Name)).ToList();
+            return possibles.Count == 0 
+                ? null 
+                : possibles[RandomSource.Next(possibles.Count)];
+        }
 
         public static void LoadMovementScripts(bool reload = false)
         {
@@ -27,7 +38,7 @@ namespace Camera2.Managers
                     {
                         var name = Path.GetFileNameWithoutExtension(cam);
 
-                        var script = MovementScript.Load(name);
+                        var script = Script.Load(name);
 
                         if (script.Frames.Count < 2)
                         {
@@ -38,9 +49,9 @@ namespace Camera2.Managers
                         Plugin.Log.Info($"Sync to song: {script.SyncToSong}");
                         Plugin.Log.Info($"Duration: {script.ScriptDuration} ({script.Frames.Count} frames)");
 
-                        MovementScripts[name] = script;
+                        MovementScripts.Add(script);
 
-                        if (reload && script != null)
+                        if (reload)
                         {
                             loadedNames.Add(name);
                         }
@@ -57,9 +68,9 @@ namespace Camera2.Managers
                     return;
                 }
 
-                foreach (var deletedScript in MovementScripts.Where(x => !loadedNames.Contains(x.Key)))
+                foreach (var deletedScript in MovementScripts.Where(x => !loadedNames.Contains(x.Name)).ToList())
                 {
-                    MovementScripts.Remove(deletedScript.Key);
+                    MovementScripts.Remove(deletedScript);
                 }
             }
         }

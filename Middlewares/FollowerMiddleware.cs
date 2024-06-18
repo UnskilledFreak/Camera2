@@ -20,13 +20,13 @@ namespace Camera2.Middlewares
         {
             if (Settings.Type != CameraType.Follower || Settings.Parent == null)
             {
-                Cam.TransformChain.Remove(TransformerTypeAndOrder.Follower);
+                Chain.Remove(TransformerTypeAndOrder.Follower);
                 _transformer = null;
                 return true;
             }
 
             // don't track until MovementScript is done
-            if (Cam.TransformChain.HasMovementScriptTransformer())
+            if (Chain.HasType(TransformerTypeAndOrder.MovementScriptProcessor))
             {
                 _wasInMovementScript = true;
                 return true;
@@ -36,7 +36,7 @@ namespace Camera2.Middlewares
             {
                 TeleportOnNextFrame = true;
 
-                _transformer = Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.Follower);
+                _transformer = Chain.AddOrGet(TransformerTypeAndOrder.Follower);
                 _transformer.ApplyAsAbsolute = true;
             }
 

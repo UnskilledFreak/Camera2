@@ -1,54 +1,24 @@
-﻿using Camera2.Utils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.IO;
 using Camera2.Enums;
-using Camera2.JsonConverter;
+using Camera2.Utils;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-namespace Camera2.Configuration
+namespace Camera2.MovementScript
 {
-    internal class MovementScript
+    internal class Script
     {
-        public class Frame
-        {
-            //[JsonConverter(typeof(StringEnumConverter))]
-            //public PositionType posType = PositionType.Absolute;
-            [JsonConverter(typeof(StringEnumConverter)), DefaultValue(MoveType.Linear)]
-            public MoveType Transition = MoveType.Linear;
-
-            [JsonConverter(typeof(Vector3Converter))]
-            public Vector3 Position = Vector3.zero;
-
-            [JsonIgnore] public Quaternion Rotation = Quaternion.identity;
-
-            [JsonConverter(typeof(Vector3Converter)), JsonProperty("rotation")]
-            public Vector3 RotationEuler
-            {
-                get => Rotation.eulerAngles;
-                set => Rotation = Quaternion.Euler(value);
-            }
-
-
-            [DefaultValue(0f)] public float FOV;
-            public float Duration;
-            public float HoldTime;
-
-            [JsonIgnore] public float StartTime;
-            [JsonIgnore] public float TransitionEndTime;
-            [JsonIgnore] public float EndTime;
-        }
-
         [JsonProperty("syncToSong")] public bool SyncToSong { get; private set; }
 
         [JsonProperty("loop")] public bool Loop { get; private set; } = true;
 
-        public List<Frame> Frames { get; } = new List<Frame>();
+        public List<ScriptFrame> Frames { get; } = new List<ScriptFrame>();
 
         [JsonIgnore] public float ScriptDuration { get; private set; }
+
+        [JsonIgnore] public string Name { get; set; } = "";
 
         private void PopulateTimes()
         {
@@ -63,7 +33,7 @@ namespace Camera2.Configuration
             ScriptDuration = time;
         }
 
-        public static MovementScript Load(string name)
+        public static Script Load(string name)
         {
             var scriptPath = ConfigUtil.GetMovementScriptPath(name);
             if (!File.Exists(scriptPath))
@@ -71,7 +41,10 @@ namespace Camera2.Configuration
                 return null;
             }
 
-            var script = new MovementScript();
+            var script = new Script
+            {
+                Name = name
+            };
 
             var scriptContent = File.ReadAllText(scriptPath);
             // Not a Noodle movement script
@@ -88,14 +61,14 @@ namespace Camera2.Configuration
 
                 foreach (var movement in camPlusScript.movements)
                 {
-                    script.Frames.Add(new Frame
+                    script.Frames.Add(new ScriptFrame
                     {
                         Position = new Vector3((float)movement.startpos.x, (float)movement.startpos.y, (float)movement.startpos.z), 
                         RotationEuler = new Vector3((float)movement.startrot.x, (float)movement.startrot.y, (float)movement.startrot.z), 
                         FOV = (float)(movement.startpos.fov ?? 0f)
                     });
 
-                    script.Frames.Add(new Frame
+                    script.Frames.Add(new ScriptFrame
                     {
                         Position = new Vector3((float)movement.endpos.x, (float)movement.endpos.y, (float)movement.endpos.z),
                         RotationEuler = new Vector3((float)movement.endrot.x, (float)movement.endrot.y, (float)movement.endrot.z),

@@ -24,6 +24,8 @@ namespace Camera2.Utils
         {
             return "Transformer Chain: " + string.Join(", ", _transformers.OrderBy(x => x.Value.Order).Select(x => x.Key));
         }
+        
+        public bool HasType(TransformerTypeAndOrder type) => _transformers.ContainsKey(type);
 
         public Transformer AddOrGet(TransformerTypeAndOrder type, bool sortIn = true)
         {
@@ -46,13 +48,11 @@ namespace Camera2.Utils
 
         public void Remove(TransformerTypeAndOrder type)
         {
-            if (_transformers.ContainsKey(type))
+            if (HasType(type))
             {
                 _transformers.Remove(type);
             }
         }
-
-        public bool HasMovementScriptTransformer() => _transformers.ContainsKey(TransformerTypeAndOrder.MovementScriptProcessor);
 
         public void Calculate(bool apply = true)
         {

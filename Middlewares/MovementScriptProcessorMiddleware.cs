@@ -1,9 +1,9 @@
-﻿using Camera2.Configuration;
-using Camera2.Interfaces;
+﻿using Camera2.Interfaces;
 using Camera2.Managers;
 using Camera2.Utils;
 using System.Linq;
 using Camera2.Enums;
+using Camera2.MovementScript;
 using UnityEngine;
 using CameraType = Camera2.Enums.CameraType;
 
@@ -11,17 +11,15 @@ namespace Camera2.Middlewares
 {
     internal class MovementScriptProcessorMiddleware : CamMiddleware, IMHandler
     {
-        private static readonly System.Random RandomSource = new System.Random();
-
         private Transformer _scriptTransformer;
-        private MovementScript _loadedScript;
+        private Script _loadedScript;
         private float _currentAnimationTime;
         private int _frameIndex;
         private float _lastFov;
         private Vector3 _lastPos = Vector3.zero;
         private Quaternion _lastRot = Quaternion.identity;
         private float _lastAnimTime;
-        private MovementScript.Frame TargetFrame => _loadedScript.Frames[_frameIndex];
+        private ScriptFrame TargetScriptFrame => _loadedScript.Frames[_frameIndex];
 
         private void Reset()
         {
@@ -70,16 +68,8 @@ namespace Camera2.Middlewares
 
             if (_loadedScript == null)
             {
-                var possibleScripts = Settings.MovementScript.ScriptList.Where(MovementScriptManager.MovementScripts.ContainsKey).ToArray();
 
-                if (possibleScripts.Length == 0)
-                {
-                    return true;
-                }
-
-                var scriptToUse = possibleScripts[RandomSource.Next(possibleScripts.Length)];
-
-                _loadedScript = MovementScriptManager.MovementScripts[scriptToUse];
+                _loadedScript = MovementScriptManager.GetRandomFromPossibles(Settings.MovementScript.ScriptList);
 
                 if (_loadedScript == null)
                 {
@@ -88,9 +78,9 @@ namespace Camera2.Middlewares
 
                 _lastFov = Cam.Camera.fieldOfView;
 
-                Cam.LogInfo($"Applying Movement script {scriptToUse} for camera {Cam.Name}");
+                Cam.LogInfo($"Applying Movement script {_loadedScript.Name} for camera {Cam.Name}");
 
-                _scriptTransformer ??= Cam.TransformChain.AddOrGet(TransformerTypeAndOrder.MovementScriptProcessor);
+                _scriptTransformer ??= Chain.AddOrGet(TransformerTypeAndOrder.MovementScriptProcessor);
             }
 
             if (_loadedScript.SyncToSong && SceneUtil.IsInSong)
@@ -120,7 +110,7 @@ namespace Camera2.Middlewares
                     /*
                     if (_scriptTransformer != null)
                     {
-                        Cam.TransformChain.Remove(TransformerOrders.MovementScriptProcessor);
+                        Chain.Remove(TransformerOrders.MovementScriptProcessor);
                         _scriptTransformer = null;
                         Cam.Transformer.Position = _lastPos;
                         Cam.Transformer.Rotation = _lastRot;
@@ -143,7 +133,7 @@ namespace Camera2.Middlewares
                     {
                         _frameIndex--;
 
-                        if (TargetFrame.StartTime <= _currentAnimationTime)
+                        if (TargetScriptFrame.StartTime <= _currentAnimationTime)
                         {
                             break;
                         }
@@ -152,35 +142,35 @@ namespace Camera2.Middlewares
                     _lastAnimTime = _currentAnimationTime;
                 }
 
-                if (TargetFrame.StartTime > _currentAnimationTime)
+                if (TargetScriptFrame.StartTime > _currentAnimationTime)
                 {
                     break;
                 }
 
-                if (TargetFrame.TransitionEndTime <= _currentAnimationTime)
+                if (TargetScriptFrame.TransitionEndTime <= _currentAnimationTime)
                 {
-                    _lastPos = _scriptTransformer.Position = TargetFrame.Position;
-                    _lastRot = _scriptTransformer.Rotation = TargetFrame.Rotation;
-                    if (TargetFrame.FOV > 0)
+                    _lastPos = _scriptTransformer.Position = TargetScriptFrame.Position;
+                    _lastRot = _scriptTransformer.Rotation = TargetScriptFrame.Rotation;
+                    if (TargetScriptFrame.FOV > 0)
                     {
-                        _lastFov = Cam.Camera.fieldOfView = TargetFrame.FOV;
+                        _lastFov = Cam.Camera.fieldOfView = TargetScriptFrame.FOV;
                     }
                 }
-                else if (TargetFrame.StartTime <= _currentAnimationTime)
+                else if (TargetScriptFrame.StartTime <= _currentAnimationTime)
                 {
-                    var frameProgress = (_currentAnimationTime - TargetFrame.StartTime) / TargetFrame.Duration;
+                    var frameProgress = (_currentAnimationTime - TargetScriptFrame.StartTime) / TargetScriptFrame.Duration;
 
-                    if (TargetFrame.Transition == MoveType.Eased)
+                    if (TargetScriptFrame.Transition == MoveType.Eased)
                     {
                         frameProgress = Easings.EaseInOutCubic01(frameProgress);
                     }
 
-                    _scriptTransformer.Position = Vector3.LerpUnclamped(_lastPos, TargetFrame.Position, frameProgress);
-                    _scriptTransformer.Rotation = Quaternion.LerpUnclamped(_lastRot, TargetFrame.Rotation, frameProgress);
+                    _scriptTransformer.Position = Vector3.LerpUnclamped(_lastPos, TargetScriptFrame.Position, frameProgress);
+                    _scriptTransformer.Rotation = Quaternion.LerpUnclamped(_lastRot, TargetScriptFrame.Rotation, frameProgress);
 
-                    if (TargetFrame.FOV > 0f)
+                    if (TargetScriptFrame.FOV > 0f)
                     {
-                        Cam.Camera.fieldOfView = Mathf.LerpUnclamped(_lastFov, TargetFrame.FOV, frameProgress);
+                        Cam.Camera.fieldOfView = Mathf.LerpUnclamped(_lastFov, TargetScriptFrame.FOV, frameProgress);
                     }
 
                     break;

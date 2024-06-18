@@ -1,7 +1,4 @@
 ﻿using Camera2.Enums;
-using Camera2.Utils;
-using Newtonsoft.Json;
-using UnityEngine;
 
 namespace Camera2.Configuration
 {

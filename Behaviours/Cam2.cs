@@ -11,7 +11,6 @@ using System.Linq;
 using Camera2.Enums;
 using Camera2.Managers;
 using UnityEngine;
-using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Behaviours
 {

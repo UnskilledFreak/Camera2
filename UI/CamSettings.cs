@@ -580,6 +580,10 @@ namespace Camera2.UI
         [UsedImplicitly]
         public void TargetNalulunaCatHead() => SetNewTarget("Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head");
 
+        [UIAction("TargetVrmHead")]
+        [UsedImplicitly]
+        public void TargetVrmHead() => SetNewTarget("VRMAvatar/Head");
+
         [UIAction("TargetLookAtPointer")]
         [UsedImplicitly]
         public void TargetLookAtPointer() => SetNewTarget("VRLaserPointer(Clone)");
