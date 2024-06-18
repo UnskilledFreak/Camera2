@@ -121,10 +121,8 @@ namespace Camera2.UI
             get => CurrentCam.Settings.Type;
             set
             {
-                //CurrentCam.Transformer.ApplyAsAbsolute = value == CameraType.Follower;
                 switch (value)
                 {
-                    // When switching to FP reset Rot / Pos so that the previous TP values aren't used as the FP offset
                     case CameraType.FirstPerson:
                     case CameraType.Attached:
                         CurrentCam.Settings.TargetPos = new Vector3(0, 0, 0);

@@ -12,21 +12,18 @@ namespace Camera2.Middlewares
         private Transform _noodleOrigin;
         private Transformer _mapMovementTransformer;
 
-        public static void Reflect()
-        {
-            //NoodlePlayerTrack ??= IPA.Loader.PluginManager.GetPluginFromId("NoodleExtensions")?.Assembly.GetType("NoodleExtensions.Animation.PlayerTrack");
-        }
-
         public bool Pre()
         {
             // We want to parent FP cams as well so that the noodle translations are applied instantly and don't get smoothed out by SmoothFollow
             if (
                 !enabled
                 || !HookLeveldata.IsModdedMap
-                || (!Settings.ModMapExtensions.MoveWithMap && Settings.IsPositionalCam()))
+                || (!Settings.ModMapExtensions.MoveWithMap && Settings.IsPositionalCam())
+            )
             {
                 Cam.TransformChain.Remove(TransformerTypeAndOrder.ModMapParenting);
                 _mapMovementTransformer = null;
+                _noodleOrigin = null;
                 return true;
             }
 

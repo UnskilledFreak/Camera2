@@ -91,7 +91,6 @@ namespace Camera2
             // Marinate the Reflection stuff off-thread so the loading of cameras later is less blocking
             Task.Run(() =>
             {
-                ModMapExtensionsMiddleware.Reflect();
                 CustomNotesUtil.Reflect();
                 if (ScoreSaber.Reflect())
                 {
