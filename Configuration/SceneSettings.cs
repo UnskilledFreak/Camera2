@@ -55,11 +55,11 @@ namespace Camera2.Configuration
             }
 
             // Populate missing Scenes if the Scenes cfg was outdated
-            foreach (SceneTypes foo in Enum.GetValues(typeof(SceneTypes)))
+            foreach (SceneTypes type in Enum.GetValues(typeof(SceneTypes)))
             {
-                if (!Scenes.ContainsKey(foo))
+                if (!Scenes.ContainsKey(type))
                 {
-                    Scenes.Add(foo, new List<string>());
+                    Scenes.Add(type, new List<string>());
                 }
             }
 

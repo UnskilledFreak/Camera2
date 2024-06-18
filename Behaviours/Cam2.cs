@@ -33,13 +33,13 @@ namespace Camera2.Behaviours
         internal IMHandler[] Middlewares { get; private set; }
         internal float TimeSinceLastRender { get; private set; }
         internal bool Destroying { get; private set; }
-        
+
         internal Transformer Transformer;
         internal TransformChain TransformChain;
         private ParentShield _shield;
-        
+
         internal string ConfigPath => ConfigUtil.GetCameraPath(Name);
-        
+
         internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.CamSettings.isActiveAndEnabled && CamSettings.CurrentCam == this;
 
         public void Awake()

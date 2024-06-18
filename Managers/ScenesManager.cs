@@ -15,7 +15,7 @@ namespace Camera2.Managers
         public static readonly HashSet<string> MenuSceneNames = new HashSet<string> { "MainMenu", "MenuViewCore", "MenuCore", "MenuViewControllers" };
         public static readonly HashSet<string> DisabledSceneNames = new HashSet<string> { "PCInit", "BeatmapEditor3D", "BeatmapLevelEditorWorldUi" };
 
-        internal static ScenesSettings Settings { get; private set; } = new ScenesSettings();
+        internal static ScenesSettings Settings { get; } = new ScenesSettings();
 
         // Kind of a hack not having it start off Menu but else the first menu load will not apply...
         internal static SceneTypes? LoadedScene { get; private set; }
