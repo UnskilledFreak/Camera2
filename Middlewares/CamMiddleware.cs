@@ -26,6 +26,8 @@ namespace Camera2.Middlewares
             Transformer.ApplyAsAbsolute = asAbsolute;
         }
 
+        protected Transformer GetTransformer(TransformerTypeAndOrder type) => Chain.AddOrGet(type);
+
         protected void RemoveTransformer(TransformerTypeAndOrder type)
         {
             Chain.Remove(type);

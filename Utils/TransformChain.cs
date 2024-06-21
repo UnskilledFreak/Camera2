@@ -22,7 +22,7 @@ namespace Camera2.Utils
 
         public string DebugChain()
         {
-            return "Transformer Chain: " + string.Join(", ", _transformers.OrderBy(x => x.Value.Order).Select(x => x.Key));
+            return "Transformer Chain: " + string.Join(", ", _transformers.OrderBy(x => x.Value.Order).Select(x => $"{x.Key} @ {x.Value.Order}"));
         }
         
         public bool HasType(TransformerTypeAndOrder type) => _transformers.ContainsKey(type);

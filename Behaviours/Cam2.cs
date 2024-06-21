@@ -251,6 +251,11 @@ namespace Camera2.Behaviours
             LogInfo("loaded");
         }
 
+        public Vector3 CalculatePositionOffsetOnRotation(Quaternion quaternion, Vector3 offset)
+        {
+            return (quaternion * (Transformer.Position - HookRoomAdjust.Position)) + HookRoomAdjust.Position - Transformer.Position + offset;
+        }
+
         private IMHandler MakeMiddleware<T>() where T : CamMiddleware, IMHandler
         {
             return gameObject.AddComponent<T>().Init(this);

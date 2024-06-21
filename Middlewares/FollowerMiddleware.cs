@@ -34,7 +34,7 @@ namespace Camera2.Middlewares
             {
                 TeleportOnNextFrame = true;
 
-                AddTransformer(TransformerTypeAndOrder.Follower, true);
+                AddTransformer(TransformerTypeAndOrder.Follower);
             }
 
             var targetPosition = -(Cam.Camera.transform.localPosition - Settings.Parent.position);
@@ -51,10 +51,15 @@ namespace Camera2.Middlewares
                     : Settings.TargetRot;
             }
 
-            var lookRotation = Quaternion.LookRotation(targetPosition);
+            var upVector = Chain.HasType(TransformerTypeAndOrder.ModMapParenting)
+                ? (Cam.Transformer.Position - GetTransformer(TransformerTypeAndOrder.ModMapParenting).Position).normalized
+                : Vector3.up;
+            
+            var lookRotation = Quaternion.LookRotation(targetPosition, upVector);
+            
             if (!Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition && !Settings.SmoothFollow.FollowerOffsetPositionIsRelative)
             {
-                lookRotation *= Quaternion.Inverse(Quaternion.Euler(Settings.TargetRot));
+                lookRotation *= Quaternion.Euler(Settings.TargetRot);
             }
 
             Transformer!.Position = Vector3.zero;

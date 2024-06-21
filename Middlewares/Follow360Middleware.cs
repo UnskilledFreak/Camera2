@@ -64,7 +64,7 @@ namespace Camera2.Middlewares
             
             var rot = Quaternion.Euler(0, rotateStep, 0);
 
-            Transformer!.Position = (rot * (Cam.Transformer.Position - HookRoomAdjust.Position)) + HookRoomAdjust.Position - Cam.Transformer.Position;
+            Transformer!.Position = Cam.CalculatePositionOffsetOnRotation(rot, Vector3.zero);
 
             Transformer.Rotation = Settings.Type == CameraType.Positionable 
                 ? rot 

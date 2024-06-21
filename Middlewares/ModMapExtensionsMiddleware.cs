@@ -2,6 +2,7 @@
 using Camera2.Interfaces;
 using Camera2.Utils;
 using UnityEngine;
+using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Middlewares
 {
@@ -23,16 +24,26 @@ namespace Camera2.Middlewares
                 return true;
             }
 
+            // Noodle maps do not *necessarily* have a player track if it not actually used
             _noodleOrigin ??= (GameObject.Find("NoodlePlayerTrackHead") ?? GameObject.Find("NoodlePlayerTrackRoot"))?.transform;
 
-            // Noodle maps do not *necessarily* have a player track if it not actually used
-            if (_noodleOrigin != null)
+            if (!(_noodleOrigin is null))
             {
-                // If we are not yet attached, and we don't have a parent that's active yet, try to get one!
-                AddTransformer(TransformerTypeAndOrder.ModMapParenting);
+                if (Transformer == null)
+                {
+                    AddTransformer(TransformerTypeAndOrder.ModMapParenting);
+                }
 
-                Transformer.Position = _noodleOrigin.localPosition;
-                Transformer.Rotation = _noodleOrigin.localRotation;
+                if (Settings.Type == CameraType.Follower)
+                {
+                    Transformer!.Position = Cam.CalculatePositionOffsetOnRotation(_noodleOrigin.localRotation, _noodleOrigin.localPosition);
+                    Transformer.Rotation = Quaternion.identity;
+                }
+                else
+                {
+                    Transformer!.Position = _noodleOrigin.localPosition;
+                    Transformer.Rotation = _noodleOrigin.localRotation;
+                }
 
                 return true;
             }
