@@ -65,7 +65,12 @@ namespace Camera2.Middlewares
 
             if (!Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition && !Settings.SmoothFollow.FollowerOffsetPositionIsRelative)
             {
-                lookRotation *= Quaternion.Euler(Settings.TargetRot);
+                var rotOffset = Quaternion.Euler(Settings.TargetRot);
+                if (Settings.SmoothFollow.FollowerUseOrganic)
+                {
+                    rotOffset = Quaternion.Inverse(rotOffset);
+                }
+                lookRotation *= rotOffset;
             }
 
             Transformer!.Position = Vector3.zero;

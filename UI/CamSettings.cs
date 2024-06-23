@@ -51,6 +51,9 @@ namespace Camera2.UI
         [UIComponent("followerPosRelativeToggle"), UsedImplicitly]
         public ToggleSetting followerPosRelativeToggle;
 
+        [UIComponent("followerUseOrganicToggle"), UsedImplicitly]
+        public ToggleSetting followerUseOrganicToggle;
+
         [UIComponent("zOffsetSlider"), UsedImplicitly]
         public SliderSetting zOffsetSlider;
 
@@ -126,23 +129,9 @@ namespace Camera2.UI
             get => CurrentCam.Settings.Type;
             set
             {
-                switch (value)
-                {
-                    case CameraType.FirstPerson:
-                    case CameraType.Attached:
-                        CurrentCam.Settings.TargetPos = new Vector3(0, 0, 0);
-                        NotifyPropertyChanged(nameof(ZOffset));
-                        break;
-                    case CameraType.Positionable:
-                    case CameraType.Follower:
-                    default:
-                        CurrentCam.Settings.TargetPos = new Vector3(0, 1.5f, 1f);
-                        CurrentCam.Settings.TargetRot = Vector3.zero;
-                        break;
-                }
-
                 CurrentCam.Settings.Type = value;
                 ToggleSettingVisibility();
+                NotifyPropertyChanged(nameof(ZOffset));
                 NotifyTargetPosRotChanged();
                 NotifyPropertyChanged(nameof(TargetParent));
             }
@@ -531,10 +520,21 @@ namespace Camera2.UI
             set
             {
                 CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition = value;
-                CurrentCam.Settings.TargetRot = Vector3.zero;
+                CurrentCam.Settings.SmoothFollow.FollowerUseOrganic = false;
+                if (CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
+                {
+                    CurrentCam.Settings.TargetRot /= 180;
+                }
+                else
+                {
+                    CurrentCam.Settings.TargetRot *= 180;
+                }
+
                 NotifyPropertyChanged();
                 NotifyTargetPosRotChanged();
                 SetRotationOffsetText();
+                ToggleFollowerSpecificSettings();
+                NotifyPropertyChanged(nameof(FollowerUseOrganic));
             }
         }
 
@@ -546,6 +546,20 @@ namespace Camera2.UI
             {
                 CurrentCam.Settings.SmoothFollow.FollowerOffsetPositionIsRelative = value;
                 NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal bool FollowerUseOrganic
+        {
+            get => CurrentCam.Settings.SmoothFollow.FollowerUseOrganic;
+            set
+            {
+                CurrentCam.Settings.SmoothFollow.FollowerUseOrganic = value;
+                CurrentCam.Settings.SmoothFollow.FollowerOffsetPositionIsRelative = false;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(FollowerRotAsPos));
+                ToggleFollowerSpecificSettings();
             }
         }
 
@@ -730,7 +744,6 @@ namespace Camera2.UI
             xRotationSlider.gameObject.SetActive(Type == CameraType.FirstPerson);
             pivotingOffsetToggle.gameObject.SetActive(Type == CameraType.FirstPerson);
             followerRotAsPosToggle.gameObject.SetActive(Type == CameraType.Follower);
-            followerPosRelativeToggle.gameObject.SetActive(Type == CameraType.Follower);
             followerRelativeTypeInput.gameObject.SetActive(Type == CameraType.Follower);
             previewSizeSlider.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             modMapExtMoveWithMapSlider.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
@@ -740,7 +753,14 @@ namespace Camera2.UI
             attachingTab.IsVisible = Type == CameraType.Attached || Type == CameraType.Follower;
             positionTab.IsVisible = Type != CameraType.FirstPerson;
 
+            ToggleFollowerSpecificSettings();
             SelectTab(0);
+        }
+
+        private void ToggleFollowerSpecificSettings()
+        {
+            followerPosRelativeToggle.gameObject.SetActive(Type == CameraType.Follower && FollowerRotAsPos);
+            followerUseOrganicToggle.gameObject.SetActive(Type == CameraType.Follower && !FollowerRotAsPos);
         }
 
         private void SelectTab(int index)
@@ -749,7 +769,7 @@ namespace Camera2.UI
             tabSelector.textSegmentedControl.SelectCellWithNumber(index);
             AccessTools.Method(typeof(TabSelector), "TabSelected").Invoke(tabSelector, new object[] { tabSelector.textSegmentedControl, index });
 
-            // oof... hard code
+            // oof... hard code... index 2 = Position tab
             if (index != 2)
             {
                 return;

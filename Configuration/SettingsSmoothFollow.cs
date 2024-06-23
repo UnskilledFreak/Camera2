@@ -9,6 +9,7 @@ namespace Camera2.Configuration
         public bool FollowReplayPosition = true;
         public bool FollowerUseOffsetRotationAsPosition = false;
         public bool FollowerOffsetPositionIsRelative = false;
+        public bool FollowerUseOrganic = false;
         public FollowerPositionOffsetType FollowerOffsetPositionRelativeType = FollowerPositionOffsetType.Forward;
         
         private bool _pivotingOffset = true;

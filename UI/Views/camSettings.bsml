@@ -64,6 +64,7 @@
                 <slider-setting id="posRotOffsetZSlider" text="Rotation Z" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotZ" bind-value="true" apply-on-change="true"/>
                 <checkbox id="followerRotAsPosToggle" text="Use Rotation as Look-At Position Offset" value="FollowerRotAsPos" bind-value="true" apply-on-change="true"/>
                 <checkbox id="followerPosRelativeToggle" text="Use Look-At Rotation Position Offset relatively" value="FollowerPosRelative" bind-value="true" apply-on-change="true"/>
+                <checkbox id="followerUseOrganicToggle" text="Use organic rotation" value="FollowerUseOrganic" bind-value="true" apply-on-change="true"/>
                 <dropdown-list-setting id="followerRelativeTypeInput" text="Relative Offset Type" value="FollowerRelativeType" choices="FollowerRelativeTypes" bind-value="true" apply-on-change="true"/>
             </modifier-container>
         </vertical>

@@ -56,15 +56,29 @@ namespace Camera2.Configuration
             set
             {
                 _type = value;
-
+                
                 if (!IsLoaded)
                 {
                     return;
                 }
-
+                
+                switch (value)
+                {
+                    case CameraType.FirstPerson:
+                    case CameraType.Attached:
+                        TargetPos = new Vector3(0, 0, 0);
+                        break;
+                    case CameraType.Positionable:
+                    case CameraType.Follower:
+                    default:
+                        TargetPos = new Vector3(0, 1.5f, 1f);
+                        TargetRot = Vector3.zero;
+                        break;
+                }
+                
                 Cam.ShowWorldCamIfNecessary();
                 ApplyLayerBitmask();
-                // Pos / Rot is applied differently depending on if it's a FP or TP cam
+                // Pos / Rot is applied differently depending on if it's an FP or TP cam
                 ApplyPositionAndRotation();
                 ParentReset();
             }
