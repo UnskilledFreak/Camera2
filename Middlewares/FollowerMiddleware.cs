@@ -55,7 +55,6 @@ namespace Camera2.Middlewares
             if (Chain.HasType(TransformerTypeAndOrder.ModMapParenting))
             {
                 var transformer = GetTransformer(TransformerTypeAndOrder.ModMapParenting);
-                Cam.LogInfo("noodle rot: " + transformer.Rotation);
                 if (transformer.Rotation.eulerAngles.z != 0)
                 {
                     upVector = (Cam.Transformer.Position - GetTransformer(TransformerTypeAndOrder.ModMapParenting).Position).normalized;
