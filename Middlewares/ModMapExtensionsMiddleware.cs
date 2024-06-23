@@ -34,16 +34,10 @@ namespace Camera2.Middlewares
                     AddTransformer(TransformerTypeAndOrder.ModMapParenting);
                 }
 
-                if (Settings.Type == CameraType.Follower)
-                {
-                    Transformer!.Position = Cam.CalculatePositionOffsetOnRotation(_noodleOrigin.localRotation, _noodleOrigin.localPosition);
-                    Transformer.Rotation = Quaternion.identity;
-                }
-                else
-                {
-                    Transformer!.Position = _noodleOrigin.localPosition;
-                    Transformer.Rotation = _noodleOrigin.localRotation;
-                }
+                Transformer!.Rotation = _noodleOrigin.localRotation;
+                Transformer!.Position = Settings.Type == CameraType.Follower 
+                    ? Cam.CalculatePositionOffsetOnRotation(_noodleOrigin.localRotation, _noodleOrigin.localPosition) 
+                    : _noodleOrigin.localPosition;
 
                 return true;
             }

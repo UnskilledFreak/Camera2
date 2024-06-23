@@ -67,7 +67,7 @@ namespace Camera2.Behaviours
 
             if (newName == Name)
             {
-                return true;
+                return false;
             }
 
             foreach (var scene in ScenesManager.Settings.Scenes.Values.Where(scene => scene.Contains(Name)))
@@ -207,7 +207,7 @@ namespace Camera2.Behaviours
 
             UpdateDepthTextureActive();
 
-            TransformChain = new TransformChain(transform, Camera.transform);
+            TransformChain = new TransformChain(this);
             Transformer = TransformChain.AddOrGet(TransformerTypeAndOrder.PositionOffset, false);
 
             foreach (Transform child in camClone.transform)

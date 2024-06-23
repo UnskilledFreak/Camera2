@@ -66,6 +66,7 @@ namespace Camera2.Configuration
                 ApplyLayerBitmask();
                 // Pos / Rot is applied differently depending on if it's a FP or TP cam
                 ApplyPositionAndRotation();
+                ParentReset();
             }
         }
 

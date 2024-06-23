@@ -110,12 +110,13 @@ namespace Camera2.UI
             get => CurrentCam.Name;
             set
             {
-                if (CurrentCam.Rename(value))
+                if (!CurrentCam.Rename(value))
                 {
-                    SettingsCoordinator.Instance.CamList.list.tableView.ReloadData();
+                    return;
                 }
 
                 NotifyPropertyChanged();
+                SettingsCoordinator.Instance.CamList.list.tableView.ReloadData();
             }
         }
 
@@ -141,7 +142,6 @@ namespace Camera2.UI
                 }
 
                 CurrentCam.Settings.Type = value;
-                CurrentCam.Settings.ParentReset();
                 ToggleSettingVisibility();
                 NotifyTargetPosRotChanged();
                 NotifyPropertyChanged(nameof(TargetParent));

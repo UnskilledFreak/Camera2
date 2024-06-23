@@ -51,12 +51,19 @@ namespace Camera2.Middlewares
                     : Settings.TargetRot;
             }
 
-            var upVector = Chain.HasType(TransformerTypeAndOrder.ModMapParenting)
-                ? (Cam.Transformer.Position - GetTransformer(TransformerTypeAndOrder.ModMapParenting).Position).normalized
-                : Vector3.up;
-            
+            var upVector = Vector3.up;
+            if (Chain.HasType(TransformerTypeAndOrder.ModMapParenting))
+            {
+                var transformer = GetTransformer(TransformerTypeAndOrder.ModMapParenting);
+                Cam.LogInfo("noodle rot: " + transformer.Rotation);
+                if (transformer.Rotation.eulerAngles.z != 0)
+                {
+                    upVector = (Cam.Transformer.Position - GetTransformer(TransformerTypeAndOrder.ModMapParenting).Position).normalized;
+                }
+            }
+
             var lookRotation = Quaternion.LookRotation(targetPosition, upVector);
-            
+
             if (!Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition && !Settings.SmoothFollow.FollowerOffsetPositionIsRelative)
             {
                 lookRotation *= Quaternion.Euler(Settings.TargetRot);

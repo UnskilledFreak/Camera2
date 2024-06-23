@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Camera2.Behaviours;
 using UnityEngine;
+using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Utils
 {
@@ -13,11 +15,13 @@ namespace Camera2.Utils
 
         private readonly Transform _targetBase;
         private readonly Transform _target;
+        private readonly Cam2 _cam;
 
-        public TransformChain(Transform targetBase, Transform target = null)
+        public TransformChain(Cam2 cam)
         {
-            _targetBase = targetBase;
-            _target = target;
+            _cam = cam;
+            _targetBase = _cam.transform;
+            _target = _cam.Camera.transform;
         }
 
         public string DebugChain()
@@ -84,7 +88,14 @@ namespace Camera2.Utils
                 }
                 else
                 {
-                    Rotation *= transformer.Rotation;
+                    if ((TransformerTypeAndOrder)transformer.Order == TransformerTypeAndOrder.ModMapParenting && _cam.Settings.Type == CameraType.Follower)
+                    {
+                        // why am I to stupid to negate this?
+                    }
+                    else
+                    {
+                        Rotation *= transformer.Rotation;
+                    }
                 }
             }
 
