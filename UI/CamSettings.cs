@@ -637,12 +637,15 @@ namespace Camera2.UI
 
         private void SetNewTarget(string target, Vector3? overridePosition = null, Vector3? overrideRotation = null)
         {
-            CurrentCam.Settings.SmoothFollow.TargetParent = target;
-            CurrentCam.Settings.ParentReset();
-            NotifyPropertyChanged(nameof(TargetParent));
-            
-            CurrentCam.Settings.TargetPos = overridePosition ?? Vector3.zero;
-            CurrentCam.Settings.TargetRot = overrideRotation ?? Vector3.zero;
+            TargetParent = target;
+
+            TargetPosX = overridePosition?.x ?? 0;
+            TargetPosY = overridePosition?.y ?? 0;
+            TargetPosZ = overridePosition?.z ?? 0;
+
+            TargetRotX = overrideRotation?.x ?? 0;
+            TargetRotY = overrideRotation?.y ?? 0;
+            TargetRotZ = overrideRotation?.z ?? 0;
 
             NotifyTargetPosRotChanged();
         }
