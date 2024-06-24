@@ -607,7 +607,13 @@ namespace Camera2.UI
 
         [UIAction("TargetCatHead")]
         [UsedImplicitly]
-        public void TargetNalulunaCatHead() => SetNewTarget("Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head", Vector3.zero, new Vector3(-90f, 0f, 0f));
+        public void TargetNalulunaCatHead() => SetNewTarget(
+            "Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head",
+            Vector3.zero,
+            CurrentCam.Settings.Type == CameraType.Attached
+                ? new Vector3(-90f, 0f, 0f)
+                : Vector3.zero
+        );
 
         [UIAction("TargetVrmHead")]
         [UsedImplicitly]
