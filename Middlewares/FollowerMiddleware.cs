@@ -17,10 +17,16 @@ namespace Camera2.Middlewares
 
         public bool Pre()
         {
-            if (Settings.Type != CameraType.Follower || Settings.Parent == null)
+            if (Settings.Type != CameraType.Follower)
             {
                 RemoveTransformer(TransformerTypeAndOrder.Follower);
                 return true;
+            }
+
+            if (Settings.Parent == null)
+            {
+                // no render if no target is set
+                return false;
             }
 
             // don't track until MovementScript is done

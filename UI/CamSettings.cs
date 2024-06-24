@@ -39,7 +39,7 @@ namespace Camera2.UI
         [UsedImplicitly] private SceneToggle[] _scenes;
 
 #pragma warning disable CS0649
-        
+
         #region UI Components
 
         [UIComponent("pivotingOffsetToggle"), UsedImplicitly]
@@ -129,11 +129,29 @@ namespace Camera2.UI
             get => CurrentCam.Settings.Type;
             set
             {
+                // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+                switch (value)
+                {
+                    case CameraType.FirstPerson:
+                    case CameraType.Attached:
+                        CurrentCam.Settings.TargetPos = Vector3.zero;
+                        CurrentCam.Settings.TargetRot = Vector3.zero;
+                        break;
+                    case CameraType.Positionable:
+                        CurrentCam.Settings.TargetPos = new Vector3(1.9f, 2.3f, -2.5f);
+                        CurrentCam.Settings.TargetRot = new Vector3(16.5f, 335.8f, 0f);
+                        break;
+                    case CameraType.Follower:
+                        CurrentCam.Settings.TargetPos = new Vector3(1.9f, 2.3f, -2.5f);
+                        CurrentCam.Settings.TargetRot = Vector3.zero;
+                        break;
+                }
+
+                CurrentCam.Settings.SmoothFollow.TargetParent = "";
                 CurrentCam.Settings.Type = value;
                 ToggleSettingVisibility();
-                NotifyPropertyChanged(nameof(ZOffset));
-                NotifyTargetPosRotChanged();
                 NotifyPropertyChanged(nameof(TargetParent));
+                NotifyTargetPosRotChanged();
             }
         }
 
@@ -521,14 +539,7 @@ namespace Camera2.UI
             {
                 CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition = value;
                 CurrentCam.Settings.SmoothFollow.FollowerUseOrganic = false;
-                if (CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
-                {
-                    CurrentCam.Settings.TargetRot /= 180;
-                }
-                else
-                {
-                    CurrentCam.Settings.TargetRot *= 180;
-                }
+                CurrentCam.Settings.TargetRot = Vector3.zero;
 
                 NotifyPropertyChanged();
                 NotifyTargetPosRotChanged();
@@ -790,9 +801,21 @@ namespace Camera2.UI
 
         private void SetRotationOffsetText()
         {
-            ChangeSliderText(posRotXSlider, CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition ? "Look at Position X" : "Rotation X");
-            ChangeSliderText(posRotYSlider, CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition ? "Look at Position Y" : "Rotation Y");
-            ChangeSliderText(posRotZSlider, CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition ? "Look at Position Z" : "Rotation Z");
+            var posBoundary = new Vector2(-15f, 15f);
+            var rotBoundary = new Vector2(-179.99f, 180f);
+            
+            if (CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
+            {
+                ChangeSlider(posRotXSlider, "Look at Position X", posBoundary);
+                ChangeSlider(posRotYSlider, "Look at Position Y", posBoundary);
+                ChangeSlider(posRotZSlider, "Look at Position Z", posBoundary);
+            }
+            else
+            {
+                ChangeSlider(posRotXSlider, "Rotation X", rotBoundary);
+                ChangeSlider(posRotYSlider, "Rotation Y", rotBoundary);
+                ChangeSlider(posRotZSlider, "Rotation Z", rotBoundary);
+            }
         }
 
         private static Vector3 GetUnOverridenPosition()
@@ -865,9 +888,16 @@ namespace Camera2.UI
                 : Mathf.Clamp(input < 0f ? input + 360f : input, 0f, 359.99f);
         }
 
-        private static void ChangeSliderText(SliderSetting sliderSetting, string newText)
+        private static void ChangeSlider(SliderSetting sliderSetting, string newText, Vector2 newMinMaxBoundary)
         {
             sliderSetting.gameObject.transform.GetChild(0).GetComponent<CurvedTextMeshPro>().text = newText;
+            /*
+            sliderSetting.slider.minValue = newMinMaxBoundary.x;
+            sliderSetting.slider.maxValue = newMinMaxBoundary.y;
+            // why is this necessary? without, buttons won't work anymore
+            sliderSetting.isInt = false;
+            sliderSetting.increments = .01f;
+            */
         }
     }
 }

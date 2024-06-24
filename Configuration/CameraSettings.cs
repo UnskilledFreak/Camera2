@@ -62,20 +62,6 @@ namespace Camera2.Configuration
                     return;
                 }
                 
-                switch (value)
-                {
-                    case CameraType.FirstPerson:
-                    case CameraType.Attached:
-                        TargetPos = new Vector3(0, 0, 0);
-                        break;
-                    case CameraType.Positionable:
-                    case CameraType.Follower:
-                    default:
-                        TargetPos = new Vector3(0, 1.5f, 1f);
-                        TargetRot = Vector3.zero;
-                        break;
-                }
-                
                 Cam.ShowWorldCamIfNecessary();
                 ApplyLayerBitmask();
                 // Pos / Rot is applied differently depending on if it's an FP or TP cam
@@ -252,20 +238,11 @@ namespace Camera2.Configuration
                     return _parent;
                 }
 
-                // todo :: check if tmp.gameObject.activeInHierarchy
                 var tmp = GameObject.Find(SmoothFollow.TargetParent)?.transform;
-                /*
-                if (tmp == null)
+                if (tmp?.gameObject.activeInHierarchy ?? false)
                 {
-                    Cam.LogError("target not found: " + SmoothFollow.TargetParent);
+                    _parent = tmp;
                 }
-                else
-                {
-                    Cam.LogDebug("target found: " + SmoothFollow.TargetParent);
-                }
-                */
-
-                _parent = tmp;
 
                 return _parent;
             }
