@@ -37,89 +37,92 @@ namespace Camera2.Middlewares
                 return true;
             }
 
-            Transform parentToUse = null;
-            var currentReplaySource = GetCurrentReplaySourceIfAny();
-
-            if (Settings.Type == CameraType.FirstPerson && HookFPFCToggle.isInFPFC)
+            if (Transformer == null)
             {
-                parentToUse = HookFPFCToggle.fpfcTransform;
-                currentReplaySource = null;
-                _useLocalPosition = HookFPFCToggle.isSiraSettingLocalPostionYes;
+                AddTransformer(TransformerTypeAndOrder.SmoothFollow);
+                TeleportOnNextFrame = true;
             }
 
             Vector3 targetPosition;
             Quaternion targetRotation;
 
-            if (currentReplaySource == null)
+            if (Settings.Type == CameraType.Attached)
             {
-                if (parentToUse == null)
-                {
-                    parentToUse = _parent;
-                }
-
-                if (parentToUse == null || !parentToUse.gameObject.activeInHierarchy)
-                {
-                    // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
-                    switch (Settings.Type)
-                    {
-                        case CameraType.FirstPerson:
-                            var mainCamera = Camera.main;
-                            _parent = parentToUse = mainCamera == null ? null : mainCamera.transform;
-                            _useLocalPosition = !ScoreSaber.IsInReplayProp;
-                            break;
-                        case CameraType.Attached:
-                            _parent = parentToUse = Settings.Parent;
-                            _useLocalPosition = false;
-                            break;
-                    }
-                }
-
-                // If we don't have a parent we should not render.
-                if (parentToUse == null)
+                if (Settings.Parent == null)
                 {
                     return false;
                 }
 
-                if (_useLocalPosition)
-                {
-                    targetPosition = parentToUse.localPosition;
-                    targetRotation = parentToUse.localRotation;
+                targetPosition = Settings.Parent.position;
+                targetRotation = Settings.Parent.rotation;
+            }
+            else
+            {
+                Transform parentToUse = null;
+                var currentReplaySource = GetCurrentReplaySourceIfAny();
 
-                    if (Settings.Type == CameraType.FirstPerson && (HookRoomAdjust.Position != Vector3.zero || HookRoomAdjust.Rotation != Quaternion.identity))
+                if (Settings.Type == CameraType.FirstPerson && HookFPFCToggle.isInFPFC)
+                {
+                    parentToUse = HookFPFCToggle.fpfcTransform;
+                    currentReplaySource = null;
+                    _useLocalPosition = HookFPFCToggle.isSiraSettingLocalPostionYes;
+                }
+
+                if (currentReplaySource == null)
+                {
+                    if (parentToUse == null)
                     {
-                        if (!HookFPFCToggle.isInFPFC)
+                        parentToUse = _parent;
+                    }
+
+                    if (parentToUse == null || !parentToUse.gameObject.activeInHierarchy)
+                    {
+                        var mainCamera = Camera.main;
+                        _parent = parentToUse = mainCamera == null ? null : mainCamera.transform;
+                        _useLocalPosition = !ScoreSaber.IsInReplayProp;
+                    }
+
+                    // If we don't have a parent we should not render.
+                    if (parentToUse == null)
+                    {
+                        return false;
+                    }
+
+                    if (_useLocalPosition)
+                    {
+                        targetPosition = parentToUse.localPosition;
+                        targetRotation = parentToUse.localRotation;
+
+                        if (Settings.Type == CameraType.FirstPerson && (HookRoomAdjust.Position != Vector3.zero || HookRoomAdjust.Rotation != Quaternion.identity))
                         {
-                            targetPosition = (HookRoomAdjust.Rotation * targetPosition) + HookRoomAdjust.Position;
-                            targetRotation = HookRoomAdjust.Rotation * targetRotation;
+                            if (!HookFPFCToggle.isInFPFC)
+                            {
+                                targetPosition = (HookRoomAdjust.Rotation * targetPosition) + HookRoomAdjust.Position;
+                                targetRotation = HookRoomAdjust.Rotation * targetRotation;
+                            }
                         }
+                    }
+                    else
+                    {
+                        targetPosition = parentToUse.position;
+                        targetRotation = parentToUse.rotation;
                     }
                 }
                 else
                 {
-                    targetPosition = parentToUse.position;
-                    targetRotation = parentToUse.rotation;
+                    targetPosition = currentReplaySource.localHeadPosition;
+                    targetRotation = currentReplaySource.localHeadRotation;
                 }
-            }
-            else
-            {
-                targetPosition = currentReplaySource.localHeadPosition;
-                targetRotation = currentReplaySource.localHeadRotation;
+
+                if (!TeleportOnNextFrame)
+                {
+                    TeleportOnNextFrame = _lastScene != SceneUtil.CurrentScene || (HookFPFCToggle.isInFPFC && currentReplaySource == null);
+                }
             }
 
             if (!HookFPFCToggle.isInFPFC)
             {
                 CalculateLimits(ref targetPosition, ref targetRotation);
-            }
-
-            if (!TeleportOnNextFrame)
-            {
-                TeleportOnNextFrame = _lastScene != SceneUtil.CurrentScene || (HookFPFCToggle.isInFPFC && currentReplaySource == null);
-            }
-
-            if (Transformer == null)
-            {
-                AddTransformer(TransformerTypeAndOrder.SmoothFollow);
-                TeleportOnNextFrame = true;
             }
 
             // If we switched scenes (E.g. left / entered a song) we want to snap to the correct position before smoothing again

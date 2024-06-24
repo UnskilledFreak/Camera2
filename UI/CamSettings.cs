@@ -607,7 +607,7 @@ namespace Camera2.UI
 
         [UIAction("TargetCatHead")]
         [UsedImplicitly]
-        public void TargetNalulunaCatHead() => SetNewTarget("Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head");
+        public void TargetNalulunaCatHead() => SetNewTarget("Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head", Vector3.zero, new Vector3(-90f, 0f, 0f));
 
         [UIAction("TargetVrmHead")]
         [UsedImplicitly]
@@ -619,11 +619,11 @@ namespace Camera2.UI
 
         [UIAction("TargetRightPanel")]
         [UsedImplicitly]
-        public void TargetRightPanel() => SetNewTarget("RightPanel");
+        public void TargetRightPanel() => SetNewTarget("RightPanel", new Vector3(0f, .85f, -1.1f));
 
         [UIAction("TargetLeftPanel")]
         [UsedImplicitly]
-        public void TargetLeftPanel() => SetNewTarget("LeftPanel");
+        public void TargetLeftPanel() => SetNewTarget("LeftPanel", new Vector3(0f, .85f, -1.1f));
 
         [UIAction("TargetEnergyBar")]
         [UsedImplicitly]
@@ -631,15 +631,20 @@ namespace Camera2.UI
 
         [UIAction("TargetScore")]
         [UsedImplicitly]
-        public void TargetScore() => SetNewTarget("ScoreCanvas");
+        public void TargetScore() => SetNewTarget("ScoreCanvas", new Vector3(0f, .3f, -1.1f));
 
         #endregion
 
-        private void SetNewTarget(string target)
+        private void SetNewTarget(string target, Vector3? overridePosition = null, Vector3? overrideRotation = null)
         {
             CurrentCam.Settings.SmoothFollow.TargetParent = target;
             CurrentCam.Settings.ParentReset();
             NotifyPropertyChanged(nameof(TargetParent));
+            
+            CurrentCam.Settings.TargetPos = overridePosition ?? Vector3.zero;
+            CurrentCam.Settings.TargetRot = overrideRotation ?? Vector3.zero;
+
+            NotifyTargetPosRotChanged();
         }
 
         public void Awake()
@@ -803,7 +808,7 @@ namespace Camera2.UI
         {
             var posBoundary = new Vector2(-15f, 15f);
             var rotBoundary = new Vector2(-179.99f, 180f);
-            
+
             if (CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
             {
                 ChangeSlider(posRotXSlider, "Look at Position X", posBoundary);
@@ -894,9 +899,6 @@ namespace Camera2.UI
             /*
             sliderSetting.slider.minValue = newMinMaxBoundary.x;
             sliderSetting.slider.maxValue = newMinMaxBoundary.y;
-            // why is this necessary? without, buttons won't work anymore
-            sliderSetting.isInt = false;
-            sliderSetting.increments = .01f;
             */
         }
     }
