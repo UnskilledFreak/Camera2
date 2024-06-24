@@ -607,13 +607,17 @@ namespace Camera2.UI
 
         [UIAction("TargetCatHead")]
         [UsedImplicitly]
-        public void TargetNalulunaCatHead() => SetNewTarget(
-            "Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head",
-            Vector3.zero,
-            CurrentCam.Settings.Type == CameraType.Attached
-                ? new Vector3(-90f, 0f, 0f)
-                : Vector3.zero
-        );
+        public void TargetNalulunaCatHead()
+        {
+            const string target = "Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head";
+            if (CurrentCam.Settings.Type == CameraType.Follower)
+            {
+                SetNewTarget(target);
+                return;
+            }
+
+            SetNewTarget(target, overrideRotation: new Vector3(-90f, 0f, 0f));
+        }
 
         [UIAction("TargetVrmHead")]
         [UsedImplicitly]
@@ -645,13 +649,19 @@ namespace Camera2.UI
         {
             TargetParent = target;
 
-            TargetPosX = overridePosition?.x ?? 0;
-            TargetPosY = overridePosition?.y ?? 0;
-            TargetPosZ = overridePosition?.z ?? 0;
+            if (overridePosition.HasValue)
+            {
+                TargetPosX = overridePosition.Value.x;
+                TargetPosY = overridePosition.Value.y;
+                TargetPosZ = overridePosition.Value.z;
+            }
 
-            TargetRotX = overrideRotation?.x ?? 0;
-            TargetRotY = overrideRotation?.y ?? 0;
-            TargetRotZ = overrideRotation?.z ?? 0;
+            if (overrideRotation.HasValue)
+            {
+                TargetRotX = overrideRotation.Value.x;
+                TargetRotY = overrideRotation.Value.y;
+                TargetRotZ = overrideRotation.Value.z;
+            }
 
             NotifyTargetPosRotChanged();
         }
