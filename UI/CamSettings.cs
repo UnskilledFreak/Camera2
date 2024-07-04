@@ -134,16 +134,16 @@ namespace Camera2.UI
                 {
                     case CameraType.FirstPerson:
                     case CameraType.Attached:
-                        CurrentCam.Settings.TargetPos = Vector3.zero;
-                        CurrentCam.Settings.TargetRot = Vector3.zero;
+                        CurrentCam.Settings.TargetPosition = Vector3.zero;
+                        CurrentCam.Settings.TargetRotation = Vector3.zero;
                         break;
                     case CameraType.Positionable:
-                        CurrentCam.Settings.TargetPos = new Vector3(1.9f, 2.3f, -2.5f);
-                        CurrentCam.Settings.TargetRot = new Vector3(16.5f, 335.8f, 0f);
+                        CurrentCam.Settings.TargetPosition = CurrentCam.Settings.Type != CameraType.Follower ? new Vector3(1.9f, 2.3f, -2.5f) : CurrentCam.Settings.TargetPosition;
+                        CurrentCam.Settings.TargetRotation = CurrentCam.Settings.Type == CameraType.Attached ? new Vector3(16.5f, 335.8f, 0f) : CurrentCam.Settings.TargetRotation;
                         break;
                     case CameraType.Follower:
-                        CurrentCam.Settings.TargetPos = new Vector3(1.9f, 2.3f, -2.5f);
-                        CurrentCam.Settings.TargetRot = Vector3.zero;
+                        CurrentCam.Settings.TargetPosition = CurrentCam.Settings.Type != CameraType.Positionable ? new Vector3(1.9f, 2.3f, -2.5f) : CurrentCam.Settings.TargetPosition;
+                        CurrentCam.Settings.TargetRotation = Vector3.zero;
                         break;
                 }
 
@@ -205,7 +205,7 @@ namespace Camera2.UI
                 var ret = 0f;
                 CurrentCam.Settings.UnOverriden(delegate
                 {
-                    ret = CurrentCam.Settings.TargetPos.z;
+                    ret = CurrentCam.Settings.TargetPosition.z;
                 });
                 return ret;
             }
@@ -213,10 +213,10 @@ namespace Camera2.UI
             {
                 CurrentCam.Settings.UnOverriden(delegate
                 {
-                    var x = CurrentCam.Settings.TargetPos;
+                    var x = CurrentCam.Settings.TargetPosition;
                     x.z = value;
 
-                    CurrentCam.Settings.TargetPos = x;
+                    CurrentCam.Settings.TargetPosition = x;
                 });
                 CurrentCam.Settings.ApplyPositionAndRotation();
             }
@@ -304,7 +304,16 @@ namespace Camera2.UI
                 }
                 else
                 {
-                    CurrentCam.Settings.SmoothFollow.Limits.RotVectorZ = new Vector2(float.NegativeInfinity, float.PositiveInfinity);
+                    CurrentCam.Settings.SmoothFollow.Limits.RotBounds.min = new Vector3(
+                        CurrentCam.Settings.SmoothFollow.Limits.RotBounds.min.x,
+                        CurrentCam.Settings.SmoothFollow.Limits.RotBounds.min.y,
+                        0
+                    );
+                    CurrentCam.Settings.SmoothFollow.Limits.RotBounds.max = new Vector3(
+                        CurrentCam.Settings.SmoothFollow.Limits.RotBounds.max.x,
+                        CurrentCam.Settings.SmoothFollow.Limits.RotBounds.max.y,
+                        360
+                    );
                 }
             }
         }
@@ -418,7 +427,11 @@ namespace Camera2.UI
         internal float XRotation
         {
             get => GetUnOverridenRotation().x;
-            set => SetAndUpdateUnOverridenRotation(value);
+            set
+            {
+                SetAndUpdateUnOverridenRotation(value);
+                NotifyPropertyChanged(nameof(TargetRotX));
+            }
         }
 
         [UsedImplicitly]
@@ -449,6 +462,7 @@ namespace Camera2.UI
             set
             {
                 CurrentCam.Settings.SmoothFollow.TargetParent = value;
+                CurrentCam.Settings.TargetRotation = Vector3.zero;
                 CurrentCam.Settings.ParentReset();
                 NotifyPropertyChanged();
             }
@@ -462,6 +476,7 @@ namespace Camera2.UI
             {
                 SetAndUpdateUnOverridenPosition(value);
                 NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(XRotation));
             }
         }
 
@@ -539,7 +554,7 @@ namespace Camera2.UI
             {
                 CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition = value;
                 CurrentCam.Settings.SmoothFollow.FollowerUseOrganic = false;
-                CurrentCam.Settings.TargetRot = Vector3.zero;
+                CurrentCam.Settings.TargetRotation = Vector3.zero;
 
                 NotifyPropertyChanged();
                 NotifyTargetPosRotChanged();
@@ -847,7 +862,7 @@ namespace Camera2.UI
             var ret = Vector3.zero;
             CurrentCam.Settings.UnOverriden(delegate
             {
-                ret = CurrentCam.Settings.TargetPos;
+                ret = CurrentCam.Settings.TargetPosition;
             });
             return ret;
         }
@@ -857,20 +872,20 @@ namespace Camera2.UI
             var ret = Vector3.zero;
             CurrentCam.Settings.UnOverriden(delegate
             {
-                ret = CurrentCam.Settings.TargetRot;
+                ret = CurrentCam.Settings.TargetRotation;
             });
             return ret;
         }
 
         private static void SetAndUpdateUnOverridenPosition(float? x = null, float? y = null, float? z = null)
         {
-            CurrentCam.Settings.TargetPos = UpdateVector(GetUnOverridenPosition(), x, y, z);
+            CurrentCam.Settings.TargetPosition = UpdateVector(GetUnOverridenPosition(), x, y, z);
             CurrentCam.Settings.ApplyPositionAndRotation();
         }
 
         private static void SetAndUpdateUnOverridenRotation(float? x = null, float? y = null, float? z = null)
         {
-            CurrentCam.Settings.TargetRot = UpdateVector(GetUnOverridenRotation(), x, y, z);
+            CurrentCam.Settings.TargetRotation = UpdateVector(GetUnOverridenRotation(), x, y, z);
             CurrentCam.Settings.ApplyPositionAndRotation();
         }
 

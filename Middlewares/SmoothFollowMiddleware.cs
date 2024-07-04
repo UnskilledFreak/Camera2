@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Camera2.Extensions;
 using Camera2.HarmonyPatches;
 using Camera2.Interfaces;
 using Camera2.SDK;
@@ -159,19 +158,17 @@ namespace Camera2.Middlewares
 
         private void CalculateLimits(ref Vector3 targetPosition, ref Quaternion targetRotation)
         {
-            targetPosition.InBoundary(
-                Settings.SmoothFollow.Limits.PosVectorX,
-                Settings.SmoothFollow.Limits.PosVectorY,
-                Settings.SmoothFollow.Limits.PosVectorZ
-            );
-
+            if (!Settings.SmoothFollow.Limits.PosBounds.Contains(targetPosition))
+            {
+                targetPosition = Settings.SmoothFollow.Limits.PosBounds.ClosestPoint(targetPosition);
+            }
+            
             var eulerAngles = targetRotation.eulerAngles;
-            eulerAngles.InBoundary(
-                Settings.SmoothFollow.Limits.RotVectorX,
-                Settings.SmoothFollow.Limits.RotVectorY,
-                Settings.SmoothFollow.Limits.RotVectorZ
-            );
-
+            if (!Settings.SmoothFollow.Limits.RotBounds.Contains(eulerAngles))
+            {
+                eulerAngles = Settings.SmoothFollow.Limits.RotBounds.ClosestPoint(eulerAngles);
+            }
+            
             targetRotation.eulerAngles = eulerAngles;
         }
     }

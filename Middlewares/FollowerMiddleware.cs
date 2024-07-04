@@ -53,8 +53,8 @@ namespace Camera2.Middlewares
                         FollowerPositionOffsetType.Up => Settings.Parent.up,
                         FollowerPositionOffsetType.Forward => Settings.Parent.forward,
                         _ => Settings.Parent.forward
-                    }, Settings.TargetRot)
-                    : Settings.TargetRot;
+                    }, Settings.TargetRotation)
+                    : Settings.TargetRotation;
             }
 
             var upVector = Vector3.up;
@@ -71,7 +71,7 @@ namespace Camera2.Middlewares
 
             if (!Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition && !Settings.SmoothFollow.FollowerOffsetPositionIsRelative)
             {
-                var rotOffset = Quaternion.Euler(Settings.TargetRot);
+                var rotOffset = Quaternion.Euler(Settings.TargetRotation);
                 if (Settings.SmoothFollow.FollowerUseOrganic)
                 {
                     rotOffset = Quaternion.Inverse(rotOffset);
@@ -83,7 +83,7 @@ namespace Camera2.Middlewares
 
             if (_wasInMovementScript)
             {
-                Cam.Transformer.Position = Settings.TargetPos;
+                Cam.Transformer.Position = Settings.TargetPosition;
                 _wasInMovementScript = false;
             }
 

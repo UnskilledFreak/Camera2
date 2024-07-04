@@ -126,8 +126,8 @@ namespace Camera2.SDK
         {
             _cam = cam;
             CamName = cam.Name;
-            Position = new Vector3(cam.Settings.TargetPos.x, cam.Settings.TargetPos.y, cam.Settings.TargetPos.z);
-            Rotation = new Vector3(cam.Settings.TargetRot.x, cam.Settings.TargetRot.y, cam.Settings.TargetRot.z);
+            Position = new Vector3(cam.Settings.TargetPosition.x, cam.Settings.TargetPosition.y, cam.Settings.TargetPosition.z);
+            Rotation = new Vector3(cam.Settings.TargetRotation.x, cam.Settings.TargetRotation.y, cam.Settings.TargetRotation.z);
             _fov = cam.Settings.FOV;
             VisibleObjects = cam.Settings.VisibleObjects.GetCopy();
 

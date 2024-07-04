@@ -46,7 +46,7 @@ namespace Camera2.Behaviours
             grabbedCamera = camera;
             isGrabbingCam = true;
             
-            //grabbedCamera.LogInfo(grabbedCamera.TransformChain.DebugChain());
+            //grabbedCamera.LogDebug(grabbedCamera.TransformChain.DebugChain());
             
             grabStartPos = controller.transform.InverseTransformPoint(grabbedCamera.Transformer.Position);
             grabStartRot = Quaternion.Inverse(controller.rotation) * grabbedCamera.Transformer.Rotation;
@@ -109,8 +109,8 @@ namespace Camera2.Behaviours
                 return;
             }
             
-            grabbedCamera.Settings.TargetPos = grabbedCamera.Transformer.Position;
-            grabbedCamera.Settings.TargetRot = grabbedCamera.Transformer.Rotation.eulerAngles;
+            grabbedCamera.Settings.TargetPosition = grabbedCamera.Transformer.Position;
+            grabbedCamera.Settings.TargetRotation = grabbedCamera.Transformer.Rotation.eulerAngles;
 
             grabbedCamera.Settings.ApplyPositionAndRotation();
 

@@ -93,8 +93,8 @@ namespace Camera2.UI
             cam.Settings.Type = CameraType.Positionable;
             cam.Settings.FOV = 75;
             cam.Settings.SetViewRect(0, 0, .195f, .395f);
-            cam.Settings.TargetPos = new Vector3(3, 1.2f, 0);
-            cam.Settings.TargetRot = new Vector3(0, -90f, 0);
+            cam.Settings.TargetPosition = new Vector3(3, 1.2f, 0);
+            cam.Settings.TargetRotation = new Vector3(0, -90f, 0);
             cam.Settings.VisibleObjects.Walls = WallVisibility.Hidden;
             cam.Settings.VisibleObjects.Debris = false;
             cam.Settings.VisibleObjects.UI = false;
@@ -113,7 +113,7 @@ namespace Camera2.UI
             cam.Settings.Type = CameraType.Positionable;
             cam.Settings.FOV = 42;
             cam.Settings.SetViewRect(0.8f, 0, .2f, .3f);
-            cam.Settings.TargetPos = new Vector3(0, 1.5f, -1.3f);
+            cam.Settings.TargetPosition = new Vector3(0, 1.5f, -1.3f);
             cam.Settings.VisibleObjects.Walls = WallVisibility.Hidden;
             cam.Settings.VisibleObjects.Debris = false;
             cam.Settings.VisibleObjects.UI = false;
@@ -132,8 +132,8 @@ namespace Camera2.UI
 
             cam.Settings.Type = CameraType.Positionable;
             cam.Settings.FOV = 75;
-            cam.Settings.TargetPos = new Vector3(1.93f, 2.32f, -2.45f);
-            cam.Settings.TargetRot = new Vector3(16.48f, 335.78f, 0.81f);
+            cam.Settings.TargetPosition = new Vector3(1.93f, 2.32f, -2.45f);
+            cam.Settings.TargetRotation = new Vector3(16.48f, 335.78f, 0.81f);
 
             AddCam(cam);
         }
@@ -145,8 +145,8 @@ namespace Camera2.UI
 
             cam.Settings.Type = CameraType.FirstPerson;
             cam.Settings.FOV = 75;
-            cam.Settings.TargetPos = new Vector3(0, -0.1f, 0.5f);
-            cam.Settings.TargetRot = new Vector3(0, 180f, 0);
+            cam.Settings.TargetPosition = new Vector3(0, -0.1f, 0.5f);
+            cam.Settings.TargetRotation = new Vector3(0, 180f, 0);
 
             cam.Settings.SmoothFollow.FollowReplayPosition = false;
             cam.Settings.SmoothFollow.Limits.RotZ = "0:0";
@@ -166,7 +166,7 @@ namespace Camera2.UI
 
             cam.Settings.Type = CameraType.Follower;
             cam.Settings.FOV = 75;
-            cam.Settings.TargetPos = new Vector3(1.93f, 2.32f, -2.45f);
+            cam.Settings.TargetPosition = new Vector3(1.93f, 2.32f, -2.45f);
 
             cam.Settings.SmoothFollow.FollowReplayPosition = false;
             cam.Settings.SmoothFollow.Position = 15f;

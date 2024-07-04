@@ -192,15 +192,17 @@ namespace Camera2.Configuration
 
         [JsonIgnore] internal ScreenRect ViewRect { get; private set; }
 
+        [JsonProperty("TargetPos")]
         [JsonConverter(typeof(Vector3Converter))]
-        public Vector3 TargetPos
+        public Vector3 TargetPosition
         {
             get => OverrideToken?.Position ?? _targetPos;
             set => _targetPos = value;
         }
 
+        [JsonProperty("TargetRot")]
         [JsonConverter(typeof(Vector3Converter))]
-        public Vector3 TargetRot
+        public Vector3 TargetRotation
         {
             get => OverrideToken?.Rotation ?? _targetRot;
             set => _targetRot = value;
@@ -336,10 +338,10 @@ namespace Camera2.Configuration
 
         public void ApplyPositionAndRotation()
         {
-            Cam.Transformer.Position = TargetPos;
+            Cam.Transformer.Position = TargetPosition;
             if (Type != CameraType.Follower)
             {
-                Cam.Transformer.RotationEuler = TargetRot;
+                Cam.Transformer.RotationEuler = TargetRotation;
             }
 
             // Force pivoting offset for 360 Levels - Non-Pivoting offset on 360 levels just looks outright trash
