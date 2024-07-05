@@ -37,7 +37,7 @@ namespace Camera2.UI
             }
         }
 
-        public void ShowSettingsForCam(Cam2 cam, bool reselect = false)
+        public void ShowSettingsForCam(Cam2 cam, bool reSelect = false)
         {
             if (!_isActive)
             {
@@ -47,7 +47,7 @@ namespace Camera2.UI
             SetTitle($"{Plugin.Name} | {cam.Name}");
 
             _lastSelected = cam;
-            if (!CamSettings.SetCam(cam) && !reselect)
+            if (!CamSettings.SetCam(cam) && !reSelect)
             {
                 return;
             }
@@ -57,7 +57,7 @@ namespace Camera2.UI
             CamList.list.tableView.SelectCellWithIdx(cellIndex);
             CamList.list.tableView.ScrollToCellWithIdx(cellIndex, TableView.ScrollPositionType.Center, false);
 
-            if (reselect)
+            if (reSelect)
             {
                 CamSettings.ReselectLastTab();
             }

@@ -149,7 +149,7 @@ namespace Camera2.UI
             cam.Settings.TargetRotation = new Vector3(0, 180f, 0);
 
             cam.Settings.SmoothFollow.FollowReplayPosition = false;
-            cam.Settings.SmoothFollow.Limits.RotZ = "0:0";
+            cam.Settings.SmoothFollow.Limits.RotationZ = "0:0";
             cam.Settings.SmoothFollow.Position = 8f;
             cam.Settings.SmoothFollow.Rotation = 3f;
 

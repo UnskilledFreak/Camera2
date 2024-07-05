@@ -10,86 +10,74 @@ namespace Camera2.Configuration
     internal class CameraBoundsConfig
     {
         private static readonly IFormatProvider Formater = CultureInfo.InvariantCulture.NumberFormat;
-        
-        public Bounds PosBounds = new Bounds(Vector3.zero, new Vector3(1000, 1000, 1000));
-        public Bounds RotBounds = new Bounds(Vector3.zero, new Vector3(360, 360, 360));
+        public static Vector2 PositionBoundary = new Vector2(-500, 500);
+        public static Vector2 RotationBoundary = new Vector2(-180, 180);
+
+        public Bounds PositionBounds = new Bounds(Vector3.zero, new Vector3(1000, 1000, 1000));
+        public Bounds RotationBounds = new Bounds(Vector3.zero, new Vector3(360, 360, 360));
+
+        private void SetBounds(ref Bounds bounds, string value, bool limitRot, bool valueIsY = false, bool valueIsZ = false)
+        {
+            Parse(value, limitRot ? RotationBoundary : PositionBoundary, out var min, out var max);
+            
+            bounds.min = new Vector3(
+                valueIsY || valueIsZ ? bounds.min.x : min,
+                valueIsY ? min : bounds.min.y,
+                valueIsZ ? min : bounds.min.z
+            );
+            bounds.max = new Vector3(
+                valueIsY || valueIsZ ? bounds.max.x : max,
+                valueIsY ? max : bounds.max.y,
+                valueIsZ ? max : bounds.max.z
+            );
+        }
 
         [JsonProperty("pos_x")]
-        public string PosX
+        public string PositionX
         {
-            get => string.Format(Formater, "{0}:{1}", PosBounds.min.x, PosBounds.max.x);
-            set
-            {
-                Parse(value, false, out var min, out var max);
-                PosBounds.min = new Vector3(min, PosBounds.min.y, PosBounds.min.z);
-                PosBounds.max = new Vector3(max, PosBounds.max.y, PosBounds.max.z);
-            }
+            get => string.Format(Formater, "{0}:{1}", PositionBounds.min.x, PositionBounds.max.x);
+            set => SetBounds(ref PositionBounds, value, false);
         }
 
         [JsonProperty("pos_y")]
-        public string PosY
+        public string PositionY
         {
-            get => string.Format(Formater, "{0}:{1}", PosBounds.min.y, PosBounds.max.y);
-            set
-            {
-                Parse(value, false, out var min, out var max);
-                PosBounds.min = new Vector3(PosBounds.min.x, min, PosBounds.min.z);
-                PosBounds.max = new Vector3(PosBounds.max.x, max, PosBounds.max.z);
-            }
+            get => string.Format(Formater, "{0}:{1}", PositionBounds.min.y, PositionBounds.max.y);
+            set => SetBounds(ref PositionBounds, value, false, true);
         }
 
         [JsonProperty("pos_z")]
-        public string PosZ
+        public string PositionZ
         {
-            get => string.Format(Formater, "{0}:{1}", PosBounds.min.z, PosBounds.max.z);
-            set
-            {
-                Parse(value, false, out var min, out var max);
-                PosBounds.min = new Vector3(PosBounds.min.x, PosBounds.min.y, min);
-                PosBounds.max = new Vector3(PosBounds.max.x, PosBounds.max.y, max);
-            }
+            get => string.Format(Formater, "{0}:{1}", PositionBounds.min.z, PositionBounds.max.z);
+            set => SetBounds(ref PositionBounds, value, false, valueIsZ: true);
         }
 
         [JsonProperty("rot_x")]
-        public string RotX
+        public string RotationX
         {
-            get => string.Format(Formater, "{0}:{1}", RotBounds.min.x, RotBounds.max.x);
-            set
-            {
-                Parse(value, true, out var min, out var max);
-                RotBounds.min = new Vector3(min, RotBounds.min.y, RotBounds.min.z);
-                RotBounds.max = new Vector3(max, RotBounds.max.y, RotBounds.max.z);
-            }
+            get => string.Format(Formater, "{0}:{1}", RotationBounds.min.x, RotationBounds.max.x);
+            set => SetBounds(ref RotationBounds, value, true);
         }
 
         [JsonProperty("rot_y")]
-        public string RotY
+        public string RotationY
         {
-            get => string.Format(Formater, "{0}:{1}", RotBounds.min.y, RotBounds.max.y);
-            set
-            {
-                Parse(value, true, out var min, out var max);
-                RotBounds.min = new Vector3(RotBounds.min.x, min, RotBounds.min.z);
-                RotBounds.max = new Vector3(RotBounds.max.x, max, RotBounds.max.z);
-            }
+            get => string.Format(Formater, "{0}:{1}", RotationBounds.min.y, RotationBounds.max.y);
+            set => SetBounds(ref RotationBounds, value, true, true);
         }
 
         [JsonProperty("rot_z")]
-        public string RotZ
+        public string RotationZ
         {
-            get => string.Format(Formater, "{0}:{1}", RotBounds.min.z, RotBounds.max.z);
-            set
-            {
-                Parse(value, true, out var min, out var max);
-                RotBounds.min = new Vector3(RotBounds.min.x, RotBounds.min.y, min);
-                RotBounds.max = new Vector3(RotBounds.max.x, RotBounds.max.y, max);
-            }
+            get => string.Format(Formater, "{0}:{1}", RotationBounds.min.z, RotationBounds.max.z);
+            set => SetBounds(ref RotationBounds, value, true, valueIsZ: true);
         }
 
-        private void Parse(string val, bool limitRot, out float min, out float max)
+        private void Parse(string val, Vector2 boundary, out float min, out float max)
         {
-            min = limitRot ? 0 : -500;
-            max = limitRot ? 360 : 500;
+            min = boundary.x;
+            max = boundary.y;
 
             if (string.IsNullOrEmpty(val))
             {
@@ -97,9 +85,9 @@ namespace Camera2.Configuration
             }
 
             var spl = val.Split(':');
-            
-            min = spl[0].SaveParseToFloat(limitRot ? 0 : -500, Formater);
-            max = (spl.Length > 1 ? spl[1] : "Infinite").SaveParseToFloat(limitRot ? 360 : 500, Formater);
+
+            min = spl[0].SaveParseToFloat(boundary.x, Formater, boundary);
+            max = (spl.Length > 1 ? spl[1] : "Infinite").SaveParseToFloat(boundary.y, Formater, boundary);
         }
     }
 }

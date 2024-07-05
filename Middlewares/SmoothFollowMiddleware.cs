@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Camera2.Extensions;
 using Camera2.HarmonyPatches;
 using Camera2.Interfaces;
 using Camera2.SDK;
@@ -29,7 +30,7 @@ namespace Camera2.Middlewares
         public bool Pre()
         {
             // only handle first person and attached types
-            if (Settings.IsPositionalCam())
+            if (Settings.Type == CameraType.Positionable || Settings.Type == CameraType.Follower)
             {
                 RemoveTransformer(TransformerTypeAndOrder.SmoothFollow);
                 _parent = null;
@@ -49,7 +50,7 @@ namespace Camera2.Middlewares
             {
                 if (Settings.Parent == null)
                 {
-                    return false;
+                    return true;
                 }
 
                 targetPosition = Settings.Parent.position;
@@ -119,7 +120,7 @@ namespace Camera2.Middlewares
                 }
             }
 
-            if (!HookFPFCToggle.isInFPFC)
+            //if (!HookFPFCToggle.isInFPFC)
             {
                 CalculateLimits(ref targetPosition, ref targetRotation);
             }
@@ -158,16 +159,23 @@ namespace Camera2.Middlewares
 
         private void CalculateLimits(ref Vector3 targetPosition, ref Quaternion targetRotation)
         {
-            if (!Settings.SmoothFollow.Limits.PosBounds.Contains(targetPosition))
-            {
-                targetPosition = Settings.SmoothFollow.Limits.PosBounds.ClosestPoint(targetPosition);
-            }
+            var pBase = Settings.SmoothFollow.Limits.PositionBounds;
+            var rBase = Settings.SmoothFollow.Limits.RotationBounds;
             
-            var eulerAngles = targetRotation.eulerAngles;
-            if (!Settings.SmoothFollow.Limits.RotBounds.Contains(eulerAngles))
-            {
-                eulerAngles = Settings.SmoothFollow.Limits.RotBounds.ClosestPoint(eulerAngles);
-            }
+            var eulerAngles = targetRotation.eulerAngles.ClampToMiddlePointAngles();
+            
+            // have to do it manually because bounds.Contains() does not work with negative values????
+            targetPosition = new Vector3(
+                Mathf.Clamp(targetPosition.x, pBase.min.x, pBase.max.x),
+                Mathf.Clamp(targetPosition.y, pBase.min.y, pBase.max.y),
+                Mathf.Clamp(targetPosition.z, pBase.min.z, pBase.max.z)
+            );
+
+            eulerAngles = new Vector3(
+                Mathf.Clamp(eulerAngles.x, rBase.min.x, rBase.max.x),
+                Mathf.Clamp(eulerAngles.y, rBase.min.y, rBase.max.y),
+                Mathf.Clamp(eulerAngles.z, rBase.min.z, rBase.max.z)
+            );
             
             targetRotation.eulerAngles = eulerAngles;
         }

@@ -22,11 +22,11 @@ namespace Camera2.Middlewares
                 RemoveTransformer(TransformerTypeAndOrder.Follower);
                 return true;
             }
-
+            
             if (Settings.Parent == null)
             {
-                // no render if no target is set
-                return false;
+                // do render like a positionable would if no target is set
+                return true;
             }
 
             // don't track until MovementScript is done
@@ -43,6 +43,7 @@ namespace Camera2.Middlewares
                 AddTransformer(TransformerTypeAndOrder.Follower);
             }
 
+            // position to look at, not the cams position
             var targetPosition = -(Cam.Camera.transform.localPosition - Settings.Parent.position);
             if (Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
             {
@@ -57,6 +58,7 @@ namespace Camera2.Middlewares
                     : Settings.TargetRotation;
             }
 
+            // calculate the vector where "up" is, this is only used for noodle maps with player movement
             var upVector = Vector3.up;
             if (Chain.HasType(TransformerTypeAndOrder.ModMapParenting))
             {
@@ -69,6 +71,7 @@ namespace Camera2.Middlewares
 
             var lookRotation = Quaternion.LookRotation(targetPosition, upVector);
 
+            // calculate the rotation offset
             if (!Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition && !Settings.SmoothFollow.FollowerOffsetPositionIsRelative)
             {
                 var rotOffset = Quaternion.Euler(Settings.TargetRotation);

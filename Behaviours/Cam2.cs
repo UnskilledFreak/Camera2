@@ -11,7 +11,6 @@ using System.Linq;
 using Camera2.Enums;
 using Camera2.Managers;
 using UnityEngine;
-using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Behaviours
 {
@@ -164,7 +163,7 @@ namespace Camera2.Behaviours
                                 || !SceneUtil.IsSongPlaying
                             );
 
-            WorldCam.gameObject.SetActive(doShowCam || (CamSettings.CurrentCam == this && Settings.Type != CameraType.FirstPerson));
+            WorldCam.gameObject.SetActive(doShowCam || (CamSettings.CurrentCam == this && Settings.IsPositionalCam()));
         }
 
         internal void UpdateDepthTextureActive()

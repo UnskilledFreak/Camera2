@@ -7,7 +7,9 @@ using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.ViewControllers;
 using Camera2.Behaviours;
+using Camera2.Configuration;
 using Camera2.Enums;
+using Camera2.Extensions;
 using Camera2.Managers;
 using HarmonyLib;
 using HMUI;
@@ -134,24 +136,34 @@ namespace Camera2.UI
                 {
                     case CameraType.FirstPerson:
                     case CameraType.Attached:
-                        CurrentCam.Settings.TargetPosition = Vector3.zero;
-                        CurrentCam.Settings.TargetRotation = Vector3.zero;
+                        SetAndUpdateUnOverridenPosition(0, 0, 0);
+                        SetAndUpdateUnOverridenRotation(0, 0, 0);
                         break;
                     case CameraType.Positionable:
-                        CurrentCam.Settings.TargetPosition = CurrentCam.Settings.Type != CameraType.Follower ? new Vector3(1.9f, 2.3f, -2.5f) : CurrentCam.Settings.TargetPosition;
-                        CurrentCam.Settings.TargetRotation = CurrentCam.Settings.Type == CameraType.Attached ? new Vector3(16.5f, 335.8f, 0f) : CurrentCam.Settings.TargetRotation;
+                        if (CurrentCam.Settings.Type != CameraType.Follower)
+                        {
+                            SetAndUpdateUnOverridenPosition(1.9f, 2.3f, -2.5f);
+                        }
+
+                        if (CurrentCam.Settings.Type == CameraType.Attached)
+                        {
+                            SetAndUpdateUnOverridenRotation(16.5f, 335.8f, 0f);
+                        }
                         break;
                     case CameraType.Follower:
-                        CurrentCam.Settings.TargetPosition = CurrentCam.Settings.Type != CameraType.Positionable ? new Vector3(1.9f, 2.3f, -2.5f) : CurrentCam.Settings.TargetPosition;
-                        CurrentCam.Settings.TargetRotation = Vector3.zero;
+                        if (CurrentCam.Settings.Type != CameraType.Positionable)
+                        {
+                            SetAndUpdateUnOverridenPosition(1.9f, 2.3f, -2.5f);
+                        }
+                        SetAndUpdateUnOverridenRotation(0, 0, 0);
                         break;
                 }
 
-                CurrentCam.Settings.SmoothFollow.TargetParent = "";
                 CurrentCam.Settings.Type = value;
-                ToggleSettingVisibility();
+                CurrentCam.Settings.SmoothFollow.TargetParent = "";
                 NotifyPropertyChanged(nameof(TargetParent));
                 NotifyTargetPosRotChanged();
+                ToggleSettingVisibility();
             }
         }
 
@@ -295,27 +307,10 @@ namespace Camera2.UI
         [UsedImplicitly]
         internal bool SmoothFollowForceUpright
         {
-            get => CurrentCam.Settings.SmoothFollow.Limits.RotZ == "0:0";
-            set
-            {
-                if (value)
-                {
-                    CurrentCam.Settings.SmoothFollow.Limits.RotZ = "0:0";
-                }
-                else
-                {
-                    CurrentCam.Settings.SmoothFollow.Limits.RotBounds.min = new Vector3(
-                        CurrentCam.Settings.SmoothFollow.Limits.RotBounds.min.x,
-                        CurrentCam.Settings.SmoothFollow.Limits.RotBounds.min.y,
-                        0
-                    );
-                    CurrentCam.Settings.SmoothFollow.Limits.RotBounds.max = new Vector3(
-                        CurrentCam.Settings.SmoothFollow.Limits.RotBounds.max.x,
-                        CurrentCam.Settings.SmoothFollow.Limits.RotBounds.max.y,
-                        360
-                    );
-                }
-            }
+            get => CurrentCam.Settings.SmoothFollow.Limits.RotationZ == "0:0";
+            set => CurrentCam.Settings.SmoothFollow.Limits.RotationZ = value
+                ? "0:0"
+                : $"{CameraBoundsConfig.RotationBoundary.x}:{CameraBoundsConfig.RotationBoundary.y}";
         }
 
         [UsedImplicitly]
@@ -819,12 +814,6 @@ namespace Camera2.UI
             tabSelector.textSegmentedControl.SelectCellWithNumber(index);
             AccessTools.Method(typeof(TabSelector), "TabSelected").Invoke(tabSelector, new object[] { tabSelector.textSegmentedControl, index });
 
-            // oof... hard code... index 2 = Position tab
-            if (index != 2)
-            {
-                return;
-            }
-
             NotifyTargetPosRotChanged();
         }
 
@@ -914,9 +903,7 @@ namespace Camera2.UI
             input += .001f;
             return CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition
                 ? input
-                : input > 180f
-                    ? input - 360f
-                    : input;
+                : input.GetNiceRotationNumber();
         }
 
         private static float SetFromNiceRotationNumber(float input)
@@ -924,7 +911,7 @@ namespace Camera2.UI
             input += .001f;
             return CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition
                 ? input
-                : Mathf.Clamp(input < 0f ? input + 360f : input, 0f, 359.99f);
+                : input.SetFromNiceRotationNumber();
         }
 
         private static void ChangeSlider(SliderSetting sliderSetting, string newText, Vector2 newMinMaxBoundary)

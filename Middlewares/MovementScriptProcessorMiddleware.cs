@@ -1,7 +1,6 @@
 ﻿using Camera2.Interfaces;
 using Camera2.Managers;
 using Camera2.Utils;
-using System.Linq;
 using Camera2.Enums;
 using Camera2.MovementScript;
 using UnityEngine;
