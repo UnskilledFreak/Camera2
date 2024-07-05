@@ -444,10 +444,10 @@ namespace Camera2.Configuration
 
         // some Newtonsoft magic
         [UsedImplicitly]
-        public bool ShouldSerializeWorldCamVisibility() => IsPositionalCam();
+        public bool ShouldSerializeWorldCamVisibility() => Type != CameraType.FirstPerson;
 
         [UsedImplicitly]
-        public bool ShouldSerializepreviewScreenSize() => IsPositionalCam();
+        public bool ShouldSerializePreviewScreenSize() => IsPositionalCam();
 
         [UsedImplicitly]
         public bool ShouldSerializeWorldCamUnderScreen() => IsPositionalCam();
@@ -462,6 +462,6 @@ namespace Camera2.Configuration
         public bool ShouldSerializeVmcProtocol() => IsPositionalCam();
 
         [UsedImplicitly]
-        public bool ShouldSerializeMovementScript() => Type != CameraType.FirstPerson;
+        public bool ShouldSerializeMovementScript() => Type != CameraType.FirstPerson && Type != CameraType.Attached;
     }
 }
