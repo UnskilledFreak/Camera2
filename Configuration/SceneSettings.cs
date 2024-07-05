@@ -4,7 +4,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Camera2.Behaviours;
 using Camera2.Enums;
+using IPA.Utilities;
 using UnityEngine;
 
 namespace Camera2.Configuration
@@ -20,17 +23,18 @@ namespace Camera2.Configuration
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<KeyCode, string> CustomSceneBindings = new Dictionary<KeyCode, string>();
 
-        public bool AutoswitchFromCustom = false;
+        public bool AutoSwitchFromCustom = false;
         
         private bool _wasLoaded;
 
-        public void Load()
+        public void Load(List<Cam2> cams)
         {
             if (File.Exists(ConfigUtil.ScenesCfg))
             {
                 try
                 {
                     JsonConvert.PopulateObject(File.ReadAllText(ConfigUtil.ScenesCfg), this, JsonHelpers.LeanDeserializeSettings);
+                    DeleteInvalidCams(cams);
                 }
                 catch (Exception ex)
                 {
@@ -76,6 +80,27 @@ namespace Camera2.Configuration
             {
                 File.WriteAllText(ConfigUtil.ScenesCfg, JsonConvert.SerializeObject(this, Formatting.Indented));
             }
+        }
+
+        private void DeleteInvalidCams(List<Cam2> cams)
+        {
+            var nameList = cams.Select(x => x.Name).ToList();
+
+            var cleanedCustomScenes = new Dictionary<string, List<string>>();
+            var cleanedScenes = new Dictionary<SceneTypes, List<string>>();
+
+            foreach (var (name, camNames) in Scenes)
+            {
+                cleanedScenes.Add(name, camNames.Where(x => nameList.Contains(x)).ToList());
+            }
+            
+            foreach (var (name, camNames) in CustomScenes)
+            {
+                cleanedCustomScenes.Add(name, camNames.Where(x => nameList.Contains(x)).ToList());
+            }
+
+            Scenes = cleanedScenes;
+            CustomScenes = cleanedCustomScenes;
         }
     }
 }

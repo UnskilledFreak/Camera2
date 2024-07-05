@@ -64,10 +64,10 @@ namespace Camera2.SDK
         [UsedImplicitly]
         public static bool AutoSwitchFromCustomScene
         {
-            get => ScenesManager.Settings.AutoswitchFromCustom;
+            get => ScenesManager.Settings.AutoSwitchFromCustom;
             set
             {
-                ScenesManager.Settings.AutoswitchFromCustom = value;
+                ScenesManager.Settings.AutoSwitchFromCustom = value;
                 ScenesManager.Settings.Save();
                 CamManager.CompleteReload();
             }

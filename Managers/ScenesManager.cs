@@ -36,7 +36,7 @@ namespace Camera2.Managers
                 return;
             }
 
-            if (!Settings.AutoswitchFromCustom && isOnCustomScene)
+            if (!Settings.AutoSwitchFromCustom && isOnCustomScene)
             {
                 return;
             }

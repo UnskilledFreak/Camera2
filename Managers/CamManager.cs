@@ -33,7 +33,7 @@ namespace Camera2.Managers
 
             LoadCameras();
 
-            ScenesManager.Settings.Load();
+            ScenesManager.Settings.Load(Cams);
 
             XRSettings.gameViewRenderMode = GameViewRenderMode.None;
             
@@ -99,7 +99,7 @@ namespace Camera2.Managers
         public static void Reload()
         {
             LoadCameras(true);
-            ScenesManager.Settings.Load();
+            ScenesManager.Settings.Load(Cams);
             UI.SpaghettiUI.ScenesSwitchUI.Update();
         }
 
