@@ -27,6 +27,9 @@ namespace Camera2.Behaviours
                 FinishCameraMove();
             }
 
+            //camera.LogDebug("pos: " + camera.Transformer.Position);
+            //camera.LogDebug(camera.TransformChain.DebugChain());
+            
             var controllers = Resources.FindObjectsOfTypeAll<VRLaserPointer>();
 
             controller = (!HookFPFCToggle.isInFPFC
@@ -42,11 +45,9 @@ namespace Camera2.Behaviours
             {
                 return;
             }
-
+            
             grabbedCamera = camera;
             isGrabbingCam = true;
-            
-            //grabbedCamera.LogDebug(grabbedCamera.TransformChain.DebugChain());
             
             grabStartPos = controller.transform.InverseTransformPoint(grabbedCamera.Transformer.Position);
             grabStartRot = Quaternion.Inverse(controller.rotation) * grabbedCamera.Transformer.Rotation;

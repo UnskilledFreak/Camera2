@@ -82,17 +82,17 @@ namespace Camera2.Middlewares
                 lookRotation *= rotOffset;
             }
 
-            Transformer!.Position = Vector3.zero;
 
             if (_wasInMovementScript)
             {
-                Cam.Transformer.Position = Settings.TargetPosition;
                 _wasInMovementScript = false;
             }
+            
+            Transformer!.Position = Vector3.zero;
 
             if (TeleportOnNextFrame)
             {
-                Transformer.Rotation = Quaternion.identity;
+                Transformer!.Rotation = Quaternion.identity;
                 TeleportOnNextFrame = false;
             }
             else

@@ -1,4 +1,5 @@
-﻿using Camera2.Interfaces;
+﻿using System.Linq;
+using Camera2.Interfaces;
 using Camera2.Managers;
 using Camera2.Utils;
 using Camera2.Enums;
@@ -26,10 +27,12 @@ namespace Camera2.Middlewares
                 Transformer.Position = Vector3.zero;
                 Transformer.Rotation = Quaternion.identity;
 
+                /*
                 if (Settings.MovementScript.FromOrigin)
                 {
                     Cam.Settings.ApplyPositionAndRotation();
                 }
+                */
             }
 
             _currentAnimationTime = 0f;
@@ -55,9 +58,10 @@ namespace Camera2.Middlewares
         public bool Pre()
         {
             if (
-                Settings.MovementScript.ScriptList.Length == 0
+                Cam.Settings.Type == CameraType.FirstPerson
+                || Cam.Settings.Type == CameraType.Attached
+                || Settings.MovementScript.ScriptList.Length == 0
                 || (!SceneUtil.IsInSong && !Settings.MovementScript.EnableInMenu)
-                || Cam.Settings.Type != CameraType.Positionable
             )
             {
                 Reset();
@@ -66,7 +70,6 @@ namespace Camera2.Middlewares
 
             if (_loadedScript == null)
             {
-
                 _loadedScript = MovementScriptManager.GetRandomFromPossibles(Settings.MovementScript.ScriptList);
 
                 if (_loadedScript == null)
@@ -105,15 +108,16 @@ namespace Camera2.Middlewares
             {
                 if (!_loadedScript.Loop)
                 {
-                    /*
-                    if (_scriptTransformer != null)
+                    if (Settings.Type == CameraType.Follower)
                     {
-                        Chain.Remove(TransformerOrders.MovementScriptProcessor);
-                        _scriptTransformer = null;
-                        Cam.Transformer.Position = _lastPos;
-                        Cam.Transformer.Rotation = _lastRot;
+                        Chain.Remove(TransformerTypeAndOrder.MovementScriptProcessor);
+                        Settings.UnOverriden(delegate
+                        {
+                            Settings.TargetPosition = _loadedScript.Frames.Last().Position;
+                        });
+                        Settings.ApplyPositionAndRotation();
                     }
-                    */
+
                     return true;
                 }
 
