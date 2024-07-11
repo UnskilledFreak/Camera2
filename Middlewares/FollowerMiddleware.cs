@@ -32,6 +32,8 @@ namespace Camera2.Middlewares
             // don't track until MovementScript is done
             if (Chain.HasType(TransformerTypeAndOrder.MovementScriptProcessor))
             {
+                // remove follower chain so rotations won't stick
+                RemoveTransformer(TransformerTypeAndOrder.Follower);
                 _wasInMovementScript = true;
                 return true;
             }
