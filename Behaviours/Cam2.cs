@@ -84,6 +84,14 @@ namespace Camera2.Behaviours
             return true;
         }
 
+        internal void ForceResetMiddleWares()
+        {
+            foreach (var middleware in Middlewares)
+            {
+                middleware.ForceReset();
+            }
+        }
+
         public void SetOrigin(Transform parent, bool startFromParentTransform = true, bool unparentOnDisable = true)
         {
             if (transform.parent == parent)

@@ -20,7 +20,7 @@ namespace Camera2.Managers
         // Kind of a hack not having it start off Menu but else the first menu load will not apply...
         internal static SceneTypes? LoadedScene { get; private set; }
 
-        private static bool isOnCustomScene;
+        internal static bool IsOnCustomScene;
 
         public static void ActiveSceneChanged(string sceneName = null)
         {
@@ -36,7 +36,7 @@ namespace Camera2.Managers
                 return;
             }
 
-            if (!Settings.AutoSwitchFromCustom && isOnCustomScene)
+            if (!Settings.AutoSwitchFromCustom && IsOnCustomScene)
             {
                 return;
             }
@@ -84,14 +84,13 @@ namespace Camera2.Managers
 
                 if (HookLeveldata.IsModdedMap)
                 {
+                    //toLookup.Insert(0, SceneTypes.PlayingModmapNoMotion);
                     toLookup.Insert(0, SceneTypes.PlayingModmap);
                 }
                 else if (HookLeveldata.Is360Level)
                 {
                     toLookup.Insert(0, SceneTypes.Playing360);
                 }
-
-                //Plugin.Log.Info("RS count: " + ReplaySources.Sources.Count);
                 
                 if (ReplaySources.Sources.Any(x => x.IsInReplay))
                 {
@@ -124,14 +123,14 @@ namespace Camera2.Managers
             {
                 return;
             }
-
-            Plugin.Log.Info($"Switching to scene {scene}");
-            Plugin.Log.Info($"Cameras: {string.Join(", ", Settings.Scenes[scene])}");
             
-            if (LoadedScene == scene && !forceReload && !isOnCustomScene)
+            if (LoadedScene == scene && !forceReload && !IsOnCustomScene)
             {
                 return;
             }
+
+            Plugin.Log.Info($"Switching to scene {scene}");
+            Plugin.Log.Info($"Cameras: {string.Join(", ", Settings.Scenes[scene])}");
 
             LoadedScene = scene;
 
@@ -143,7 +142,7 @@ namespace Camera2.Managers
             }
 
             SwitchToCamList(toLoad);
-            isOnCustomScene = false;
+            IsOnCustomScene = false;
             UI.SpaghettiUI.ScenesSwitchUI.Update(0, false);
         }
 
@@ -159,7 +158,7 @@ namespace Camera2.Managers
                 return;
             }
 
-            isOnCustomScene = true;
+            IsOnCustomScene = true;
 
             SwitchToCamList(scene);
         }
@@ -184,10 +183,9 @@ namespace Camera2.Managers
                 }
 
                 var isContained = cams?.Contains(cam.Name);
-
-                var camShouldBeActive = (activateAllWhenEmpty && isContained != false) || isContained == true || UI.CamSettings.CurrentCam == cam;
-
-                cam.gameObject.SetActive(camShouldBeActive);
+                
+                cam.ForceResetMiddleWares();
+                cam.gameObject.SetActive((activateAllWhenEmpty && isContained != false) || isContained == true || UI.CamSettings.CurrentCam == cam);
             }
 
             GL.Clear(true, true, Color.black);

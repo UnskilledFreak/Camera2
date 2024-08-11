@@ -191,5 +191,7 @@ namespace Camera2.Middlewares
 
             return true;
         }
+        
+        public void ForceReset() { }
     }
 }

@@ -46,5 +46,7 @@ namespace Camera2.Middlewares
         }
 
         public void CamConfigReloaded() { }
+        
+        public void ForceReset() { }
     }
 }

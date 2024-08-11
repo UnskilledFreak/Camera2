@@ -179,5 +179,7 @@ namespace Camera2.Middlewares
             
             targetRotation.eulerAngles = eulerAngles;
         }
+        
+        public void ForceReset() { }
     }
 }

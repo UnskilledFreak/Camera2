@@ -111,5 +111,7 @@ namespace Camera2.Middlewares
         {
             Settings.ParentReset();
         }
+        
+        public void ForceReset() { }
     }
 }

@@ -11,6 +11,21 @@ namespace Camera2.Utils
         public static bool IsProbablyWallMap(IDifficultyBeatmap map) => IsModCapable && IsModdedMap(map);
 
         public static bool IsModdedMap(IDifficultyBeatmap map) => HasSongCore && IsModCapable && IsModdedMapFunc(map);
+        /*
+        public static bool HasPlayerTrack(IDifficultyBeatmap map)
+        {
+            if (!IsModdedMap(map))
+            {
+                return false;
+            }
+
+            var hash = SongCore.Collections.hashForLevelID(map.level.levelID);
+
+            var test = SongCore.Loader.CustomLevels.FirstOrDefault(x => x.Value.levelID == difficultyBeatmap.level.levelID).Key;
+            
+            return true;
+        }
+        */
 
         // Separate method so we dont throw if theres no SongCore
         private static bool IsModdedMapFunc(IDifficultyBeatmap map)

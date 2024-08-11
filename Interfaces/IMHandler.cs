@@ -6,5 +6,6 @@
         public bool Pre();
         public void Post();
         public void CamConfigReloaded();
+        public void ForceReset();
     }
 }
