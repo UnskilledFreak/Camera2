@@ -84,8 +84,8 @@ namespace Camera2.Managers
 
                 if (HookLeveldata.IsModdedMap)
                 {
-                    //toLookup.Insert(0, SceneTypes.PlayingModmapNoMotion);
-                    toLookup.Insert(0, SceneTypes.PlayingModmap);
+                    toLookup.Insert(0, SceneTypes.PlayingModmapNoMotion);
+                    //toLookup.Insert(0, SceneTypes.PlayingModmap);
                 }
                 else if (HookLeveldata.Is360Level)
                 {

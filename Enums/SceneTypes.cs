@@ -7,7 +7,7 @@
         Playing,
         Playing360,
         PlayingModmap,
-        //PlayingModmapNoMotion,
+        PlayingModmapNoMotion,
         PlayingMulti,
         SpectatingMulti,
         Replay,

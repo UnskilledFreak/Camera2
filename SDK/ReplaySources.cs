@@ -21,11 +21,11 @@ namespace Camera2.SDK
             public string Name { get; }
             public bool IsInReplay { get; private set; }
 
-            // another things thank to spaghetti... lower case public members urgh
+            // another thing thanks to spaghetti... lower case public members urgh
             [UsedImplicitly]
             public Vector3 localHeadPosition { get; private set; }
 
-            // another things thank to spaghetti... lower case public members urgh
+            // another thing thanks to spaghetti... lower case public members urgh
             [UsedImplicitly]
             public Quaternion localHeadRotation { get; private set; }
 

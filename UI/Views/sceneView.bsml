@@ -7,7 +7,7 @@
                 <button text="Playing" on-click="SwitchToPlaying"/>
                 <button text="Playing360" on-click="SwitchToPlaying360"/>
                 <button text="PlayingModmap" on-click="SwitchToPlayingModmap"/>
-                <!--<button text="PlayingModmapNoMotion" on-click="PlayingModmapNoMotion"/>-->
+                <button text="PlayingModmapNoMotion" on-click="PlayingModmapNoMotion"/>
                 <button text="PlayingMulti" on-click="SwitchToPlayingMulti"/>
                 <button text="SpectatingMulti" on-click="SwitchToSpectatingMulti"/>
                 <button text="Replay" on-click="SwitchToReplay"/>

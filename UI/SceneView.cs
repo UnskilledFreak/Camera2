@@ -38,14 +38,12 @@ namespace Camera2.UI
         {
             ScenesManager.SwitchToScene(SceneTypes.PlayingModmap);
         }
-
-        /*
+        
         [UsedImplicitly]
         public void PlayingModmapNoMotion()
         {
             ScenesManager.SwitchToScene(SceneTypes.PlayingModmapNoMotion);
         }
-        */
 
         [UsedImplicitly]
         public void SwitchToPlayingMulti()
