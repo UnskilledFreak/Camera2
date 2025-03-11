@@ -46,18 +46,23 @@ namespace Camera2.Middlewares
             }
 
             // position to look at, not the cams position
+            var positionOffset = Settings.SmoothFollow.FollowerOffsetPositionIsRelative
+                ? Vector3.Scale(Settings.SmoothFollow.FollowerOffsetPositionRelativeType switch
+                {
+                    FollowerPositionOffsetType.Right => Settings.Parent.right,
+                    FollowerPositionOffsetType.Left => -Settings.Parent.right,
+                    FollowerPositionOffsetType.Up => Settings.Parent.up,
+                    FollowerPositionOffsetType.Down => -Settings.Parent.up,
+                    FollowerPositionOffsetType.Forward => Settings.Parent.forward,
+                    FollowerPositionOffsetType.Backward => -Settings.Parent.forward,
+                    _ => Settings.Parent.forward
+                }, Settings.TargetRotation)
+                : Settings.TargetRotation;
+            
             var targetPosition = -(Cam.Camera.transform.localPosition - Settings.Parent.position);
             if (Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
             {
-                targetPosition += Settings.SmoothFollow.FollowerOffsetPositionIsRelative
-                    ? Vector3.Scale(Settings.SmoothFollow.FollowerOffsetPositionRelativeType switch
-                    {
-                        FollowerPositionOffsetType.Right => Settings.Parent.right,
-                        FollowerPositionOffsetType.Up => Settings.Parent.up,
-                        FollowerPositionOffsetType.Forward => Settings.Parent.forward,
-                        _ => Settings.Parent.forward
-                    }, Settings.TargetRotation)
-                    : Settings.TargetRotation;
+                targetPosition += positionOffset;
             }
 
             // calculate the vector where "up" is, this is only used for noodle maps with player movement
@@ -84,7 +89,6 @@ namespace Camera2.Middlewares
                 lookRotation *= rotOffset;
             }
 
-
             if (_wasInMovementScript)
             {
                 _wasInMovementScript = false;
@@ -94,12 +98,28 @@ namespace Camera2.Middlewares
 
             if (TeleportOnNextFrame)
             {
-                Transformer!.Rotation = Quaternion.identity;
                 TeleportOnNextFrame = false;
+                /*
+                Transformer.Rotation = _wasInMovementScript 
+                    ? lookRotation 
+                    : Quaternion.identity;
+                */  
+                Transformer.Rotation = lookRotation;
             }
             else
             {
                 Transformer.Rotation = Quaternion.Slerp(Transformer.Rotation, lookRotation, Cam.TimeSinceLastRender * Settings.SmoothFollow.Rotation);
+            }
+
+            if (Settings.SmoothFollow.FollowerFakeZoom.IsValid())
+            {
+                //var distance = Mathf.Abs(Vector3.Distance(Cam.Camera.transform.localPosition, Settings.Parent.position + positionOffset));
+                var distance = Mathf.Abs(Vector3.Distance(Cam.Camera.transform.localPosition, targetPosition));
+                var fovDelta = Settings.SmoothFollow.FollowerFakeZoom.FarthestFOV - Settings.SmoothFollow.FollowerFakeZoom.NearestFOV;
+                //var fov = Mathf.Clamp(Settings.SmoothFollow.FollowerFakeZoom.MaxFOV - (Settings.SmoothFollow.FollowerFakeZoom.Distance * Mathf.Log(distance)), Settings.SmoothFollow.FollowerFakeZoom.MinFOV, Settings.SmoothFollow.FollowerFakeZoom.MaxFOV);
+                var fov = Mathf.Clamp(distance / Settings.SmoothFollow.FollowerFakeZoom.Distance, .01f, 1f) * fovDelta + Settings.SmoothFollow.FollowerFakeZoom.NearestFOV;
+                //Cam.LogInfo("distance: " + distance + " - FOV = " + fov);
+                Cam.Camera.fieldOfView = fov;
             }
 
             return true;

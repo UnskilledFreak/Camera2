@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -12,11 +12,9 @@
     <Nullable>disable</Nullable>
     <Product>Camera2</Product>
     <Company />
-    <Authors>Kinsi55</Authors>
-    <Copyright>Kinsi55</Copyright>
-    <RepositoryType></RepositoryType>
+    <Authors>Kinsi55 &amp; UnskilledFreak</Authors>
+    <Copyright>Kinsi55 &amp; UnskilledFreak</Copyright>
     <RepositoryUrl>https://github.com/kinsi55/CS_BeatSaber_Camera2</RepositoryUrl>
-    <Description></Description>
     <Platforms>x64</Platforms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

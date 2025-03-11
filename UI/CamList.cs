@@ -23,7 +23,7 @@ namespace Camera2.UI
 
         public override string ResourceName => "Camera2.UI.Views.camList.bsml";
 
-        [UsedImplicitly] private string _cam2Version = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak Version 0.2.1";
+        [UsedImplicitly] private string _cam2Version = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak Version {Plugin.ModdedVersion}";
         
 #pragma warning disable CS0649
         

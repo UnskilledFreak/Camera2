@@ -5,11 +5,12 @@
 	<horizontal>
 		<vertical preferred-width="27">
 			<button click-event="addCamModal" text="Add Camera" horizontal-fit="Unconstrained"/>
-			<button id="deleteButton" click-event="showDelConf" text="Delete Camera" hover-hint="You will FC your next Song and get a PB OkayChamp" horizontal-fit="Unconstrained"/>
+			<button id="deleteButton" click-event="showDelConf" text="Delete Camera" horizontal-fit="Unconstrained"/>
 			<button click-event="showViewRectModal" on-click="UnlockCamPosTab" text="Move Display" horizontal-fit="Unconstrained"/>
 			<button text="Camera2 Wiki" on-click="ShowWiki" click-event="showLinkInfoModal" pad-top="13" horizontal-fit="Unconstrained"/>
 			<button text="Github" on-click="ShowGithub" click-event="showLinkInfoModal" hover-hint="Report bugs!" horizontal-fit="Unconstrained"/>
 			<text text="~_cam2Version" align="Center" font-size="3" font-color="#CC6E3B"/>
+			<!-- sorry, no unsecure urls and no donations from me for your spaghetti, but thanks for your work -->
 			<!--<clickable-text text="♥ Donate" font-size="4" align="Center" click-event="OpenSponsorModal" on-click="OpenSponsorsModal"/>-->
 		</vertical>
 		<vertical pad-left="3" pad-right="3">

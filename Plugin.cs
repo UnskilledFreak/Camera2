@@ -1,4 +1,4 @@
-﻿using Camera2.HarmonyPatches;
+using Camera2.HarmonyPatches;
 using Camera2.Managers;
 using Camera2.Utils;
 using HarmonyLib;
@@ -23,6 +23,8 @@ namespace Camera2
         internal static Material ShaderMatCa;
         internal static Shader ShaderVolumetricBlit;
         internal const string Name = "Camera 2.5";
+        internal const string ModdedVersion = "0.4.0";
+        internal const string FullName = Name + " Mod " + ModdedVersion;
         
         private static Harmony Harmony { get; set; }
 
@@ -38,7 +40,7 @@ namespace Camera2
             Instance = this;
             Log = logger;
 
-            Log.Info($"{Name} loaded");
+            Log.Info($"{Name} mod {ModdedVersion} loaded");
             LoadShaders();
         }
 

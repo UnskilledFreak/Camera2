@@ -595,6 +595,54 @@ namespace Camera2.UI
             }
         }
 
+        [UsedImplicitly]
+        internal bool FakeZoomEnable
+        {
+            get => CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Enabled;
+            set
+            {
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Enabled = value;
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Reset();
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal float FakeZoomNearFov
+        {
+            get => CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.NearestFOV;
+            set
+            {
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.NearestFOV = value;
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Reset();
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal float FakeZoomFarFov
+        {
+            get => CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.FarthestFOV;
+            set
+            {
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.FarthestFOV = value;
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Reset();
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal float FakeZoomMaxDistance
+        {
+            get => CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Distance;
+            set
+            {
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Distance = Mathf.Clamp(value, .01f, 50f);
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Reset();
+                NotifyPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region UI Buttons

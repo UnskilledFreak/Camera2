@@ -43,10 +43,11 @@ namespace Camera2.Middlewares
                     AddTransformer(TransformerTypeAndOrder.ModMapParenting);
                 }
                 
-                if (!ScenesManager.IsOnCustomScene && !HookFPFCToggle.isInFPFC && ScenesManager.LoadedScene != SceneTypes.PlayingModmap)
+                //if (!ScenesManager.IsOnCustomScene && !HookFPFCToggle.isInFPFC && ScenesManager.LoadedScene != SceneTypes.PlayingModmap)
+                if (!HookFPFCToggle.isInFPFC && ScenesManager.LoadedScene != SceneTypes.PlayingModmap)
                 {
                     //Cam.LogInfo("modmap WITH movement");
-                    ScenesManager.SwitchToScene(SceneTypes.PlayingModmap);   
+                    ScenesManager.SwitchToScene(SceneTypes.PlayingModmap);
                 }
 
                 Transformer!.Rotation = _noodleOrigin!.transform.localRotation;

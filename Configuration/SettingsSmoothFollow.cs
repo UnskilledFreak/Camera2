@@ -11,6 +11,7 @@ namespace Camera2.Configuration
         public bool FollowerOffsetPositionIsRelative = false;
         public bool FollowerUseOrganic = false;
         public FollowerPositionOffsetType FollowerOffsetPositionRelativeType = FollowerPositionOffsetType.Forward;
+        public FollowerFakeZoom FollowerFakeZoom = new FollowerFakeZoom();
         
         private bool _pivotingOffset = true;
         public string TargetParent { get; set; } = "";

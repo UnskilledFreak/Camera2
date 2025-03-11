@@ -2,8 +2,11 @@
 {
     internal enum FollowerPositionOffsetType
     {
-        Forward,
+        Up,
+        Down,
         Right,
-        Up
+        Left,
+        Forward,
+        Backward,
     }
 }

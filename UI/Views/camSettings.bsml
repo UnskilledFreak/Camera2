@@ -75,7 +75,10 @@
             <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
                 <string-setting id="attachedTarget" text="Target" value="TargetParent" bind-value="true" apply-on-change="true"
                                 hover-hint="Insert a path or name of any GameObject here"/>
-                <button text="Templates" click-event="targetTemplateModal"/>
+                <horizontal preferred-width="80">
+                    <button text="Templates" click-event="targetTemplateModal"/>
+                    <button text="Fake Zoom" click-event="fakeFovTemplateModal"/>
+                </horizontal>
                 <slider-setting text="Position Smoothing *" min="0.1" max="50" increment="0.1" value="SmoothFollowPosition" bind-value="true" apply-on-change="true" show-buttons="true"/>
                 <slider-setting text="Rotation Smoothing *" min="0.1" max="50" increment="0.1" value="SmoothFollowRotation" bind-value="true" apply-on-change="true" show-buttons="true"/>
             </modifier-container>
@@ -231,6 +234,30 @@
                 <primary-button on-click="TargetCatHead" text="NalulunaCat Head" click-event="CloseTargetModal" horizontal-fit="Unconstrained"/>
             </vertical>
             <button text="Cancel" click-event="CloseTargetModal"/>
+        </vertical>
+    </modal>
+
+    <modal clickerino-offerino-closerino="true" move-to-center="true" hide-event="CloseFakeFovModal" show-event="fakeFovTemplateModal" size-delta-x="90" size-delta-y="70">
+        <vertical preferred-width="72" vertical-fit="PreferredSize" pad-left="2" pad-right="2" spacing="2">
+            <horizontal pad-bottom="2" pad-top="1">
+                <horizontal bg="panel-top-gradient">
+                    <text text="Camera 2.5 - Fake Zoom" align="Center" font-size="3"/>
+                </horizontal>
+            </horizontal>
+            <vertical spacing="1.5" pad-bottom="2" preferred-width="60">
+                <horizontal preferred-width="100" pad-top="3">
+                    <text font-size="3" align="Center" word-wrapping="true"
+                          text="Fake Zoom will try to zoom on the target based on the distance between the camera position and the target. Distance defines the maximum relative distance between camera and target position. Hard to explain, try yourself."
+                    />
+                </horizontal>
+                <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
+                    <checkbox text="Enable Fake Zoom" value="FakeZoomEnable" bind-value="true" apply-on-change="true" />
+                    <slider-setting text="Nearest FOV" min="1" max="180" increment="0.02" value="FakeZoomNearFov" bind-value="true" apply-on-change="true" show-buttons="true"/>
+                    <slider-setting text="Farthest FOV" min="1" max="180" increment="0.02" value="FakeZoomFarFov" bind-value="true" apply-on-change="true" show-buttons="true"/>
+                    <slider-setting text="Max relative Distance" min=".01" max="50" increment="0.01" value="FakeZoomMaxDistance" bind-value="true" apply-on-change="true" show-buttons="true"/>
+                </modifier-container>
+            </vertical>
+            <button text="Done" click-event="CloseFakeFovModal"/>
         </vertical>
     </modal>
 </vertical>

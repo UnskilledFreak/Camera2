@@ -52,7 +52,7 @@ namespace Camera2.Configuration
                     }
                     else
                     {
-                        System.Threading.Tasks.Task.Run(() => WinAPI.MessageBox(IntPtr.Zero, "It seems like the Formatting of your Scenes.json is invalid! It was not loaded.\n\nIf you cant figure out how to fix the formatting you can simply delete it which will recreate it on next load", Plugin.Name, 0x30));
+                        System.Threading.Tasks.Task.Run(() => WinAPI.MessageBox(IntPtr.Zero, "It seems like the Formatting of your Scenes.json is invalid! It was not loaded.\n\nIf you cant figure out how to fix the formatting you can simply delete it which will recreate it on next load", Plugin.FullName, 0x30));
                         return;
                     }
                 }
