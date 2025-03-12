@@ -252,6 +252,7 @@
                 </horizontal>
                 <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
                     <checkbox text="Enable Fake Zoom" value="FakeZoomEnable" bind-value="true" apply-on-change="true" />
+                    <checkbox text="Ignore Position Offset" value="FakeZoomIgnorePositionOffset" bind-value="true" apply-on-change="true" />
                     <slider-setting text="Nearest FOV" min="1" max="180" increment="0.02" value="FakeZoomNearFov" bind-value="true" apply-on-change="true" show-buttons="true"/>
                     <slider-setting text="Farthest FOV" min="1" max="180" increment="0.02" value="FakeZoomFarFov" bind-value="true" apply-on-change="true" show-buttons="true"/>
                     <slider-setting text="Max relative Distance" min=".01" max="50" increment="0.01" value="FakeZoomMaxDistance" bind-value="true" apply-on-change="true" show-buttons="true"/>

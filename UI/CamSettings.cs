@@ -548,6 +548,7 @@ namespace Camera2.UI
             set
             {
                 CurrentCam.Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition = value;
+                CurrentCam.Settings.SmoothFollow.FollowerOffsetPositionIsRelative = false;
                 CurrentCam.Settings.SmoothFollow.FollowerUseOrganic = false;
                 CurrentCam.Settings.TargetRotation = Vector3.zero;
 
@@ -555,6 +556,7 @@ namespace Camera2.UI
                 NotifyTargetPosRotChanged();
                 SetRotationOffsetText();
                 ToggleFollowerSpecificSettings();
+                NotifyPropertyChanged(nameof(FollowerPosRelative));
                 NotifyPropertyChanged(nameof(FollowerUseOrganic));
             }
         }
@@ -566,7 +568,9 @@ namespace Camera2.UI
             set
             {
                 CurrentCam.Settings.SmoothFollow.FollowerOffsetPositionIsRelative = value;
+                CurrentCam.Settings.SmoothFollow.FollowerUseOrganic = false;
                 NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(FollowerUseOrganic));
             }
         }
 
@@ -602,6 +606,18 @@ namespace Camera2.UI
             set
             {
                 CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Enabled = value;
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Reset();
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal bool FakeZoomIgnorePositionOffset
+        {
+            get => CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.IgnorePositionOffset;
+            set
+            {
+                CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.IgnorePositionOffset = value;
                 CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Reset();
                 NotifyPropertyChanged();
             }

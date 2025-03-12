@@ -22,7 +22,7 @@ namespace Camera2.Middlewares
                 RemoveTransformer(TransformerTypeAndOrder.Follower);
                 return true;
             }
-            
+
             if (Settings.Parent == null)
             {
                 // do render like a positionable would if no target is set
@@ -46,23 +46,23 @@ namespace Camera2.Middlewares
             }
 
             // position to look at, not the cams position
-            var positionOffset = Settings.SmoothFollow.FollowerOffsetPositionIsRelative
-                ? Vector3.Scale(Settings.SmoothFollow.FollowerOffsetPositionRelativeType switch
-                {
-                    FollowerPositionOffsetType.Right => Settings.Parent.right,
-                    FollowerPositionOffsetType.Left => -Settings.Parent.right,
-                    FollowerPositionOffsetType.Up => Settings.Parent.up,
-                    FollowerPositionOffsetType.Down => -Settings.Parent.up,
-                    FollowerPositionOffsetType.Forward => Settings.Parent.forward,
-                    FollowerPositionOffsetType.Backward => -Settings.Parent.forward,
-                    _ => Settings.Parent.forward
-                }, Settings.TargetRotation)
-                : Settings.TargetRotation;
-            
-            var targetPosition = -(Cam.Camera.transform.localPosition - Settings.Parent.position);
+            var realTargetPosition = -(Cam.Camera.transform.localPosition - Settings.Parent.position);
+            // where is clone?
+            var targetPositionWitOffset = new Vector3(realTargetPosition.x, realTargetPosition.y, realTargetPosition.z);
             if (Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
             {
-                targetPosition += positionOffset;
+                targetPositionWitOffset += Settings.SmoothFollow.FollowerOffsetPositionIsRelative
+                    ? Vector3.Scale(Settings.SmoothFollow.FollowerOffsetPositionRelativeType switch
+                    {
+                        FollowerPositionOffsetType.Right => Settings.Parent.right,
+                        FollowerPositionOffsetType.Left => -Settings.Parent.right,
+                        FollowerPositionOffsetType.Up => Settings.Parent.up,
+                        FollowerPositionOffsetType.Down => -Settings.Parent.up,
+                        FollowerPositionOffsetType.Forward => Settings.Parent.forward,
+                        FollowerPositionOffsetType.Backward => -Settings.Parent.forward,
+                        _ => Settings.Parent.forward
+                    }, Settings.TargetRotation)
+                    : Settings.TargetRotation;
             }
 
             // calculate the vector where "up" is, this is only used for noodle maps with player movement
@@ -76,7 +76,7 @@ namespace Camera2.Middlewares
                 }
             }
 
-            var lookRotation = Quaternion.LookRotation(targetPosition, upVector);
+            var lookRotation = Quaternion.LookRotation(targetPositionWitOffset, upVector);
 
             // calculate the rotation offset
             if (!Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition && !Settings.SmoothFollow.FollowerOffsetPositionIsRelative)
@@ -86,6 +86,7 @@ namespace Camera2.Middlewares
                 {
                     rotOffset = Quaternion.Inverse(rotOffset);
                 }
+
                 lookRotation *= rotOffset;
             }
 
@@ -93,17 +94,17 @@ namespace Camera2.Middlewares
             {
                 _wasInMovementScript = false;
             }
-            
+
             Transformer!.Position = Vector3.zero;
 
             if (TeleportOnNextFrame)
             {
                 TeleportOnNextFrame = false;
                 /*
-                Transformer.Rotation = _wasInMovementScript 
-                    ? lookRotation 
+                Transformer.Rotation = _wasInMovementScript
+                    ? lookRotation
                     : Quaternion.identity;
-                */  
+                */
                 Transformer.Rotation = lookRotation;
             }
             else
@@ -114,7 +115,7 @@ namespace Camera2.Middlewares
             if (Settings.SmoothFollow.FollowerFakeZoom.IsValid())
             {
                 //var distance = Mathf.Abs(Vector3.Distance(Cam.Camera.transform.localPosition, Settings.Parent.position + positionOffset));
-                var distance = Mathf.Abs(Vector3.Distance(Cam.Camera.transform.localPosition, targetPosition));
+                var distance = Mathf.Abs(Vector3.Distance(Cam.Camera.transform.localPosition, Settings.SmoothFollow.FollowerFakeZoom.IgnorePositionOffset ? realTargetPosition : targetPositionWitOffset));
                 var fovDelta = Settings.SmoothFollow.FollowerFakeZoom.FarthestFOV - Settings.SmoothFollow.FollowerFakeZoom.NearestFOV;
                 //var fov = Mathf.Clamp(Settings.SmoothFollow.FollowerFakeZoom.MaxFOV - (Settings.SmoothFollow.FollowerFakeZoom.Distance * Mathf.Log(distance)), Settings.SmoothFollow.FollowerFakeZoom.MinFOV, Settings.SmoothFollow.FollowerFakeZoom.MaxFOV);
                 var fov = Mathf.Clamp(distance / Settings.SmoothFollow.FollowerFakeZoom.Distance, .01f, 1f) * fovDelta + Settings.SmoothFollow.FollowerFakeZoom.NearestFOV;
@@ -131,7 +132,7 @@ namespace Camera2.Middlewares
         {
             Settings.ParentReset();
         }
-        
+
         public void ForceReset() { }
     }
 }

@@ -3,6 +3,7 @@
     internal class FollowerFakeZoom
     {
         public bool Enabled = false;
+        public bool IgnorePositionOffset = false;
         public float NearestFOV = 10;
         public float FarthestFOV = 110;
         public float Distance = 3;
