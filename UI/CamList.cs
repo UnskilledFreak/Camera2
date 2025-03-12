@@ -200,14 +200,5 @@ namespace Camera2.UI
         
         [UsedImplicitly]
         private void LayerDecrease() => ChangeLayer(-1);
-
-        [UsedImplicitly]
-        private void UnlockCamPosTab() => SettingsCoordinator.Instance.CamSettings.viewRectTab.IsVisible = true;
-
-        [UsedImplicitly]
-        private void ShowGithub() => Process.Start("https://github.com/kinsi55/CS_BeatSaber_Camera2");
-        
-        [UsedImplicitly]
-        private void ShowWiki() => Process.Start("https://github.com/kinsi55/CS_BeatSaber_Camera2/wiki");
     }
 }

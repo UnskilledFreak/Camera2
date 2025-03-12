@@ -17,8 +17,8 @@ namespace Camera2.Managers
         public static Script GetRandomFromPossibles(string[] names)
         {
             var possibles = MovementScripts.Where(x => names.Contains(x.Name)).ToList();
-            return possibles.Count == 0 
-                ? null 
+            return possibles.Count == 0
+                ? null
                 : possibles[RandomSource.Next(possibles.Count)];
         }
 
@@ -27,51 +27,42 @@ namespace Camera2.Managers
             if (!Directory.Exists(ConfigUtil.MovementScriptsDir))
             {
                 Directory.CreateDirectory(ConfigUtil.MovementScriptsDir);
+                return;
             }
-            else
+
+            var loadedNames = new List<string>();
+
+            foreach (var cam in Directory.GetFiles(ConfigUtil.MovementScriptsDir, "*.json"))
             {
-                var loadedNames = new List<string>();
+                var name = Path.GetFileNameWithoutExtension(cam);
+                var script = Script.Load(name);
 
-                foreach (var cam in Directory.GetFiles(ConfigUtil.MovementScriptsDir, "*.json"))
+                if (script.Frames.Count < 2)
                 {
-                    try
-                    {
-                        var name = Path.GetFileNameWithoutExtension(cam);
-
-                        var script = Script.Load(name);
-
-                        if (script.Frames.Count < 2)
-                        {
-                            throw new Exception("Movement scripts must contain at least two keyframes");
-                        }
-
-                        Plugin.Log.Info($"Loaded Movement script {name}");
-                        Plugin.Log.Info($"Sync to song: {script.SyncToSong}");
-                        Plugin.Log.Info($"Duration: {script.ScriptDuration} ({script.Frames.Count} frames)");
-
-                        MovementScripts.Add(script);
-
-                        if (reload)
-                        {
-                            loadedNames.Add(name);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Plugin.Log.Error($"Failed to load Movement script {Path.GetFileName(cam)}");
-                        Plugin.Log.Error(ex);
-                    }
+                    Plugin.Log.Warn("Movement scripts must contain at least two keyframes");
+                    continue;
                 }
 
-                if (!reload)
-                {
-                    return;
-                }
+                Plugin.Log.Info($"Loaded Movement script {name}");
+                Plugin.Log.Info($"Sync to song: {script.SyncToSong}");
+                Plugin.Log.Info($"Duration: {script.ScriptDuration} ({script.Frames.Count} frames)");
 
-                foreach (var deletedScript in MovementScripts.Where(x => !loadedNames.Contains(x.Name)).ToList())
+                MovementScripts.Add(script);
+
+                if (reload)
                 {
-                    MovementScripts.Remove(deletedScript);
+                    loadedNames.Add(name);
                 }
+            }
+
+            if (!reload)
+            {
+                return;
+            }
+
+            foreach (var deletedScript in MovementScripts.Where(x => !loadedNames.Contains(x.Name)).ToList())
+            {
+                MovementScripts.Remove(deletedScript);
             }
         }
     }

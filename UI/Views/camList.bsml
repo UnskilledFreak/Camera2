@@ -6,12 +6,7 @@
 		<vertical preferred-width="27">
 			<button click-event="addCamModal" text="Add Camera" horizontal-fit="Unconstrained"/>
 			<button id="deleteButton" click-event="showDelConf" text="Delete Camera" horizontal-fit="Unconstrained"/>
-			<button click-event="showViewRectModal" on-click="UnlockCamPosTab" text="Move Display" horizontal-fit="Unconstrained"/>
-			<button text="Camera2 Wiki" on-click="ShowWiki" click-event="showLinkInfoModal" pad-top="13" horizontal-fit="Unconstrained"/>
-			<button text="Github" on-click="ShowGithub" click-event="showLinkInfoModal" hover-hint="Report bugs!" horizontal-fit="Unconstrained"/>
 			<text text="~_cam2Version" align="Center" font-size="3" font-color="#CC6E3B"/>
-			<!-- sorry, no unsecure urls and no donations from me for your spaghetti, but thanks for your work -->
-			<!--<clickable-text text="♥ Donate" font-size="4" align="Center" click-event="OpenSponsorModal" on-click="OpenSponsorsModal"/>-->
 		</vertical>
 		<vertical pad-left="3" pad-right="3">
 			<custom-list id="camList" select-cell="SelectCamera" contents="Cams" visible-cells="8" stick-scrolling="true">
@@ -64,39 +59,6 @@
 				<primary-button on-click="AddCamFollowerCam" text="Follower Cam TEST" click-event="closeAddModal" horizontal-fit="Unconstrained"/>
 			</vertical>
 			<button text="Cancel" click-event="closeAddModal"/>
-		</vertical>
-	</modal>
-	
-	<modal clickerino-offerino-closerino="true" move-to-center="true" hide-event="closeLinkInfoModal" show-event="showLinkInfoModal" size-delta-x="60" size-delta-y="25">
-		<vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize" pad="8">
-			<text text="A link has been opened on your desktop" align="Center"/>
-			<primary-button text="OK" click-event="closeLinkInfoModal" pad-top="4"/>
-		</vertical>
-	</modal>
-
-	<modal clickerino-offerino-closerino="true" move-to-center="true" hide-event="closeViewRectModal" show-event="showViewRectModal" size-delta-x="80" size-delta-y="45">
-		<vertical preferred-width="90" vertical-fit="PreferredSize" pad="8">
-			<text align="Center" word-wrapping="true" text="Changing the size / position of a camera screen is done on the desktop window by dragging out the corners of a cameras view. If you *really* want to do it from ingame however, clicking this button unlocked a secret settings tab ('Display') where you can do that in a crude way"/>
-			<primary-button text="OK" click-event="closeViewRectModal" pad-top="4"/>
-		</vertical>
-	</modal>
-
-	<modal move-to-center="true" hide-event="CloseSponsorModal" show-event="OpenSponsorModal" size-delta-x="80" size-delta-y="82">
-		<vertical preferred-width="80" vertical-fit="PreferredSize" pad-left="2" pad-right="2" spacing="2" child-expand-width="true">
-			<horizontal pad-bottom="2" pad-top="1">
-				<horizontal bg="panel-top-gradient">
-					<text text="Camera2 - Sponsors" align="Center" font-size="4"/>
-				</horizontal>
-			</horizontal>
-			<text text="Are you enjoying my stuff and want to support me?" align="Center"/>
-			<horizontal>
-				<primary-button text="Open Website on Desktop" on-click="OpenSponsorsLink"/>
-				<button text="Close" click-event="CloseSponsorModal"/>
-			</horizontal>
-			<text text="Current sponsors" align="Center"/>
-			<vertical horizontal-fit="Unconstrained" vertical-fit="Unconstrained" preferred-height="45">
-				<text-page id="sponsorsText" text="Loading..."/>
-			</vertical>
 		</vertical>
 	</modal>
 </vertical>

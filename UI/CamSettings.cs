@@ -95,9 +95,6 @@ namespace Camera2.UI
         [UIComponent("positionTab"), UsedImplicitly]
         public Tab positionTab;
 
-        [UIComponent("viewRectTab"), UsedImplicitly]
-        public Tab viewRectTab;
-
         [UIComponent("tabSelector"), UsedImplicitly]
         public TabSelector tabSelector;
 
@@ -831,8 +828,6 @@ namespace Camera2.UI
             {
                 x.transform.localScale = new Vector3(1.09f, 1f, 1f);
             }
-
-            viewRectTab.IsVisible = false;
 
             tabSelector.textSegmentedControl.didSelectCellEvent += (control, index) =>
             {
