@@ -178,7 +178,7 @@ namespace Camera2.Behaviours
         {
             if (Camera != null)
             {
-                Camera.depthTextureMode = InitOnMainAvailable.useDepthTexture || Settings?.PostProcessing.ForceDepthTexture == true ? DepthTextureMode.Depth : DepthTextureMode.None;
+                Camera.depthTextureMode = InitOnMainAvailable.UseDepthTexture || Settings?.PostProcessing.ForceDepthTexture == true ? DepthTextureMode.Depth : DepthTextureMode.None;
             }
         }
 

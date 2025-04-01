@@ -8,23 +8,23 @@ namespace Camera2.HarmonyPatches
     [HarmonyPatch(typeof(SmoothCameraController), nameof(SmoothCameraController.ActivateSmoothCameraIfNeeded))]
     internal static class InitOnMainAvailable
     {
-        static bool isInited = false;
-        public static bool useDepthTexture { get; private set; }
+        private static bool isInitialized;
+        public static bool UseDepthTexture { get; private set; }
 
         [UsedImplicitly]
         // ReSharper disable once InconsistentNaming
         private static void Postfix(MainSettingsModelSO ____mainSettingsModel)
         {
-            useDepthTexture = ____mainSettingsModel.smokeGraphicsSettings;
+            UseDepthTexture = ____mainSettingsModel.smokeGraphicsSettings;
 
-            if (!isInited)
+            if (!isInitialized)
             {
                 if (CamManager.BaseCullingMask == 0)
                 {
-                    CamManager.BaseCullingMask = Camera.main.cullingMask;
+                    CamManager.BaseCullingMask = Camera.main!.cullingMask;
                 }
 
-                isInited = true;
+                isInitialized = true;
 
                 Plugin.Log.Notice("Game is ready, Initializing...");
 

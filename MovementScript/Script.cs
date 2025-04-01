@@ -10,15 +10,22 @@ namespace Camera2.MovementScript
 {
     internal class Script
     {
-        [JsonProperty("syncToSong")] public bool SyncToSong { get; private set; }
+        [JsonProperty("syncToSong")] 
+        public bool SyncToSong { get; private set; }
 
-        [JsonProperty("loop")] public bool Loop { get; private set; } = true;
+        [JsonProperty("loop")] 
+        public bool Loop { get; private set; } = true;
 
         public List<ScriptFrame> Frames { get; } = new List<ScriptFrame>();
 
-        [JsonIgnore] public float ScriptDuration { get; private set; }
+        [JsonIgnore] 
+        public float ScriptDuration { get; private set; }
 
-        [JsonIgnore] public string Name { get; set; } = "";
+        [JsonIgnore] 
+        public string Name { get; set; } = "";
+        
+        [JsonIgnore]
+        private string Path { get; set; } = "";
 
         private void PopulateTimes()
         {
@@ -43,7 +50,8 @@ namespace Camera2.MovementScript
 
             var script = new Script
             {
-                Name = name
+                Name = name,
+                Path = scriptPath,
             };
 
             var scriptContent = File.ReadAllText(scriptPath);
@@ -79,13 +87,18 @@ namespace Camera2.MovementScript
                     });
                 }
 
-                File.Move(scriptPath, $"{scriptPath}.cameraPlusFormat");
-                File.WriteAllText(scriptPath, JsonConvert.SerializeObject(script, Formatting.Indented, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore }));
+                File.Move(script.Path, $"{script.Path}.cameraPlusFormat");
+                script.Save();
             }
 
             script.PopulateTimes();
 
             return script;
+        }
+
+        public void Save()
+        {
+            File.WriteAllText(Path, JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore }));
         }
     }
 }

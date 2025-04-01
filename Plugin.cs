@@ -23,8 +23,9 @@ namespace Camera2
         internal static Material ShaderMatCa;
         internal static Shader ShaderVolumetricBlit;
         internal const string Name = "Camera 2.5";
-        internal const string ModdedVersion = "0.4.0";
+        private const string ModdedVersion = "0.4.0";
         internal const string FullName = Name + " Mod " + ModdedVersion;
+        internal static readonly string FullInfo = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak Version {ModdedVersion}";
         
         private static Harmony Harmony { get; set; }
 
@@ -84,8 +85,8 @@ namespace Camera2
             Harmony = new Harmony("Kinsi55.BeatSaber.Cam2");
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-            MovementScriptManager.LoadMovementScripts();
             GlobalFPSCap.Init();
+            MovementScriptManager.LoadMovementScripts();
 
             SceneManager.activeSceneChanged += SceneUtil.OnActiveSceneChanged;
 

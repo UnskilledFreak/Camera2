@@ -39,7 +39,7 @@ namespace Camera2.Managers
             
             _ = new GameObject("Cam2_Positioner", typeof(CamPositioner));
 
-            UI.SpaghettiUI.Init();
+            UI.NonSpaghettiUI.Init();
         }
 
         [CanBeNull]
@@ -100,7 +100,7 @@ namespace Camera2.Managers
         {
             LoadCameras(true);
             ScenesManager.Settings.Load(Cams);
-            UI.SpaghettiUI.ScenesSwitchUI.Update();
+            UI.NonSpaghettiUI.ScenesSwitchUI.Update();
         }
 
         /*

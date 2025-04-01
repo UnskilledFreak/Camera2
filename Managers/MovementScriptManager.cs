@@ -10,8 +10,22 @@ namespace Camera2.Managers
 {
     internal static class MovementScriptManager
     {
-        private static List<Script> MovementScripts { get; } = new List<Script>();
+        public static List<Script> MovementScripts { get; } = new List<Script>();
         private static readonly Random RandomSource = new Random();
+
+        public static void AddScript()
+        {
+            var name = "New Script";
+            var counter = 0;
+            while (MovementScripts.Any(x => x.Name == name))
+            {
+                counter++;
+                name = "New Script " + counter;
+            }
+            var script = new Script { Name = name, };
+            script.Save();
+            MovementScripts.Add(script);
+        }
 
         [CanBeNull]
         public static Script GetRandomFromPossibles(string[] names)

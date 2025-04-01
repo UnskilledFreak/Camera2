@@ -86,9 +86,6 @@ namespace Camera2.UI
         [UIComponent("smoothFollowTab"), UsedImplicitly]
         public Tab smoothFollowTab;
 
-        [UIComponent("follow360Tab"), UsedImplicitly]
-        public Tab follow360Tab;
-
         [UIComponent("attachingTab"), UsedImplicitly]
         public Tab attachingTab;
 
@@ -853,7 +850,6 @@ namespace Camera2.UI
             modMapExtMoveWithMapSlider.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             worldCamVisibilityObj.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             smoothFollowTab.IsVisible = Type == CameraType.FirstPerson;
-            follow360Tab.IsVisible = CurrentCam.Settings.IsPositionalCam();
             attachingTab.IsVisible = Type == CameraType.Attached || Type == CameraType.Follower;
             positionTab.IsVisible = Type != CameraType.FirstPerson;
 

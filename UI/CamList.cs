@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -23,18 +21,16 @@ namespace Camera2.UI
 
         public override string ResourceName => "Camera2.UI.Views.camList.bsml";
 
-        [UsedImplicitly] private string _cam2Version = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak Version {Plugin.ModdedVersion}";
+        // ReSharper disable once InconsistentNaming
+        [UsedImplicitly] 
+        private string _cam2Version => Plugin.FullInfo;
         
-#pragma warning disable CS0649
-        
-        [UIComponent("deleteButton"), UsedImplicitly]
+        [UsedImplicitly, UIComponent("deleteButton")]
         public NoTransitionsButton deleteButton;
 
-        [UIComponent("camList"), UsedImplicitly]
+        [UsedImplicitly, UIComponent("camList")]
         public CustomCellListTableData list;
         
-#pragma warning restore CS0649
-
         public IEnumerable<CamListCellWrapper> ListDataOrdered => _listData.OrderByDescending(x => x.Cam.Settings.Layer);
 
         private void UpdateCamListUI()

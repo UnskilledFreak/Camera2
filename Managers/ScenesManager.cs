@@ -143,7 +143,7 @@ namespace Camera2.Managers
 
             SwitchToCamList(toLoad);
             IsOnCustomScene = false;
-            UI.SpaghettiUI.ScenesSwitchUI.Update(0, false);
+            UI.NonSpaghettiUI.ScenesSwitchUI.Update(0, false);
         }
 
         public static void SwitchToCustomScene(string name)
