@@ -10,9 +10,9 @@ namespace Camera2.Managers
 {
     internal static class MovementScriptManager
     {
-        public static List<Script> MovementScripts { get; } = new List<Script>();
+        internal static List<Script> MovementScripts { get; } = new List<Script>();
         private static readonly Random RandomSource = new Random();
-
+        
         public static void AddScript()
         {
             var name = "New Script";

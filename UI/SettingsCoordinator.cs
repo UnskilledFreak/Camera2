@@ -13,6 +13,7 @@ namespace Camera2.UI
 
         internal CamSettings CamSettings;
         internal CamList CamList;
+        internal CamMovementSettings CamMovementSettings;
         private PreviewView _previewView;
         private Cam2 _lastSelected;
         private bool _isActive;
@@ -35,6 +36,16 @@ namespace Camera2.UI
             {
                 _previewView = BeatSaberUI.CreateViewController<PreviewView>();
             }
+
+            if (CamMovementSettings == null)
+            {
+                CamMovementSettings = BeatSaberUI.CreateViewController<CamMovementSettings>();
+            }
+        }
+
+        public void UpdateTitle(Cam2 cam)
+        {
+            SetTitle($"{Plugin.Name} | {cam.Name}");
         }
 
         public void ShowSettingsForCam(Cam2 cam, bool reSelect = false)
@@ -44,13 +55,15 @@ namespace Camera2.UI
                 return;
             }
             
-            SetTitle($"{Plugin.Name} | {cam.Name}");
+            UpdateTitle(cam);
 
             _lastSelected = cam;
             if (!CamSettings.SetCam(cam) && !reSelect)
             {
+                CamMovementSettings.SetCam(null);
                 return;
             }
+            CamMovementSettings.SetCam(cam);
 
             var cellIndex = Array.FindIndex(CamList.ListDataOrdered.ToArray(), x => x.Cam == cam);
 
@@ -81,7 +94,7 @@ namespace Camera2.UI
 
                 showBackButton = true;
 
-                ProvideInitialViewControllers(CamSettings, CamList, null, _previewView);
+                ProvideInitialViewControllers(CamSettings, CamList, CamMovementSettings, _previewView);
             }
             catch (Exception ex)
             {
@@ -92,6 +105,7 @@ namespace Camera2.UI
         protected override void BackButtonWasPressed(ViewController topViewController)
         {
             CamSettings.SetCam(null);
+            CamMovementSettings.SetCam(null);
             ScenesManager.LoadGameScene(forceReload: true);
             BeatSaberUI.MainFlowCoordinator.DismissFlowCoordinator(this);
             _isActive = false;

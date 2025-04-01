@@ -43,6 +43,7 @@ namespace Camera2.Middlewares
                 TeleportOnNextFrame = true;
 
                 AddTransformer(TransformerTypeAndOrder.Follower);
+                Settings.ApplyPositionAndRotation();
             }
 
             // position to look at, not the cams position

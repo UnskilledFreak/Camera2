@@ -27,6 +27,11 @@ namespace Camera2.Middlewares
                 Transformer.Position = Vector3.zero;
                 Transformer.Rotation = Quaternion.identity;
 
+                if (Chain.HasType(TransformerTypeAndOrder.MovementScriptProcessor))
+                {
+                    RemoveTransformer(TransformerTypeAndOrder.MovementScriptProcessor);
+                }
+                
                 /*
                 if (Settings.MovementScript.FromOrigin)
                 {

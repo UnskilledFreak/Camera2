@@ -116,6 +116,7 @@ namespace Camera2.UI
 
                 NotifyPropertyChanged();
                 SettingsCoordinator.Instance.CamList.list.tableView.ReloadData();
+                SettingsCoordinator.Instance.UpdateTitle(CurrentCam);
             }
         }
 

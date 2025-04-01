@@ -23,7 +23,7 @@ namespace Camera2
         internal static Material ShaderMatCa;
         internal static Shader ShaderVolumetricBlit;
         internal const string Name = "Camera 2.5";
-        private const string ModdedVersion = "0.4.0";
+        private const string ModdedVersion = "0.4.5";
         internal const string FullName = Name + " Mod " + ModdedVersion;
         internal static readonly string FullInfo = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak Version {ModdedVersion}";
         

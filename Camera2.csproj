@@ -189,6 +189,7 @@
     <EmbeddedResource Include="Shaders\camera2utils" />
     <EmbeddedResource Include="Shaders\camera2utilsvr" />
     <EmbeddedResource Include="UI\Views\camList.bsml" />
+    <EmbeddedResource Include="UI\Views\camMovementSettings.bsml" />
     <EmbeddedResource Include="UI\Views\camPreview.bsml" />
     <EmbeddedResource Include="UI\Views\camSettings.bsml" />
     <EmbeddedResource Include="UI\Views\customScenesList.bsml" />
