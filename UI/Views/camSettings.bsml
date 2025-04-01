@@ -1,6 +1,10 @@
 ﻿<vertical child-control-height="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
-    <tab-selector tab-tag="tabs" id="tabSelector"/>
-
+    <horizontal vertical-fit="PreferredSize" horizontal-fit="PreferredSize" child-expand-width="true" child-expand-height="true" pref-height="7" pref-width="120">
+        <page-button pref-width="6" pref-height="6" tags="LeftButton" direction="Left"/>
+        <tab-selector child-expand-width="true" child-control-width="true" tab-tag="tabs" id="tabSelector" page-count="5" left-button-tag="LeftButton" right-button-tag="RightButton"/>
+        <page-button pref-width="6" pref-height="6" tags="RightButton" direction="Right"/>
+    </horizontal>
+    
     <tab tags="tabs" tab-name="General">
         <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
             <string-setting text="Camera Name" value="CamName" bind-value="true" apply-on-change="true"/>
@@ -103,24 +107,25 @@
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="ModMaps/360/90">
+    <tab tags="tabs" tab-name="ModMaps">
+        <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
+            <checkbox id="modMapExtMoveWithMapCheckbox" text="Follow Map movement" value="ModMapExtMoveWithMap" bind-value="true" apply-on-change="true"
+                      hover-hint="Make the Camera follow the Map movement / rotation"
+            />
+            <checkbox text="Auto-Visible Walls" value="ModMapExtAutoOpaqueWalls" bind-value="true" apply-on-change="true"
+                      hover-hint="When playing a modded Map automatically make the Walls opaque for this Camera"
+            />
+            <checkbox text="Auto-Hide HUD" value="ModMapExtAutoHideHUD" bind-value="true" apply-on-change="true"
+                      hover-hint="When playing a modded Map automatically hide the HUD for this Camera"
+            />
+        </modifier-container>
+    </tab>
+
+    <tab tags="tabs" tab-name="360/90" id="follow360Tab">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
-            <text text="ModMaps" color="#CCC" font-size="3" align="Center"/>
-            <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
-                <checkbox id="modMapExtMoveWithMapCheckbox" text="Follow Map movement" value="ModMapExtMoveWithMap" bind-value="true" apply-on-change="true"
-                    hover-hint="Make the Camera follow the Map movement / rotation"
-                />
-                <checkbox text="Auto-Visible Walls" value="ModMapExtAutoOpaqueWalls" bind-value="true" apply-on-change="true"
-                    hover-hint="When playing a modded Map automatically make the Walls opaque for this Camera"
-                />
-                <checkbox text="Auto-Hide HUD" value="ModMapExtAutoHideHUD" bind-value="true" apply-on-change="true"
-                    hover-hint="When playing a modded Map automatically hide the HUD for this Camera"
-                />
-            </modifier-container>
-            <text text="360/90" color="#CCC" font-size="3" align="Center"/>
             <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
                 <checkbox text="Enabled" value="Follow360MoveWithMap" bind-value="true" apply-on-change="true"
-                    hover-hint="Makes it so the Camera follows the Map rotation in 90/360 levels"
+                          hover-hint="Makes it so the Camera follows the Map rotation in 90/360 levels"
                 />
                 <slider-setting text="Rotation Smoothing *" min="0.1" max="50" increment="0.1" value="Follow360Smoothing" bind-value="true" apply-on-change="true" show-buttons="true"/>
             </modifier-container>
