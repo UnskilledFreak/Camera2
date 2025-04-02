@@ -46,6 +46,7 @@ namespace Camera2.UI
         public void UpdateTitle(Cam2 cam)
         {
             SetTitle($"{Plugin.Name} | {cam.Name}");
+            _lastSelected = cam;
         }
 
         public void ShowSettingsForCam(Cam2 cam, bool reSelect = false)
@@ -55,18 +56,15 @@ namespace Camera2.UI
                 return;
             }
             
-            UpdateTitle(cam);
-
-            _lastSelected = cam;
             if (!CamSettings.SetCam(cam) && !reSelect)
             {
-                CamMovementSettings.SetCam(null);
                 return;
             }
+            UpdateTitle(cam);
             CamMovementSettings.SetCam(cam);
 
-            var cellIndex = Array.FindIndex(CamList.ListDataOrdered.ToArray(), x => x.Cam == cam);
-
+            var cellIndex = Array.FindIndex(CamList.ListDataOrdered.ToArray(), x => x.Cam.Name == cam.Name);
+            
             CamList.list.tableView.SelectCellWithIdx(cellIndex);
             CamList.list.tableView.ScrollToCellWithIdx(cellIndex, TableView.ScrollPositionType.Center, false);
 
@@ -88,7 +86,11 @@ namespace Camera2.UI
                         CamList.Init();
                     }
 
-                    ShowSettingsForCam(_lastSelected);
+                    if (_lastSelected != null)
+                    {
+                        ShowSettingsForCam(_lastSelected);
+                    }
+
                     return;
                 }
 

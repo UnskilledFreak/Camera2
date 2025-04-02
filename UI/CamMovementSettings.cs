@@ -18,7 +18,8 @@ namespace Camera2.UI
         internal Cam2 CurrentCam { get; private set; }
 
         [UIComponent("movementScripts")]
-        public CustomCellListTableData? scriptsList;
+        [CanBeNull]
+        public CustomCellListTableData scriptsList;
 
         [UsedImplicitly]
         [UIValue("scripts")]

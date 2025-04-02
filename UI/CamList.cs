@@ -25,11 +25,17 @@ namespace Camera2.UI
         [UsedImplicitly] 
         private string _cam2Version => Plugin.FullInfo;
         
-        [UsedImplicitly, UIComponent("deleteButton")]
+#pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
+        
+        [UsedImplicitly]
+        [UIComponent("deleteButton")]
         public NoTransitionsButton deleteButton;
 
-        [UsedImplicitly, UIComponent("camList")]
+        [UsedImplicitly]
+        [UIComponent("camList")]
         public CustomCellListTableData list;
+        
+#pragma warning restore CS0649 // Field is never assigned to, and will always have its default value
         
         public IEnumerable<CamListCellWrapper> ListDataOrdered => _listData.OrderByDescending(x => x.Cam.Settings.Layer);
 
