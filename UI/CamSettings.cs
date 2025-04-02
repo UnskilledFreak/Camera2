@@ -94,6 +94,9 @@ namespace Camera2.UI
 
         [UIComponent("positionTab"), UsedImplicitly]
         public Tab positionTab;
+        
+        [UIComponent("fakeZoomTab"), UsedImplicitly]
+        public Tab fakeZoomTab;
 
         [UIComponent("tabSelector"), UsedImplicitly]
         public TabSelector tabSelector;
@@ -162,6 +165,7 @@ namespace Camera2.UI
                 NotifyPropertyChanged(nameof(TargetParent));
                 NotifyTargetPosRotChanged();
                 ToggleSettingVisibility();
+                FakeZoomEnable = false;
             }
         }
 
@@ -856,6 +860,7 @@ namespace Camera2.UI
             smoothFollowTab.IsVisible = Type == CameraType.FirstPerson;
             follow360Tab.IsVisible = CurrentCam.Settings.IsPositionalCam();
             attachingTab.IsVisible = Type == CameraType.Attached || Type == CameraType.Follower;
+            fakeZoomTab.IsVisible = Type == CameraType.Follower;
             positionTab.IsVisible = Type != CameraType.FirstPerson;
 
             ToggleFollowerSpecificSettings();
