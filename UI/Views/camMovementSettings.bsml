@@ -3,11 +3,7 @@
         <text text="Movement Scripts" align="Center"/>
     </horizontal>
     <horizontal horizontal-fit="PreferredSize">
-        <custom-list id="movementScripts"
-                     contents="scripts"
-                     show-scrollbar="true"
-                     select-cell="script-selected"
-                     pref-width="80">
+        <custom-list id="movementScripts" contents="scripts" show-scrollbar="true" select-cell="script-selected" stick-scrolling="true" pref-width="80">
             <stack size-delta-x="3">
                 <bg bg="panel-top-gradient" bg-color="#8a8a8a" tags="hovered" size-delta-x="1"/>
                 <bg bg="panel-top-gradient" bg-color="#ff44ee" tags="selected" size-delta-x="1"/>
