@@ -82,7 +82,9 @@ namespace Camera2.Middlewares
                     return true;
                 }
 
-                _lastFov = Cam.Camera.fieldOfView;
+                //_lastFov = Cam.Camera.fieldOfView;
+                _lastFov = Settings.FOV;
+                Cam.Camera.fieldOfView = Settings.FOV;
 
                 Cam.LogInfo($"Applying Movement script {_loadedScript.Name} for camera {Cam.Name}");
 
