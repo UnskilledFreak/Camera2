@@ -29,7 +29,7 @@ namespace Camera2.UI
             ProvideInitialViewControllers(SceneView);
         }
 
-        protected override void BackButtonWasPressed(ViewController topViewController)
+        protected override void BackButtonWasPressed(ViewController thisTopViewController)
         {
             ScenesManager.SwitchToScene(HookFPFCToggle.isInFPFC ? SceneTypes.FPFC : SceneTypes.Menu);
             BeatSaberUI.MainFlowCoordinator.DismissFlowCoordinator(this);

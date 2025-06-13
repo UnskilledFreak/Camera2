@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using BeatSaberMarkupLanguage;
+﻿using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.GameplaySetup;
 using BeatSaberMarkupLanguage.MenuButtons;
 using Camera2.Managers;
@@ -19,9 +18,11 @@ namespace Camera2.UI
         [UsedImplicitly]
         private static SceneCoordinator sceneFlow;
         
+        //[UsedImplicitly]
+        //private static ScriptCoordinator scriptFlow;
+        
 #pragma warning restore CS0649 // Field is never assigned to, and will always have its default value
         
-        //private static ScriptCoordinator scriptFlow;
         internal static readonly CustomScenesSwitchUI ScenesSwitchUI = new CustomScenesSwitchUI();
 
         public static void Init()
@@ -32,6 +33,7 @@ namespace Camera2.UI
 
             settingsFlow = BeatSaberUI.CreateFlowCoordinator<SettingsCoordinator>();
             sceneFlow = BeatSaberUI.CreateFlowCoordinator<SceneCoordinator>();
+            //scriptFlow = BeatSaberUI.CreateFlowCoordinator<ScriptCoordinator>();
             
             if (ScenesManager.Settings.CustomScenes.Count > 0)
             {

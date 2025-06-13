@@ -15,7 +15,8 @@ namespace Camera2.MovementScript
         [JsonConverter(typeof(Vector3Converter))]
         public Vector3 Position = Vector3.zero;
 
-        [JsonIgnore] public Quaternion Rotation = Quaternion.identity;
+        [JsonIgnore]
+        public Quaternion Rotation = Quaternion.identity;
 
         [JsonConverter(typeof(Vector3Converter)), JsonProperty("rotation")]
         public Vector3 RotationEuler
@@ -25,12 +26,23 @@ namespace Camera2.MovementScript
         }
 
 
-        [DefaultValue(0f)] public float FOV;
+        [DefaultValue(0f)]
+        public float FOV;
+
         public float Duration;
         public float HoldTime;
 
-        [JsonIgnore] public float StartTime;
-        [JsonIgnore] public float TransitionEndTime;
-        [JsonIgnore] public float EndTime;
+        [JsonIgnore]
+        public float StartTime;
+
+        [JsonIgnore]
+        public float TransitionEndTime;
+
+        [JsonIgnore]
+        public float EndTime;
+
+        public bool OnFollowerIgnoreRotation;
+
+        public bool OnFollowerEnableFakeZoom;
     }
 }

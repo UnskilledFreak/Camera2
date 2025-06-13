@@ -1,9 +1,11 @@
-﻿using Camera2.Managers;
+﻿using System.Collections.Generic;
+using Camera2.Managers;
 using HarmonyLib;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.XR;
 
 namespace Camera2.HarmonyPatches
 {
@@ -12,13 +14,14 @@ namespace Camera2.HarmonyPatches
     {
         private static bool isOculus;
         private static bool isOculusUserPresent;
-        
+
         public static void Init()
         {
             /*
              * On VRMode Oculus, when you take off the headset the game ends up in an uncapped FPS state,
              * this makes sure to apply an FPS cap when the headset is taken off
              */
+#if V1_29_1
             if (!OVRPlugin.initialized)
             {
                 return;
@@ -45,11 +48,29 @@ namespace Camera2.HarmonyPatches
                     System.Threading.Thread.Sleep(isOculusUserPresent ? 2000 : 750);
                 }
             });
+#endif
         }
+
+#if !V1_29_1
+        public static XRDisplaySubsystem GetActiveVrDevice()
+        {
+            var xrDisplaySubsystems = new List<XRDisplaySubsystem>();
+            SubsystemManager.GetInstances<XRDisplaySubsystem>(xrDisplaySubsystems);
+            foreach (var xrDisplay in xrDisplaySubsystems)
+            {
+                if (xrDisplay.running)
+                    return xrDisplay;
+            }
+
+            return null;
+        }
+#endif
 
         public static void ApplyFPSCap()
         {
+#if V1_29_1
             ApplyFPSCap(UnityEngine.XR.XRDevice.isPresent || UnityEngine.XR.XRDevice.refreshRate != 0);
+#endif
         }
 
         [UsedImplicitly]

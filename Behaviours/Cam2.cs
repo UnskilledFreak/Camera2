@@ -21,7 +21,11 @@ namespace Camera2.Behaviours
             "AudioListener", 
             "LIV", 
             "MainCamera", 
-            "MeshCollider"
+            "MeshCollider",
+#if !V1_29_1
+            "TrackedPoseDriver",
+            "DepthTextureController"
+#endif
         };
 
         internal string Name { get; private set; }

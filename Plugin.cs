@@ -85,7 +85,10 @@ namespace Camera2
             Harmony = new Harmony("Kinsi55.BeatSaber.Cam2");
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
 
+#if V1_29_1
             GlobalFPSCap.Init();
+#endif
+            
             MovementScriptManager.LoadMovementScripts();
 
             SceneManager.activeSceneChanged += SceneUtil.OnActiveSceneChanged;

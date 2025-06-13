@@ -1,0 +1,17 @@
+﻿<vertical child-control-height="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
+    <horizontal bg="panel-top-gradient" anchor-min-y="-1">
+        <text text="Movement Scripts" align="Center"/>
+    </horizontal>
+    <horizontal horizontal-fit="PreferredSize">
+        <custom-list id="movementScripts" contents="scripts" show-scrollbar="true" select-cell="script-selected" stick-scrolling="true" pref-width="80">
+            <stack size-delta-x="3">
+                <bg bg="panel-top-gradient" bg-color="#8a8a8a" tags="hovered" size-delta-x="1"/>
+                <bg bg="panel-top-gradient" bg-color="#ff44ee" tags="selected" size-delta-x="1"/>
+                <horizontal horizontal-fit="Unconstrained" child-align="MiddleLeft" pad-left="3" pad-right="3">
+                    <text text="~Name" align="MidlineLeft" font-size="3"/>
+                    <text text="~Enabled" align="MidlineRight" font-size="3"/>
+                </horizontal>
+            </stack>
+        </custom-list>
+    </horizontal>
+</vertical>

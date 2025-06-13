@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Camera2.HarmonyPatches;
 using Camera2.Interfaces;
 using UnityEngine;
 
@@ -62,8 +63,12 @@ namespace Camera2.Utils
 
                         SpectateParent = y == null ? null : y.transform.parent;
                     }
-
+#if V1_29_1
                     if (!UnityEngine.XR.XRDevice.isPresent)
+#else
+                    if (GlobalFPSCap.GetActiveVrDevice() == null)
+#endif
+                    
                     {
                         x.enabled = false;
                     }

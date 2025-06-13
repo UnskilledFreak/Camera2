@@ -27,18 +27,32 @@ namespace Camera2.UI
 
         private static int lastTabSelectedIndex;
 
-        [UsedImplicitly] public static readonly List<object> Types = Enum.GetValues(typeof(CameraType)).Cast<object>().ToList();
+        [UsedImplicitly]
+        public static readonly List<object> Types = Enum.GetValues(typeof(CameraType)).Cast<object>().ToList();
 
-        [UsedImplicitly] private static readonly List<object> AntiAliasingLevels = new List<object> { 1, 2, 4, 8 };
-        [UsedImplicitly] private static readonly List<object> WorldCamVisibilities = Enum.GetValues(typeof(WorldCamVisibility)).Cast<object>().ToList();
-        [UsedImplicitly] private static readonly List<object> VisibilitiesWalls = Enum.GetValues(typeof(WallVisibility)).Cast<object>().ToList();
-        [UsedImplicitly] private static readonly List<object> VisibilitiesNotes = Enum.GetValues(typeof(NoteVisibility)).Cast<object>().ToList();
-        [UsedImplicitly] private static readonly List<object> VisibilitiesAvatar = Enum.GetValues(typeof(AvatarVisibility)).Cast<object>().ToList();
-        [UsedImplicitly] private static readonly List<object> FollowerRelativeTypes = Enum.GetValues(typeof(FollowerPositionOffsetType)).Cast<object>().ToList();
+        [UsedImplicitly]
+        private static readonly List<object> AntiAliasingLevels = new List<object> { 1, 2, 4, 8 };
 
-        [UsedImplicitly] private static string[] props;
+        [UsedImplicitly]
+        private static readonly List<object> WorldCamVisibilities = Enum.GetValues(typeof(WorldCamVisibility)).Cast<object>().ToList();
 
-        [UsedImplicitly] private SceneToggle[] _scenes;
+        [UsedImplicitly]
+        private static readonly List<object> VisibilitiesWalls = Enum.GetValues(typeof(WallVisibility)).Cast<object>().ToList();
+
+        [UsedImplicitly]
+        private static readonly List<object> VisibilitiesNotes = Enum.GetValues(typeof(NoteVisibility)).Cast<object>().ToList();
+
+        [UsedImplicitly]
+        private static readonly List<object> VisibilitiesAvatar = Enum.GetValues(typeof(AvatarVisibility)).Cast<object>().ToList();
+
+        [UsedImplicitly]
+        private static readonly List<object> FollowerRelativeTypes = Enum.GetValues(typeof(FollowerPositionOffsetType)).Cast<object>().ToList();
+
+        [UsedImplicitly]
+        private static string[] props;
+
+        [UsedImplicitly]
+        private SceneToggle[] _scenes;
 
 #pragma warning disable CS0649
 
@@ -85,7 +99,7 @@ namespace Camera2.UI
 
         [UIComponent("smoothFollowTab"), UsedImplicitly]
         public Tab smoothFollowTab;
-        
+
         [UIComponent("follow360Tab"), UsedImplicitly]
         public Tab follow360Tab;
 
@@ -94,7 +108,7 @@ namespace Camera2.UI
 
         [UIComponent("positionTab"), UsedImplicitly]
         public Tab positionTab;
-        
+
         [UIComponent("fakeZoomTab"), UsedImplicitly]
         public Tab fakeZoomTab;
 
@@ -150,12 +164,14 @@ namespace Camera2.UI
                         {
                             SetAndUpdateUnOverridenRotation(16.5f, 335.8f, 0f);
                         }
+
                         break;
                     case CameraType.Follower:
                         if (CurrentCam.Settings.Type != CameraType.Positionable)
                         {
                             SetAndUpdateUnOverridenPosition(1.9f, 2.3f, -2.5f);
                         }
+
                         SetAndUpdateUnOverridenRotation(0, 0, 0);
                         break;
                 }
@@ -657,6 +673,28 @@ namespace Camera2.UI
             {
                 CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Distance = Mathf.Clamp(value, .01f, 50f);
                 CurrentCam.Settings.SmoothFollow.FollowerFakeZoom.Reset();
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal bool MovementScriptFromOrigin
+        {
+            get => CurrentCam.Settings.MovementScript.FromOrigin;
+            set
+            {
+                CurrentCam.Settings.MovementScript.FromOrigin = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal bool MovementScriptEnableInMenu
+        {
+            get => CurrentCam.Settings.MovementScript.EnableInMenu;
+            set
+            {
+                CurrentCam.Settings.MovementScript.EnableInMenu = value;
                 NotifyPropertyChanged();
             }
         }

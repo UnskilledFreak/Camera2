@@ -1,0 +1,18 @@
+﻿<vertical child-control-height="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
+    <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="5">
+        <horizontal preferred-width="110" child-expand-width="true">
+            <grid cell-size-x="46" cell-size-y="6" spacing-x="7" spacing-y="2" child-align="MiddleCenter">
+                <button text="Menu" on-click="SwitchToMenu"/>
+                <button text="MultiplayerMenu" on-click="SwitchToMultiplayerMenu"/>
+                <button text="Playing" on-click="SwitchToPlaying"/>
+                <button text="Playing360" on-click="SwitchToPlaying360"/>
+                <button text="PlayingModmap" on-click="SwitchToPlayingModmap"/>
+                <button text="PlayingModmapNoMotion" on-click="PlayingModmapNoMotion"/>
+                <button text="PlayingMulti" on-click="SwitchToPlayingMulti"/>
+                <button text="SpectatingMulti" on-click="SwitchToSpectatingMulti"/>
+                <button text="Replay" on-click="SwitchToReplay"/>
+                <button text="FPFC" on-click="SwitchToFPFC"/>
+            </grid>
+        </horizontal>
+    </vertical>
+</vertical>

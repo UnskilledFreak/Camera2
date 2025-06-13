@@ -159,7 +159,10 @@ namespace Camera2.Middlewares
                 if (TargetScriptFrame.TransitionEndTime <= _currentAnimationTime)
                 {
                     _lastPos = Transformer.Position = TargetScriptFrame.Position;
-                    _lastRot = Transformer.Rotation = TargetScriptFrame.Rotation;
+                    if (!TargetScriptFrame.OnFollowerIgnoreRotation)
+                    {
+                        _lastRot = Transformer.Rotation = TargetScriptFrame.Rotation;
+                    }
                     if (TargetScriptFrame.FOV > 0)
                     {
                         _lastFov = Cam.Camera.fieldOfView = TargetScriptFrame.FOV;
@@ -175,7 +178,10 @@ namespace Camera2.Middlewares
                     }
 
                     Transformer.Position = Vector3.LerpUnclamped(_lastPos, TargetScriptFrame.Position, frameProgress);
-                    Transformer.Rotation = Quaternion.LerpUnclamped(_lastRot, TargetScriptFrame.Rotation, frameProgress);
+                    if (!TargetScriptFrame.OnFollowerIgnoreRotation)
+                    {
+                        Transformer.Rotation = Quaternion.LerpUnclamped(_lastRot, TargetScriptFrame.Rotation, frameProgress);
+                    }
 
                     if (TargetScriptFrame.FOV > 0f)
                     {
