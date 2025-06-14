@@ -21,7 +21,12 @@ namespace Camera2.UI
             }
         }
 
-        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+#if V1_29_1
+        public 
+#else
+        protected
+#endif
+            override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             showBackButton = true;
             SetTitle(Plugin.Name + " Scene Tester");
@@ -29,7 +34,13 @@ namespace Camera2.UI
             ProvideInitialViewControllers(SceneView);
         }
 
-        protected override void BackButtonWasPressed(ViewController thisTopViewController)
+        
+#if V1_29_1
+        public 
+#else
+        protected
+#endif
+            override void BackButtonWasPressed(ViewController thisTopViewController)
         {
             ScenesManager.SwitchToScene(HookFPFCToggle.isInFPFC ? SceneTypes.FPFC : SceneTypes.Menu);
             BeatSaberUI.MainFlowCoordinator.DismissFlowCoordinator(this);

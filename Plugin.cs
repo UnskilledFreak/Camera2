@@ -16,7 +16,6 @@ namespace Camera2
     [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin
     {
-        internal static Plugin Instance { [UsedImplicitly]get; private set; }
         internal static IPALogger Log { get; private set; }
         internal static Material ShaderMatLuminanceKey;
         internal static Material ShaderMatOutline;
@@ -29,18 +28,12 @@ namespace Camera2
         
         private static Harmony Harmony { get; set; }
 
-        /// <summary>
-        /// Called when the plugin is first loaded by IPA (either when the game starts or when the plugin is enabled if it starts disabled).
-        /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
-        /// Only use [Init] with one Constructor.
-        /// </summary>
         [UsedImplicitly]
         [Init]
-        public void Init(IPALogger logger)
+        public Plugin(IPALogger logger)
         {
-            Instance = this;
             Log = logger;
-
+            
             Log.Info($"{Name} mod {ModdedVersion} loaded");
             LoadShaders();
         }

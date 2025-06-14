@@ -12,7 +12,6 @@ namespace Camera2.SDK
     /// </summary>
     public class OverrideToken
     {
-
         private Cam2 _cam;
         private string CamName { get; set; }
         
@@ -21,6 +20,9 @@ namespace Camera2.SDK
         private float _fov;
         public Vector3 Position { get; [UsedImplicitly] set; }
         public Vector3 Rotation { get; [UsedImplicitly] set; }
+        
+        public Vector3 CurrentPosition => _cam.TransformChain.Position;
+        public Quaternion CurrentRotation => _cam.TransformChain.Rotation;
 
         public GameObjects VisibleObjects { get; private set; }
 

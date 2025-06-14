@@ -13,6 +13,13 @@ namespace Camera2.HarmonyPatches
         public static Vector3 Position { get; private set; }
         public static Quaternion Rotation { get; private set; }
 
+#if !V1_29_1
+        [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.OnEnable))]
+        [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.Start))]
+        [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.HandleRoomCenterDidChange))]
+        [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.HandleRoomRotationDidChange))]
+        [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.ResetRoom))]
+#endif
         [UsedImplicitly]
         // ReSharper disable InconsistentNaming
         private static void Postfix(Vector3SO ____roomCenter, FloatSO ____roomRotation, MethodBase __originalMethod)
@@ -37,7 +44,7 @@ namespace Camera2.HarmonyPatches
             Console.WriteLine("pos {0}, rot {1}", position, rotation);
 #endif
         }
-
+#if V1_29_1
         [UsedImplicitly]
         private static IEnumerable<MethodBase> TargetMethods()
         {
@@ -47,5 +54,6 @@ namespace Camera2.HarmonyPatches
             yield return AccessTools.Method(typeof(VRCenterAdjust), nameof(VRCenterAdjust.HandleRoomRotationDidChange));
             yield return AccessTools.Method(typeof(VRCenterAdjust), nameof(VRCenterAdjust.ResetRoom));
         }
+#endif
     }
 }

@@ -12,13 +12,9 @@ namespace Camera2.UI
         
         public override string ResourceName => "Camera2.UI.Views.camPreview.bsml";
         
-#pragma warning disable CS0649
-        
         [UIComponent("previewImage"), UsedImplicitly]
-        public RawImage image;
+        public RawImage image = null;
         
-#pragma warning restore CS0649
-
         public void OnEnable()
         {
             if (image == null)

@@ -1,5 +1,6 @@
 ﻿using IPA.Loader;
 using System.Linq;
+using System.Xaml;
 
 namespace Camera2.Utils
 {
@@ -22,7 +23,7 @@ namespace Camera2.Utils
             var hash = SongCore.Collections.hashForLevelID(map.level.levelID);
 
             var test = SongCore.Loader.CustomLevels.FirstOrDefault(x => x.Value.levelID == difficultyBeatmap.level.levelID).Key;
-            
+
             return true;
         }
         */
@@ -32,10 +33,15 @@ namespace Camera2.Utils
         {
             try
             {
-                return SongCore.Collections.RetrieveDifficultyData(map)
+                var x = SongCore.Collections.RetrieveDifficultyData(map)
                     ?.additionalDifficultyData
                     ._requirements
                     .Any(x => x == "Mapping Extensions" || x == "Noodle Extensions") == true;
+#if V1_29_1
+                return x;
+#else
+                return map != null && x;
+#endif
             }
             catch
             {

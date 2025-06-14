@@ -55,16 +55,17 @@ namespace Camera2.UI
             {
                 return;
             }
-            
+
             if (!CamSettings.SetCam(cam) && !reSelect)
             {
                 return;
             }
+
             UpdateTitle(cam);
             CamMovementSettings.SetCam(cam);
 
             var cellIndex = Array.FindIndex(CamList.ListDataOrdered.ToArray(), x => x.Cam.Name == cam.Name);
-            
+
             CamList.list.tableView.SelectCellWithIdx(cellIndex);
             CamList.list.tableView.ScrollToCellWithIdx(cellIndex, TableView.ScrollPositionType.Center, false);
 
@@ -74,7 +75,13 @@ namespace Camera2.UI
             }
         }
 
-        protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
+
+#if V1_29_1
+        public
+#else
+        protected
+#endif
+            override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             _isActive = true;
             try
@@ -104,7 +111,13 @@ namespace Camera2.UI
             }
         }
 
-        protected override void BackButtonWasPressed(ViewController topViewController)
+
+#if V1_29_1
+        public
+#else
+        protected
+#endif
+            override void BackButtonWasPressed(ViewController topViewController)
         {
             CamSettings.SetCam(null);
             CamMovementSettings.SetCam(null);
