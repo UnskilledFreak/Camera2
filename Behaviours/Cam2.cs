@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using Camera2.Enums;
 using Camera2.Managers;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Camera2.Behaviours
@@ -46,6 +47,10 @@ namespace Camera2.Behaviours
 
         internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.CamSettings.isActiveAndEnabled && CamSettings.CurrentCam == this;
 
+        // Naluluna also uses reflection onto Kinsi's spaghetti... great...
+        [UsedImplicitly]
+        internal Camera UCamera => Camera;
+        
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);

@@ -19,6 +19,11 @@ namespace Camera2.Configuration
     {
         internal Cam2 Cam { get; }
 
+        // Naluluna also uses reflection onto Kinsi's spaghetti... great...
+        [UsedImplicitly]
+        // ReSharper disable once InconsistentNaming
+        internal Cam2 cam => Cam;
+
         internal OverrideToken OverrideToken;
 
         private bool IsLoaded { get; set; }
