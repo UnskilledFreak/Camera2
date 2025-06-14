@@ -16,10 +16,6 @@ namespace Camera2.HarmonyPatches
     [HarmonyPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.StartSong))]
     internal static class HookAudioTimeSyncController
     {
-#if !V1_29_1
-        [HarmonyPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Pause))]
-        [HarmonyPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Resume))]
-#endif
         [UsedImplicitly]
         // ReSharper disable once InconsistentNaming
         private static void Postfix(AudioTimeSyncController __instance)
@@ -34,6 +30,10 @@ namespace Camera2.HarmonyPatches
     [HarmonyPatch]
     internal static class HookAudioTimeSyncController2
     {
+#if !V1_29_1
+        [HarmonyPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Pause))]
+        [HarmonyPatch(typeof(AudioTimeSyncController), nameof(AudioTimeSyncController.Resume))]
+#endif
         [UsedImplicitly]
         private static void Postfix()
         {
