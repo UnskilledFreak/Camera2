@@ -27,7 +27,7 @@ namespace Camera2
         internal const string Name = "Camera 2.5";
         private const string ModdedVersion = "0.4.5";
         internal const string FullName = Name + " Mod " + ModdedVersion;
-        internal static readonly string FullInfo = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)} by Kinsi55 modified by UnskilledFreak Version {ModdedVersion}";
+        internal static readonly string FullInfo = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}\nby Kinsi55\nmodified by UnskilledFreak\nVersion {ModdedVersion}";
         
         private static Harmony Harmony { get; set; }
 

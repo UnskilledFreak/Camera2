@@ -233,7 +233,7 @@
     <tab tags="tabs" tab-name="MS" horizontal-fit="PreferredSize">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
             <horizontal preferred-width="100">
-                <text color="#FF" font-size="4" align="Center" word-wrapping="true" text="Movement Script Settings"/>
+                <text color="#FFF" font-size="4" align="Center" word-wrapping="true" text="Movement Script Settings"/>
             </horizontal>
             <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
                 <checkbox text="Start From Origin" value="MovementScriptFromOrigin" bind-value="true" apply-on-change="true" hover-hint="yeah ???"/>

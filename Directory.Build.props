@@ -27,7 +27,7 @@
         <BSMLFolder>1.37.1</BSMLFolder>
     </PropertyGroup>
     <PropertyGroup Condition="$(Configuration) == 'Release-Latest' Or $(Configuration) == 'Debug-Latest'">
-        <GameVersion>1.40.5</GameVersion>
+        <GameVersion>1.40.6</GameVersion>
         <BSIPAVersion>4.3.5</BSIPAVersion>
         <BSMLVersion>1.12.5</BSMLVersion>
         <SiraUtilVersion>3.1.14</SiraUtilVersion>
@@ -41,7 +41,7 @@
         <PluginName>Camera2</PluginName>
         <AssemblyName>Camera2</AssemblyName>
         <Authors>Kinsi55 &amp; UnskilledFreak</Authors>
-        <Version>0.6.108+$(GameVersion)</Version>
+        <Version>0.6.111+$(GameVersion)</Version>
         <Description>Why helping others when you can be a jerk?</Description>
         <ProjectHome>https://github.com/UnskilledFreak/Camera2</ProjectHome>
         <ProjectSource>https://github.com/UnskilledFreak/Camera2</ProjectSource>
