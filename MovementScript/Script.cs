@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Camera2.Enums;
+using Camera2.Handler;
 using Camera2.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -42,7 +43,7 @@ namespace Camera2.MovementScript
 
         public static Script Load(string name)
         {
-            var scriptPath = ConfigUtil.GetMovementScriptPath(name);
+            var scriptPath = ConfigHandler.Instance.GetMovementScriptPath(name);
             if (!File.Exists(scriptPath))
             {
                 return null;

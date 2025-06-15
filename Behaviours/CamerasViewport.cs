@@ -53,7 +53,7 @@ namespace Camera2.Behaviours
             {
                 var d = new Rect(camScreen.Rect.position, camScreen.Rect.rect.size);
 
-                if (d.Contains(point) && (!camScreen.Cam.Settings.IsScreenLocked || UI.CamSettings.CurrentCam == camScreen.Cam))
+                if (d.Contains(point) && (!camScreen.Cam.Settings.IsScreenLocked || UI.CameraSettingsViewController.CurrentCam == camScreen.Cam))
                 {
                     var relativeCursorPos = point - d.position;
 

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Camera2.Enums;
+using Camera2.Handler;
 using Camera2.Managers;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -17,6 +18,8 @@ namespace Camera2.Behaviours
 {
     internal class Cam2 : MonoBehaviour
     {
+        private static ConfigHandler _config => ConfigHandler.Instance;
+        
         private static readonly HashSet<string> CameraBehavioursToDestroy = new HashSet<string>
         {
             "AudioListener", 
@@ -43,9 +46,9 @@ namespace Camera2.Behaviours
         internal TransformChain TransformChain;
         private ParentShield _shield;
 
-        internal string ConfigPath => ConfigUtil.GetCameraPath(Name);
+        internal string ConfigPath => _config.GetCameraPath(Name);
 
-        internal bool IsCurrentlySelectedInSettings => SettingsCoordinator.Instance && SettingsCoordinator.Instance.CamSettings.isActiveAndEnabled && CamSettings.CurrentCam == this;
+        internal bool IsCurrentlySelectedInSettings => UI.SettingsFlowCoordinator.Instance && UI.SettingsFlowCoordinator.Instance.CameraListViewController.isActiveAndEnabled && CameraSettingsViewController.CurrentCam == this;
 
         // Naluluna also uses reflection onto Kinsi's spaghetti... great...
         [UsedImplicitly]
@@ -86,7 +89,7 @@ namespace Camera2.Behaviours
             }
 
             Settings.Save();
-            File.Move(ConfigPath, ConfigUtil.GetCameraPath(newName));
+            File.Move(ConfigPath, _config.GetCameraPath(newName));
             Init(newName, rename: true);
             ScenesManager.Settings.Save();
 
@@ -180,7 +183,7 @@ namespace Camera2.Behaviours
                                 || !SceneUtil.IsSongPlaying
                             );
 
-            WorldCam.gameObject.SetActive(doShowCam || (CamSettings.CurrentCam == this && Settings.IsPositionalCam()));
+            WorldCam.gameObject.SetActive(doShowCam || (CameraSettingsViewController.CurrentCam == this && Settings.IsPositionalCam()));
         }
 
         internal void UpdateDepthTextureActive()

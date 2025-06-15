@@ -1,6 +1,5 @@
 ﻿using Camera2.HarmonyPatches;
 using System.Linq;
-using Camera2.UI;
 using UnityEngine;
 using VRUIControls;
 using CameraType = Camera2.Enums.CameraType;
@@ -120,7 +119,7 @@ namespace Camera2.Behaviours
             grabbedCamera.Settings.Save();
             
             // null check is important! otherwise grabbing a cam without opening cam settings once will result in endless grab loop
-            SettingsCoordinator.Instance?.ShowSettingsForCam(grabbedCamera, true);
+            UI.SettingsFlowCoordinator.Instance?.ShowSettingsForCam(grabbedCamera, true);
 
             grabbedCamera = null;
             isGrabbingCam = false;

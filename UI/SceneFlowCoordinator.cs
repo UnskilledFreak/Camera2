@@ -3,22 +3,23 @@ using Camera2.Enums;
 using Camera2.HarmonyPatches;
 using Camera2.Managers;
 using HMUI;
+using Zenject;
 
 namespace Camera2.UI
 {
-    public class SceneCoordinator : FlowCoordinator
+    internal class SceneFlowCoordinator : FlowCoordinator
     {
-        internal static SceneCoordinator Instance { get; private set; }
-        internal SceneView SceneView;
+        private MainFlowCoordinator _mainFlowCoordinator;
+        private SceneViewController _sceneViewController;
 
-        public void Awake()
+        [Inject]
+        public void Construct(
+            MainFlowCoordinator mainFlowCoordinator,
+            SceneViewController sceneViewController
+            )
         {
-            Instance = this;
-            
-            if (SceneView == null)
-            {
-                SceneView = BeatSaberUI.CreateViewController<SceneView>();
-            }
+            _mainFlowCoordinator = mainFlowCoordinator;
+            _sceneViewController = sceneViewController;
         }
 
 #if V1_29_1
@@ -28,10 +29,13 @@ namespace Camera2.UI
 #endif
             override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
-            showBackButton = true;
-            SetTitle(Plugin.Name + " Scene Tester");
+            if (firstActivation)
+            {
+                showBackButton = true;
+                ProvideInitialViewControllers(_sceneViewController);
+            }
 
-            ProvideInitialViewControllers(SceneView);
+            SetTitle(Plugin.Name + " Scene Tester");
         }
 
         

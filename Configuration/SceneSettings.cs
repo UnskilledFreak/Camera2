@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using Camera2.Behaviours;
 using Camera2.Enums;
+using Camera2.Handler;
 using IPA.Utilities;
 using UnityEngine;
 
@@ -14,6 +15,9 @@ namespace Camera2.Configuration
 {
     internal class ScenesSettings
     {
+        [JsonIgnore]
+        private static ConfigHandler _config => ConfigHandler.Instance;
+        
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<SceneTypes, List<string>> Scenes = new Dictionary<SceneTypes, List<string>>();
 
@@ -29,11 +33,11 @@ namespace Camera2.Configuration
 
         public void Load(List<Cam2> cams)
         {
-            if (File.Exists(ConfigUtil.ScenesCfg))
+            if (File.Exists(_config.ScenesConfigFile))
             {
                 try
                 {
-                    JsonConvert.PopulateObject(File.ReadAllText(ConfigUtil.ScenesCfg), this, JsonHelpers.LeanDeserializeSettings);
+                    JsonConvert.PopulateObject(File.ReadAllText(_config.ScenesConfigFile), this, JsonHelpers.LeanDeserializeSettings);
                     DeleteInvalidCams(cams);
                 }
                 catch (Exception ex)
@@ -43,12 +47,12 @@ namespace Camera2.Configuration
                         Plugin.Log.Error("Failed to load Scenes config, it has been reset:");
                         Plugin.Log.Error(ex);
 
-                        if (File.Exists($"{ConfigUtil.ScenesCfg}.corrupted"))
+                        if (File.Exists($"{_config.ScenesConfigFile}.corrupted"))
                         {
-                            File.Delete($"{ConfigUtil.ScenesCfg}.corrupted");
+                            File.Delete($"{_config.ScenesConfigFile}.corrupted");
                         }
 
-                        File.Move(ConfigUtil.ScenesCfg, $"{ConfigUtil.ScenesCfg}.corrupted");
+                        File.Move(_config.ScenesConfigFile, $"{_config.ScenesConfigFile}.corrupted");
                     }
                     else
                     {
@@ -78,7 +82,7 @@ namespace Camera2.Configuration
         {
             if (_wasLoaded)
             {
-                File.WriteAllText(ConfigUtil.ScenesCfg, JsonConvert.SerializeObject(this, Formatting.Indented));
+                File.WriteAllText(_config.ScenesConfigFile, JsonConvert.SerializeObject(this, Formatting.Indented));
             }
         }
 

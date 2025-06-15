@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Camera2.Enums;
+using Camera2.UI;
 using UnityEngine;
 
 namespace Camera2.Managers
@@ -143,7 +144,8 @@ namespace Camera2.Managers
 
             SwitchToCamList(toLoad);
             IsOnCustomScene = false;
-            UI.NonSpaghettiUI.ScenesSwitchUI.Update(0, false);
+            
+            MenuButtonManager.ScenesSwitchUI.Update(0, false);
         }
 
         public static void SwitchToCustomScene(string name)
@@ -185,7 +187,7 @@ namespace Camera2.Managers
                 var isContained = cams?.Contains(cam.Name);
                 
                 cam.ForceResetMiddleWares();
-                cam.gameObject.SetActive((activateAllWhenEmpty && isContained != false) || isContained == true || UI.CamSettings.CurrentCam == cam);
+                cam.gameObject.SetActive((activateAllWhenEmpty && isContained != false) || isContained == true || UI.CameraSettingsViewController.CurrentCam == cam);
             }
 
             GL.Clear(true, true, Color.black);

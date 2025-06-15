@@ -5,15 +5,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Camera2.Enums;
+using Camera2.Handler;
+using Camera2.UI;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.XR;
+using Zenject;
 using Object = UnityEngine.Object;
 
 namespace Camera2.Managers
 {
     internal static class CamManager
     {
+        private static ConfigHandler _config => ConfigHandler.Instance;
+        
         public static List<Cam2> Cams { get; } = new List<Cam2>();
         internal static CamerasViewport CustomScreen { get; private set; }
         public static int BaseCullingMask { get; internal set; }
@@ -38,8 +43,6 @@ namespace Camera2.Managers
             XRSettings.gameViewRenderMode = GameViewRenderMode.None;
             
             _ = new GameObject("Cam2_Positioner", typeof(CamPositioner));
-
-            UI.NonSpaghettiUI.Init();
         }
 
         [CanBeNull]
@@ -52,14 +55,9 @@ namespace Camera2.Managers
 
         private static void LoadCameras(bool reload = false)
         {
-            if (!Directory.Exists(ConfigUtil.CamsDir))
-            {
-                Directory.CreateDirectory(ConfigUtil.CamsDir);
-            }
-
             var loadedNames = new List<string>();
 
-            foreach (var cam in Directory.GetFiles(ConfigUtil.CamsDir, "*.json"))
+            foreach (var cam in _config.GetAllCameraFiles())
             {
                 try
                 {
@@ -100,7 +98,7 @@ namespace Camera2.Managers
         {
             LoadCameras(true);
             ScenesManager.Settings.Load(Cams);
-            UI.NonSpaghettiUI.ScenesSwitchUI.Update();
+            MenuButtonManager.ScenesSwitchUI.Update();
         }
 
         /*
@@ -191,7 +189,7 @@ namespace Camera2.Managers
             
             Cams.Remove(cam);
 
-            var cfgPath = ConfigUtil.GetCameraPath(cam.Name);
+            var cfgPath = _config.GetCameraPath(cam.Name);
 
             Object.DestroyImmediate(cam);
 

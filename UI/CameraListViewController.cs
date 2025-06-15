@@ -13,13 +13,13 @@ using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.UI
 {
-    internal class CamList : BSMLResourceViewController
+    [ViewDefinition("Camera2.UI.Views.CameraList.bsml")]
+    [HotReload(RelativePathToLayout = "Views.CameraList.bsml")]
+    internal class CameraListViewController : BSMLAutomaticViewController
     {
         private List<object> Cams => ListDataOrdered.ToList<object>();
 
         private readonly List<CamListCellWrapper> _listData = new List<CamListCellWrapper>();
-
-        public override string ResourceName => "Camera2.UI.Views.camList.bsml";
 
         // ReSharper disable once InconsistentNaming
         [UsedImplicitly] 
@@ -58,7 +58,7 @@ namespace Camera2.UI
 
         [UIAction("SelectCamera")]
         [UsedImplicitly]
-        private void SelectCamera(TableView tableView, CamListCellWrapper row) => SettingsCoordinator.Instance.ShowSettingsForCam(row.Cam);
+        private void SelectCamera(TableView tableView, CamListCellWrapper row) => SettingsFlowCoordinator.Instance.ShowSettingsForCam(row.Cam);
 
         private static Cam2 GetNewCam(string name)
         {
@@ -81,7 +81,7 @@ namespace Camera2.UI
 
             _listData.Insert(0, new CamListCellWrapper(cam));
             UpdateCamListUI();
-            SettingsCoordinator.Instance.ShowSettingsForCam(cam);
+            SettingsFlowCoordinator.Instance.ShowSettingsForCam(cam);
         }
 
         [UsedImplicitly]
@@ -184,17 +184,17 @@ namespace Camera2.UI
         [UsedImplicitly]
         private void DeleteCam()
         {
-            _listData.Remove(_listData.Find(x => x.Cam == CamSettings.CurrentCam));
-            CamManager.DeleteCamera(CamSettings.CurrentCam);
+            _listData.Remove(_listData.Find(x => x.Cam == CameraSettingsViewController.CurrentCam));
+            CamManager.DeleteCamera(CameraSettingsViewController.CurrentCam);
             UpdateCamListUI();
-            SettingsCoordinator.Instance.ShowSettingsForCam(ListDataOrdered.First().Cam);
+            SettingsFlowCoordinator.Instance.ShowSettingsForCam(ListDataOrdered.First().Cam);
         }
 
         private static void ChangeLayer(int diff)
         {
-            CamSettings.CurrentCam.Settings.Layer += diff;
-            SettingsCoordinator.Instance.CamList.UpdateCamListUI();
-            SettingsCoordinator.Instance.ShowSettingsForCam(CamSettings.CurrentCam, true);
+            CameraSettingsViewController.CurrentCam.Settings.Layer += diff;
+            SettingsFlowCoordinator.Instance.CameraListViewController.UpdateCamListUI();
+            SettingsFlowCoordinator.Instance.ShowSettingsForCam(CameraSettingsViewController.CurrentCam, true);
         }
 
         [UsedImplicitly]

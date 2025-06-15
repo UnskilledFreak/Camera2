@@ -20,9 +20,10 @@ using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.UI
 {
-    internal class CamSettings : BSMLResourceViewController
+    [ViewDefinition("Camera2.UI.Views.CameraSettings.bsml")]
+    [HotReload(RelativePathToLayout = "Views.CameraSettings.bsml")]
+    internal class CameraSettingsViewController : BSMLAutomaticViewController
     {
-        public override string ResourceName => "Camera2.UI.Views.camSettings.bsml";
         internal static Cam2 CurrentCam { get; private set; }
 
         private static int lastTabSelectedIndex;
@@ -135,8 +136,8 @@ namespace Camera2.UI
                 }
 
                 NotifyPropertyChanged();
-                SettingsCoordinator.Instance.CamList.list.tableView.ReloadData();
-                SettingsCoordinator.Instance.UpdateTitle(CurrentCam);
+                SettingsFlowCoordinator.Instance.CameraListViewController.list.tableView.ReloadData();
+                SettingsFlowCoordinator.Instance.UpdateTitle(CurrentCam);
             }
         }
 
@@ -785,7 +786,7 @@ namespace Camera2.UI
             // Don't really care which cam it is, this is just for BSML to init
             CurrentCam = CamManager.Cams.First();
 
-            props ??= typeof(CamSettings).GetProperties(BindingFlags.Instance | BindingFlags.NonPublic)
+            props ??= typeof(CameraSettingsViewController).GetProperties(BindingFlags.Instance | BindingFlags.NonPublic)
                 .Select(x => x.Name)
                 .ToArray();
 
@@ -877,7 +878,7 @@ namespace Camera2.UI
                 lastTabSelectedIndex = index;
             };
 
-            SettingsCoordinator.Instance.ShowSettingsForCam(CamManager.Cams.OrderByDescending(x => x.Settings.Layer).First());
+            SettingsFlowCoordinator.Instance.ShowSettingsForCam(CamManager.Cams.OrderByDescending(x => x.Settings.Layer).First());
         }
 
         private void ToggleSettingVisibility()

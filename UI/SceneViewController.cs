@@ -1,14 +1,15 @@
-﻿using BeatSaberMarkupLanguage.ViewControllers;
+﻿using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.ViewControllers;
 using Camera2.Enums;
 using Camera2.Managers;
 using JetBrains.Annotations;
 
 namespace Camera2.UI
 {
-    public class SceneView : BSMLResourceViewController
+    [ViewDefinition("Camera2.UI.Views.SceneView.bsml")]
+    [HotReload(RelativePathToLayout = "Views.SceneView.bsml")]
+    public class SceneViewController : BSMLAutomaticViewController
     {
-        public override string ResourceName => "Camera2.UI.Views.sceneView.bsml";
-
         [UsedImplicitly]
         public void SwitchToMenu()
         {

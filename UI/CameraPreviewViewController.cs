@@ -6,11 +6,11 @@ using UnityEngine.UI;
 
 namespace Camera2.UI
 {
-    internal class PreviewView : BSMLResourceViewController
+    [ViewDefinition("Camera2.UI.Views.CameraPreview.bsml")]
+    [HotReload(RelativePathToLayout = "Views.CameraPreview.bsml")]
+    internal class CameraPreviewViewController : BSMLAutomaticViewController
     {
         private UnityEngine.RenderTexture _renderTexture;
-        
-        public override string ResourceName => "Camera2.UI.Views.camPreview.bsml";
         
         [UIComponent("previewImage"), UsedImplicitly]
         public RawImage image = null;

@@ -11,10 +11,11 @@ using JetBrains.Annotations;
 
 namespace Camera2.UI
 {
-    public class CamMovementSettings : BSMLResourceViewController
+    [ViewDefinition("Camera2.UI.Views.CameraMovementSettings.bsml")]
+    [HotReload(RelativePathToLayout = "Views.CameraMovementSettings.bsml")]
+    public class CameraMovementSettingsViewController : BSMLAutomaticViewController
     {
-        public override string ResourceName => "Camera2.UI.Views.camMovementSettings.bsml";
-        
+       
         internal Cam2 CurrentCam { get; private set; }
 
         [UIComponent("movementScripts")]

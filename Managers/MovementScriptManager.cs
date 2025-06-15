@@ -1,8 +1,8 @@
-﻿using Camera2.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Camera2.Handler;
 using Camera2.MovementScript;
 using JetBrains.Annotations;
 
@@ -10,6 +10,7 @@ namespace Camera2.Managers
 {
     internal static class MovementScriptManager
     {
+        private static ConfigHandler _config => ConfigHandler.Instance;
         internal static List<Script> MovementScripts { get; } = new List<Script>();
         private static readonly Random RandomSource = new Random();
         
@@ -38,15 +39,9 @@ namespace Camera2.Managers
 
         public static void LoadMovementScripts(bool reload = false)
         {
-            if (!Directory.Exists(ConfigUtil.MovementScriptsDir))
-            {
-                Directory.CreateDirectory(ConfigUtil.MovementScriptsDir);
-                return;
-            }
-
             var loadedNames = new List<string>();
 
-            foreach (var cam in Directory.GetFiles(ConfigUtil.MovementScriptsDir, "*.json"))
+            foreach (var cam in _config.GetAllMovementScriptFiles())
             {
                 var name = Path.GetFileNameWithoutExtension(cam);
                 var script = Script.Load(name);

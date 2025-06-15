@@ -5,7 +5,10 @@ using HarmonyLib;
 using IPA;
 using System.Reflection;
 using System.Threading.Tasks;
+using Camera2.Handler;
+using Camera2.Installers;
 using JetBrains.Annotations;
+using SiraUtil.Zenject;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using IPALogger = IPA.Logging.Logger;
@@ -30,9 +33,14 @@ namespace Camera2
 
         [UsedImplicitly]
         [Init]
-        public Plugin(IPALogger logger)
+        public Plugin(IPALogger logger, Zenjector zenjector)
         {
             Log = logger;
+            
+            ConfigHandler.Instance = new ConfigHandler();
+            
+            zenjector.Install<AppInstaller>(Location.App, ConfigHandler.Instance);
+            zenjector.Install<MenuInstaller>(Location.Menu);
             
             Log.Info($"{Name} mod {ModdedVersion} loaded");
             LoadShaders();
@@ -55,9 +63,11 @@ namespace Camera2
                 bundle.Unload(false);
             }
 
-#if DEV
-			LoadNormalShaders(AssetBundle.LoadFromFile(@"D:\Unity Shit\Projects\AssetBundlePacker\Assets\StreamingAssets\camera2utils"));
-			LoadVRShaders(AssetBundle.LoadFromFile(@"D:\Unity Shit\Projects\AssetBundlePacker\Assets\StreamingAssets\camera2utilsvr"));
+#if TEST
+			//LoadNormalShaders(AssetBundle.LoadFromFile(@"D:\Unity Shit\Projects\AssetBundlePacker\Assets\StreamingAssets\camera2utils"));
+            //LoadVRShaders(AssetBundle.LoadFromFile(@"D:\Unity Shit\Projects\AssetBundlePacker\Assets\StreamingAssets\camera2utilsvr"));
+            LoadNormalShaders(AssetBundle.LoadFromFile("/home/freaky/Desktop/Development/Beat Saber Plugins/CS_BeatSaber_Camera2-0.6.109/Shaders/camera2utils"));
+            LoadVRShaders(AssetBundle.LoadFromFile("/home/freaky/Desktop/Development/Beat Saber Plugins/CS_BeatSaber_Camera2-0.6.109/Shaders/camera2utilsvr"));
 #else
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Camera2.Shaders.camera2utils"))
             {

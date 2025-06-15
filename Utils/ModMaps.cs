@@ -1,6 +1,5 @@
 ﻿using IPA.Loader;
 using System.Linq;
-using System.Xaml;
 
 namespace Camera2.Utils
 {

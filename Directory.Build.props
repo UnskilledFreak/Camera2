@@ -26,16 +26,8 @@
         <SongCoreVersion>3.14.11</SongCoreVersion>
         <BSMLFolder>1.37.1</BSMLFolder>
     </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration) == 'Release-1.39.1' Or $(Configuration) == 'Debug-1.39.1'">
-        <GameVersion>1.39.1</GameVersion>
-        <BSIPAVersion>4.3.5</BSIPAVersion>
-        <BSMLVersion>1.12.4</BSMLVersion>
-        <SiraUtilVersion>3.1.14</SiraUtilVersion>
-        <SongCoreVersion>3.14.15</SongCoreVersion>
-        <BSMLFolder>LATEST</BSMLFolder>
-    </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration) == 'Release-1.40.3' Or $(Configuration) == 'Debug-1.40.3'">
-        <GameVersion>1.40.3</GameVersion>
+    <PropertyGroup Condition="$(Configuration) == 'Release-Latest' Or $(Configuration) == 'Debug-Latest'">
+        <GameVersion>1.40.5</GameVersion>
         <BSIPAVersion>4.3.5</BSIPAVersion>
         <BSMLVersion>1.12.5</BSMLVersion>
         <SiraUtilVersion>3.1.14</SiraUtilVersion>
