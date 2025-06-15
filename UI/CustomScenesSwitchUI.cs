@@ -39,15 +39,24 @@ namespace Camera2.UI
 
         public void Update(int setSelected = -1, bool reloadData = true)
         {
+#if PRE_1_40_6
             if (_list == null || _list.tableView == null)
+#else
+            if (_list == null || _list.TableView == null)
+#endif
             {
                 return;
             }
 
             if (reloadData)
             {
+#if PRE_1_40_6
                 _list.data = Scenes;
                 _list.tableView.ReloadData();
+#else
+                _list.Data = Scenes;
+                _list.TableView.ReloadData();
+#endif
             }
 
             if (setSelected <= -1)
@@ -55,8 +64,13 @@ namespace Camera2.UI
                 return;
             }
 
+#if PRE_1_40_6
             _list.tableView.SelectCellWithIdx(setSelected);
             _list.tableView.ScrollToCellWithIdx(setSelected, TableView.ScrollPositionType.Center, false);
+#else
+            _list.TableView.SelectCellWithIdx(setSelected);
+            _list.TableView.ScrollToCellWithIdx(setSelected, TableView.ScrollPositionType.Center, false);
+#endif
         }
     }
 }

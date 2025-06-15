@@ -1,4 +1,6 @@
+#if PRE_1_40_6
 using Camera2.HarmonyPatches;
+#endif
 using Camera2.Managers;
 using Camera2.Utils;
 using HarmonyLib;
@@ -28,7 +30,7 @@ namespace Camera2
         private const string ModdedVersion = "0.4.5";
         internal const string FullName = Name + " Mod " + ModdedVersion;
         internal static readonly string FullInfo = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}\nby Kinsi55\nmodified by UnskilledFreak\nVersion {ModdedVersion}";
-        
+
         private static Harmony Harmony { get; set; }
 
         [UsedImplicitly]
@@ -36,16 +38,18 @@ namespace Camera2
         public Plugin(IPALogger logger, Zenjector zenjector)
         {
             Log = logger;
-            
+
             ConfigHandler.Instance = new ConfigHandler();
-            
+
             zenjector.Install<AppInstaller>(Location.App, ConfigHandler.Instance);
             zenjector.Install<MenuInstaller>(Location.Menu);
-            
-            Log.Info($"{Name} mod {ModdedVersion} loaded");
+
+            Log.Info($"{Name} mod {ModdedVersion} loading...");
             LoadShaders();
+            Log.Info($"{Name} mod {ModdedVersion} loaded");
         }
 
+#if PRE_1_40_6
         private static void LoadShaders()
         {
             void LoadNormalShaders(AssetBundle bundle)
@@ -63,21 +67,35 @@ namespace Camera2
                 bundle.Unload(false);
             }
 
-#if TEST
-			//LoadNormalShaders(AssetBundle.LoadFromFile(@"D:\Unity Shit\Projects\AssetBundlePacker\Assets\StreamingAssets\camera2utils"));
-            //LoadVRShaders(AssetBundle.LoadFromFile(@"D:\Unity Shit\Projects\AssetBundlePacker\Assets\StreamingAssets\camera2utilsvr"));
-            LoadNormalShaders(AssetBundle.LoadFromFile("/home/freaky/Desktop/Development/Beat Saber Plugins/CS_BeatSaber_Camera2-0.6.109/Shaders/camera2utils"));
-            LoadVRShaders(AssetBundle.LoadFromFile("/home/freaky/Desktop/Development/Beat Saber Plugins/CS_BeatSaber_Camera2-0.6.109/Shaders/camera2utilsvr"));
-#else
+            //LoadNormalShaders(AssetBundle.LoadFromFile("/home/freaky/Desktop/Development/Beat Saber Plugins/CS_BeatSaber_Camera2-0.6.109/Shaders/camera2utils"));
+            //LoadVRShaders(AssetBundle.LoadFromFile("/home/freaky/Desktop/Development/Beat Saber Plugins/CS_BeatSaber_Camera2-0.6.109/Shaders/camera2utilsvr"));
+
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Camera2.Shaders.camera2utils"))
             {
                 LoadNormalShaders(AssetBundle.LoadFromStream(stream));
             }
-
+            
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Camera2.Shaders.camera2utilsvr"))
             {
                 LoadVRShaders(AssetBundle.LoadFromStream(stream));
             }
+#else
+        internal static void LoadShaders()
+        {
+            void LoadNormalShaders(AssetBundle bundle)
+            {
+                foreach (var assetName in bundle.GetAllAssetNames())
+                {
+                    Log.Info($"Loading asset {assetName}");
+                }
+                ShaderMatLuminanceKey = new Material(bundle.LoadAsset<Shader>("luminancekey.shader"));
+                ShaderMatOutline = new Material(bundle.LoadAsset<Shader>("texouline.shader"));
+                ShaderVolumetricBlit = bundle.LoadAsset<Shader>("volumetricblit.shader");
+                bundle.Unload(false);
+            }
+
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Camera2.Shaders.latest.1_40_6_camera2utils");
+            LoadNormalShaders(AssetBundle.LoadFromStream(stream));
 #endif
         }
 
@@ -91,7 +109,7 @@ namespace Camera2
 #if V1_29_1
             GlobalFPSCap.Init();
 #endif
-            
+
             MovementScriptManager.LoadMovementScripts();
 
             SceneManager.activeSceneChanged += SceneUtil.OnActiveSceneChanged;

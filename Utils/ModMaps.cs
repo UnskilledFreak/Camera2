@@ -10,37 +10,45 @@ namespace Camera2.Utils
 
 #if PRE_1_37_1
         public static bool IsProbablyWallMap(IDifficultyBeatmap map) => IsModCapable && IsModdedMap(map);
-#else
+        
+        public static bool IsModdedMap(IDifficultyBeatmap map) => HasSongCore && IsModCapable && IsModdedMapFunc(map);
+#elif PRE_1_40_6
         public static bool IsProbablyWallMap(BeatmapLevel map, BeatmapKey beatmapKey) => IsModCapable && IsModdedMap(map, beatmapKey);
+        
+        public static bool IsModdedMap(BeatmapLevel map, BeatmapKey beatmapKey) => HasSongCore && IsModCapable && IsModdedMapFunc(map, beatmapKey);
+#else
+        public static bool IsProbablyWallMap(BeatmapKey beatmapKey) => IsModCapable && IsModdedMap(beatmapKey);
+        
+        public static bool IsModdedMap(BeatmapKey beatmapKey) => HasSongCore && IsModCapable && IsModdedMapFunc(beatmapKey);
 #endif
 
-#if PRE_1_37_1
-        public static bool IsModdedMap(IDifficultyBeatmap map) => HasSongCore && IsModCapable && IsModdedMapFunc(map);
-#else
-        public static bool IsModdedMap(BeatmapLevel map, BeatmapKey beatmapKey) => HasSongCore && IsModCapable && IsModdedMapFunc(map, beatmapKey);
-#endif
 
         // Separate method so we dont throw if theres no SongCore
 #if PRE_1_37_1
         private static bool IsModdedMapFunc(IDifficultyBeatmap map)
-#else
+#elif PRE_1_40_6 
         private static bool IsModdedMapFunc(BeatmapLevel map, BeatmapKey beatmapKey)
+#else
+        private static bool IsModdedMapFunc(BeatmapKey beatmapKey)
 #endif
         {
             try
             {
 #if PRE_1_37_1
-                var x = SongCore.Collections.RetrieveDifficultyData(map)
-#else
-                var x = SongCore.Collections.RetrieveDifficultyData(map, beatmapKey)
-#endif
+                return SongCore.Collections.RetrieveDifficultyData(map)
                     ?.additionalDifficultyData
                     ._requirements
                     .Any(x => x == "Mapping Extensions" || x == "Noodle Extensions") == true;
-#if PRE_1_37_1
-                return x;
+#elif PRE_1_40_6
+                return map != null && SongCore.Collections.RetrieveDifficultyData(map, beatmapKey)
+                    ?.additionalDifficultyData
+                    ._requirements
+                    .Any(x => x == "Mapping Extensions" || x == "Noodle Extensions") == true;
 #else
-                return map != null && x;
+                return SongCore.Collections.GetCustomLevelSongDifficultyData(beatmapKey)
+                    ?.additionalDifficultyData
+                    ._requirements
+                    .Any(x => x == "Mapping Extensions" || x == "Noodle Extensions") == true;
 #endif
             }
             catch

@@ -190,7 +190,11 @@ namespace Camera2.Behaviours
         {
             if (Camera != null)
             {
+#if PRE_1_40_6
                 Camera.depthTextureMode = InitOnMainAvailable.UseDepthTexture || Settings?.PostProcessing.ForceDepthTexture == true ? DepthTextureMode.Depth : DepthTextureMode.None;
+#else
+                Camera.depthTextureMode = HookSettingsManager.UseDepthTexture || Settings?.PostProcessing.ForceDepthTexture == true ? DepthTextureMode.Depth : DepthTextureMode.None;
+#endif
             }
         }
 

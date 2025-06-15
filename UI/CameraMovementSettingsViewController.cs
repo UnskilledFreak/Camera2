@@ -52,7 +52,12 @@ namespace Camera2.UI
 
         internal void UpdateList()
         {
+#if PRE_1_40_6
             scriptsList?.tableView.ClearSelection();
+#else
+            scriptsList?.TableView.ClearSelection();
+#endif
+            
             AvailableScripts.Clear();
 
             AvailableScripts.AddRange(
@@ -78,8 +83,13 @@ namespace Camera2.UI
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
+#if PRE_1_40_6
                 scriptsList?.tableView.ReloadData();
                 //scriptsList?.tableView.ScrollToCellWithIdx();
+#else
+                scriptsList?.TableView.ReloadData();
+                //scriptsList?.TableView.ScrollToCellWithIdx();
+#endif
             }).ConfigureAwait(false);
         }
 

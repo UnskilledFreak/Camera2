@@ -42,8 +42,13 @@ namespace Camera2.UI
         private void UpdateCamListUI()
         {
             //var x = Sprite.Create(cam.screenImage.material, new Rect(0, 0, cam.renderTexture.width, cam.renderTexture.width), new Vector2(0.5f, 0.5f));
+#if PRE_1_40_6
             list.data = Cams;
             list.tableView.ReloadData();
+#else
+            list.Data = Cams;
+            list.TableView.ReloadData();
+#endif
             deleteButton.interactable = _listData.Count > 1;
         }
 

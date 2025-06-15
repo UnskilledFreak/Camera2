@@ -41,7 +41,7 @@
         <PluginName>Camera2</PluginName>
         <AssemblyName>Camera2</AssemblyName>
         <Authors>Kinsi55 &amp; UnskilledFreak</Authors>
-        <Version>0.6.111+$(GameVersion)</Version>
+        <Version>0.6.117+$(GameVersion)</Version>
         <Description>Why helping others when you can be a jerk?</Description>
         <ProjectHome>https://github.com/UnskilledFreak/Camera2</ProjectHome>
         <ProjectSource>https://github.com/UnskilledFreak/Camera2</ProjectSource>

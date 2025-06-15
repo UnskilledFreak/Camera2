@@ -62,9 +62,13 @@ namespace Camera2.UI
             _cameraMovementSettingsViewController.SetCam(cam);
 
             var cellIndex = Array.FindIndex(CameraListViewController.ListDataOrdered.ToArray(), x => x.Cam.Name == cam.Name);
-
-            CameraListViewController.list.tableView.SelectCellWithIdx(cellIndex);
-            CameraListViewController.list.tableView.ScrollToCellWithIdx(cellIndex, TableView.ScrollPositionType.Center, false);
+#if PRE_1_40_6
+            var table = CameraListViewController.list.tableView;
+#else
+            var table = CameraListViewController.list.TableView;
+#endif
+            table.SelectCellWithIdx(cellIndex);
+            table.ScrollToCellWithIdx(cellIndex, TableView.ScrollPositionType.Center, false);
 
             if (reSelect)
             {

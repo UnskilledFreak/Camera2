@@ -63,10 +63,14 @@ namespace Camera2.HarmonyPatches
         private static void Postfix(BeatmapKey beatmapKey, BeatmapLevel beatmapLevel, GameplayModifiers gameplayModifiers) {
             HookLeveldata.BeatmapLevel = beatmapLevel;
             HookLeveldata.GameplayModifiers = gameplayModifiers;
-
+#if PRE_1_40_6
             IsModdedMap = ModMapUtil.IsModdedMap(beatmapLevel, beatmapKey);
             Is360Level = beatmapKey.beatmapCharacteristic.containsRotationEvents;
             IsWallMap = ModMapUtil.IsProbablyWallMap(beatmapLevel, beatmapKey);
+#endif
+            IsModdedMap = ModMapUtil.IsModdedMap(beatmapKey);
+            Is360Level = beatmapKey.beatmapCharacteristic.containsRotationEvents;
+            IsWallMap = ModMapUtil.IsProbablyWallMap(beatmapKey);
         }
 #endif
         internal static void Reset()

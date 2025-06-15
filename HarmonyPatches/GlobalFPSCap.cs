@@ -2,7 +2,9 @@
 using Camera2.Managers;
 using HarmonyLib;
 using System.Linq;
+#if PRE_1_40_6
 using System.Threading.Tasks;
+#endif
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.XR;
@@ -59,7 +61,9 @@ namespace Camera2.HarmonyPatches
             foreach (var xrDisplay in xrDisplaySubsystems)
             {
                 if (xrDisplay.running)
+                {
                     return xrDisplay;
+                }
             }
 
             return null;
@@ -91,7 +95,11 @@ namespace Camera2.HarmonyPatches
                 if (CamManager.Cams?.Count > 0)
                 {
                     QualitySettings.vSyncCount = 1;
+#if PRE_1_40_6
                     var srr = Screen.currentResolution.refreshRate;
+#else
+                    var srr = (int)Screen.currentResolution.refreshRateRatio.value;
+#endif
                     cap = -1;
 
                     foreach (var cam in CamManager.Cams.Where(x => x.gameObject.activeInHierarchy))

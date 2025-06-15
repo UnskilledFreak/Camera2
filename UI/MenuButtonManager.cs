@@ -58,7 +58,12 @@ internal class MenuButtonManager : IInitializable, IDisposable
         _menuButtons.RegisterButton(_menuButtonScene);
         //_menuButtons.RegisterButton(_menuButtonScript);
 #endif
-        GameplaySetup.instance.AddTab(Plugin.Name, "Camera2.UI.Views.customScenesList.bsml", ScenesSwitchUI);
+#if PRE_1_40_6
+        GameplaySetup.instance
+#else
+        GameplaySetup.Instance
+#endif
+            .AddTab(Plugin.Name, "Camera2.UI.Views.customScenesList.bsml", ScenesSwitchUI);
     }
 
     public void Dispose()
@@ -67,7 +72,12 @@ internal class MenuButtonManager : IInitializable, IDisposable
         _menuButtons.UnregisterButton(_menuButtonScene);
         //_menuButtons.UnregisterButton(_menuButtonScript);
         
-        GameplaySetup.instance.RemoveTab(Plugin.Name);
+#if PRE_1_40_6
+        GameplaySetup.instance
+#else
+        GameplaySetup.Instance
+#endif
+            .RemoveTab(Plugin.Name);
     }
 
     private void ShowFlow(FlowCoordinator flowCoordinator)

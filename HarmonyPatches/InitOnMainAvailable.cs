@@ -5,12 +5,14 @@ using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Camera2.HarmonyPatches
-{// TODO: Change to .depthTexture when they fixed that its true even with smoke off
+{
     [HarmonyPatch(typeof(SmoothCameraController), nameof(SmoothCameraController.ActivateSmoothCameraIfNeeded))]
     internal static class InitOnMainAvailable
     {
         private static bool isInitialized;
+#if PRE_1_40_6
         public static bool UseDepthTexture { get; private set; }
+#endif
 
         [UsedImplicitly]
         // ReSharper disable once InconsistentNaming
@@ -21,7 +23,7 @@ namespace Camera2.HarmonyPatches
 
             if (!isInitialized)
             {
-#else
+#elif V1_34_2
         private static void Postfix(SmoothCameraController __instance)
         {
             UseDepthTexture = false;
@@ -29,12 +31,21 @@ namespace Camera2.HarmonyPatches
             {
                 if (SceneUtil.GetMainCameraButReally().GetComponent<DepthTextureController>()._handler.TryGetCurrentPerformancePreset(out var pp))
                 {
-                    // TODO: Change to .depthTexture when they fixed that its true even with smoke off
                     UseDepthTexture = pp.smokeGraphics; 
                 }
+#else
+        private static void Postfix(SmoothCameraController __instance)
+        {
+#if PRE_1_40_6
+            UseDepthTexture = false;
 #endif
-
-
+            
+            if (!isInitialized)
+            {
+#if PRE_1_40_6
+                UseDepthTexture = SceneUtil.GetMainCameraButReally().GetComponent<DepthTextureController>()._settingsManager.settings.quality.smokeGraphics;
+#endif
+#endif
                 if (CamManager.BaseCullingMask == 0)
                 {
                     CamManager.BaseCullingMask = Camera.main!.cullingMask;

@@ -24,22 +24,22 @@
         <DisableZipRelease>True</DisableZipRelease>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-1.29.1' ">
-      <DefineConstants>TRACE;DEBUG;PRE_1_37_1;V1_29_1;</DefineConstants>
+      <DefineConstants>TRACE;DEBUG;PRE_1_37_1;PRE_1_40_6;V1_29_1;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release-1.29.1' ">
-        <DefineConstants>TRACE;PRE_1_37_1;V1_29_1;</DefineConstants>
+        <DefineConstants>TRACE;PRE_1_37_1;PRE_1_40_6;V1_29_1;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-1.34.2' ">
-      <DefineConstants>TRACE;DEBUG;PRE_1_37_1;V1_34_2;</DefineConstants>
+      <DefineConstants>TRACE;DEBUG;PRE_1_37_1;PRE_1_40_6;V1_34_2;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release-1.34.2' ">
-      <DefineConstants>TRACE;DEBUG;PRE_1_37_1;V1_34_2;</DefineConstants>
+      <DefineConstants>TRACE;DEBUG;PRE_1_37_1;PRE_1_40_6;V1_34_2;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-1.37.1' ">
-      <DefineConstants>TRACE;V1_37_1;</DefineConstants>
+      <DefineConstants>TRACE;PRE_1_40_6;V1_37_1;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release-1.37.1' ">
-        <DefineConstants>TRACE;DEBUG;V1_37_1;</DefineConstants>
+        <DefineConstants>TRACE;DEBUG;PRE_1_40_6;V1_37_1;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-Latest' ">
       <DefineConstants>TRACE;DEBUG;VLATEST;</DefineConstants>
@@ -52,12 +52,15 @@
     </ItemGroup>
     <ItemGroup>
         <None Remove="Shaders\camera2utils"/>
+        <None Remove="Shaders\latest\camera2utils"/>
         <None Remove="Shaders\camera2utilsvr"/>
         <None Remove="UI\Views\camPreview.bsml"/>
     </ItemGroup>
     <ItemGroup>
         <Reference Include="Microsoft.CSharp"/>
         <Reference Include="System.Core"/>
+        <Reference Include="System.Data.DataSetExtensions"/>
+        <Reference Include="System.Data"/>
         <Reference Include="BGLib.AppFlow" Condition="$(GameVersion) != '1.29.1'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.AppFlow.dll</HintPath>
             <Private>false</Private>
@@ -74,11 +77,15 @@
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.ViewSystem.dll</HintPath>
             <Private>false</Private>
         </Reference>
-        <Reference Include="BeatSaber.GameSettings" Condition="$(GameVersion) != '1.29.1' And $(GameVersion) != '1.34.2'">
+        <Reference Include="BeatSaber.GameSettings" Condition="$(GameVersion) != '1.29.1' And $(GameVersion) != '1.34.1'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.GameSettings.dll</HintPath>
             <Private>false</Private>
         </Reference>
-        <Reference Include="BeatSaber.PerformancePresets" Condition="$(GameVersion) != '1.29.1' And $(GameVersion) != '1.34.2'">
+        <Reference Include="BeatSaber.Settings" Condition="$(GameVersion) == '1.40.6'">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.Settings.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="BeatSaber.PerformancePresets" Condition="$(GameVersion) == '1.37.1'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.PerformancePresets.dll</HintPath>
             <Private>false</Private>
         </Reference>
@@ -103,6 +110,10 @@
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\DataModels.dll</HintPath>
             <Private>false</Private>
             <SpecificVersion>False</SpecificVersion>
+        </Reference>
+        <Reference Include="GameInit" Condition="$(GameVersion) == '1.40.6'">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GameInit.dll</HintPath>
+            <Private>false</Private>
         </Reference>
         <Reference Include="MediaLoader" Condition="$(GameVersion) != '1.29.1' And $(GameVersion) != '1.34.2'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\MediaLoader.dll</HintPath>
@@ -147,8 +158,12 @@
             <Private>false</Private>
         </Reference>
         <Reference Include="System.Data.DataSetExtensions"/>
-        <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+        <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL" Condition="$(GameVersion) != '1.40.6'">
             <SpecificVersion>False</SpecificVersion>
+            <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="0Harmony">
             <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
             <Private>False</Private>
         </Reference>
@@ -176,6 +191,10 @@
         </Reference>
         <Reference Include="IPA.Loader">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Unity.Mathematics" Condition="$(GameVersion) == '1.40.6'">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.Mathematics.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Tweening" Condition="$(GameVersion) != '1.29.1'">
@@ -281,13 +300,18 @@
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Shaders\camera2utils"/>
-        <EmbeddedResource Include="Shaders\camera2utilsvr"/>
+        <EmbeddedResource Include="Shaders\camera2utilsvr" />
         <EmbeddedResource Include="UI\Views\CameraList.bsml" />
         <EmbeddedResource Include="UI\Views\CameraMovementSettings.bsml" />
         <EmbeddedResource Include="UI\Views\CameraPreview.bsml" />
         <EmbeddedResource Include="UI\Views\CameraSettings.bsml" />
         <EmbeddedResource Include="UI\Views\CustomScenesList.bsml" />
         <EmbeddedResource Include="UI\Views\SceneView.bsml" />
+        <EmbeddedResource Include="Shaders\latest\1_40_6_camera2utils" />
+        <EmbeddedResource Include="Shaders\latest\1_40_6_LuminanceKey.shader" />
+        <EmbeddedResource Include="Shaders\latest\1_40_6_MotionBlur.shader" />
+        <EmbeddedResource Include="Shaders\latest\1_40_6_TexOuline.shader" />
+        <EmbeddedResource Include="Shaders\latest\1_40_6_VolumetricBlit.shader" />
     </ItemGroup>
     <ItemGroup>
         <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')"/>

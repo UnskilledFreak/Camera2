@@ -25,8 +25,9 @@ namespace Camera2.UI
     internal class CameraSettingsViewController : BSMLAutomaticViewController
     {
         internal static Cam2 CurrentCam { get; private set; }
-
+#if PRE_1_40_6
         private static int lastTabSelectedIndex;
+#endif
 
         [UsedImplicitly]
         public static readonly List<object> Types = Enum.GetValues(typeof(CameraType)).Cast<object>().ToList();
@@ -136,7 +137,11 @@ namespace Camera2.UI
                 }
 
                 NotifyPropertyChanged();
+#if PRE_1_40_6
                 SettingsFlowCoordinator.Instance.CameraListViewController.list.tableView.ReloadData();
+#else
+                SettingsFlowCoordinator.Instance.CameraListViewController.list.TableView.ReloadData();
+#endif
                 SettingsFlowCoordinator.Instance.UpdateTitle(CurrentCam);
             }
         }
@@ -798,7 +803,9 @@ namespace Camera2.UI
 
         internal void ReselectLastTab()
         {
+#if PRE_1_40_6
             SelectTab(lastTabSelectedIndex);
+#endif
         }
 
         internal bool SetCam(Cam2 newCam)
@@ -873,10 +880,13 @@ namespace Camera2.UI
                 x.transform.localScale = new Vector3(1.09f, 1f, 1f);
             }
 
+#if PRE_1_40_6
             tabSelector.textSegmentedControl.didSelectCellEvent += (control, index) =>
             {
                 lastTabSelectedIndex = index;
             };
+#endif
+            
 
             SettingsFlowCoordinator.Instance.ShowSettingsForCam(CamManager.Cams.OrderByDescending(x => x.Settings.Layer).First());
         }
@@ -915,9 +925,13 @@ namespace Camera2.UI
         private void SelectTab(int index)
         {
             // Apparently this is the best possible way to programmatically switch the selected tab
+#if PRE_1_40_6
             tabSelector.textSegmentedControl.SelectCellWithNumber(index);
-            AccessTools.Method(typeof(TabSelector), "TabSelected").Invoke(tabSelector, new object[] { tabSelector.textSegmentedControl, index });
-
+            AccessTools.Method(typeof(TabSelector), "TabSelected").Invoke(tabSelector, new object[]
+            {
+                tabSelector.textSegmentedControl, index
+            });
+#endif
             NotifyTargetPosRotChanged();
         }
 
