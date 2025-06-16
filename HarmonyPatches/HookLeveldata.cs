@@ -67,10 +67,11 @@ namespace Camera2.HarmonyPatches
             IsModdedMap = ModMapUtil.IsModdedMap(beatmapLevel, beatmapKey);
             Is360Level = beatmapKey.beatmapCharacteristic.containsRotationEvents;
             IsWallMap = ModMapUtil.IsProbablyWallMap(beatmapLevel, beatmapKey);
-#endif
+#else
             IsModdedMap = ModMapUtil.IsModdedMap(beatmapKey);
             Is360Level = beatmapKey.beatmapCharacteristic.containsRotationEvents;
             IsWallMap = ModMapUtil.IsProbablyWallMap(beatmapKey);
+#endif
         }
 #endif
         internal static void Reset()

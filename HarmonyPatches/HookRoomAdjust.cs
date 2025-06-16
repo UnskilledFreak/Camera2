@@ -22,7 +22,12 @@ namespace Camera2.HarmonyPatches
 #if !V1_29_1
         [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.OnEnable))]
         [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.Start))]
+#if V1_34_2
+        [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.HandleRoomCenterDidChange))]
+        [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.HandleRoomRotationDidChange))]
+#else
         [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.SetRoomTransformOffset))]
+#endif
         [HarmonyPatch(typeof(VRCenterAdjust), nameof(VRCenterAdjust.ResetRoom))]
 #endif
         [UsedImplicitly]

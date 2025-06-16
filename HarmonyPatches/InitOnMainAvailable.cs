@@ -42,7 +42,12 @@ namespace Camera2.HarmonyPatches
             
             if (!isInitialized)
             {
-#if PRE_1_40_6
+#if V1_37_1
+                if (SceneUtil.GetMainCameraButReally().GetComponent<DepthTextureController>()._handler.TryGetCurrentPerformancePreset(out var pp))
+                {
+                    UseDepthTexture = pp.smokeGraphics;
+                }
+#elif PRE_1_40_6
                 UseDepthTexture = SceneUtil.GetMainCameraButReally().GetComponent<DepthTextureController>()._settingsManager.settings.quality.smokeGraphics;
 #endif
 #endif
