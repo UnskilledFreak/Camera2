@@ -63,7 +63,7 @@ internal class MenuButtonManager : IInitializable, IDisposable
 #else
         GameplaySetup.Instance
 #endif
-            .AddTab(Plugin.Name, "Camera2.UI.Views.customScenesList.bsml", ScenesSwitchUI);
+            .AddTab(Plugin.Name, "Camera2.UI.Views.CustomScenesList.bsml", ScenesSwitchUI);
     }
 
     public void Dispose()

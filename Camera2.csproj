@@ -299,19 +299,19 @@
         <None Include="Utils\BloomShite.cs"/>
     </ItemGroup>
     <ItemGroup>
-        <EmbeddedResource Include="Shaders\camera2utils"/>
-        <EmbeddedResource Include="Shaders\camera2utilsvr" />
+        <!-- global working views -->
         <EmbeddedResource Include="UI\Views\CameraList.bsml" />
         <EmbeddedResource Include="UI\Views\CameraMovementSettings.bsml" />
         <EmbeddedResource Include="UI\Views\CameraPreview.bsml" />
         <EmbeddedResource Include="UI\Views\CameraSettings.bsml" />
         <EmbeddedResource Include="UI\Views\CustomScenesList.bsml" />
         <EmbeddedResource Include="UI\Views\SceneView.bsml" />
-        <EmbeddedResource Include="Shaders\latest\1_40_6_camera2utils" />
-        <EmbeddedResource Include="Shaders\latest\1_40_6_LuminanceKey.shader" />
-        <EmbeddedResource Include="Shaders\latest\1_40_6_MotionBlur.shader" />
-        <EmbeddedResource Include="Shaders\latest\1_40_6_TexOuline.shader" />
-        <EmbeddedResource Include="Shaders\latest\1_40_6_VolumetricBlit.shader" />
+        <!-- version specific -->
+        <!--<EmbeddedResource Include="UI\Views\$(BSMLFolder)\CustomSceneList.bsml" LogicalName="$(AssemblyName).UI.BSML.Empty.bsml" />-->
+        <!-- shaders -->
+        <EmbeddedResource Condition="$(GameVersion) == '1.29.1' Or $(GameVersion) == '1.34.2' Or $(GameVersion) == '1.37.1'" Include="Shaders\1.29.1\camera2utils" LogicalName="$(AssemblyName).Shaders.camera2utils" />
+        <EmbeddedResource Condition="$(GameVersion) == '1.29.1' Or $(GameVersion) == '1.34.2' Or $(GameVersion) == '1.37.1'" Include="Shaders\1.29.1\camera2utilsvr" LogicalName="$(AssemblyName).Shaders.camera2utilsvr" />
+        <EmbeddedResource Condition="$(GameVersion) != '1.29.1' And $(GameVersion) != '1.34.2' And $(GameVersion) != '1.37.1'" Include="Shaders\LATEST\camera2utils" LogicalName="$(AssemblyName).Shaders.camera2utils" />
     </ItemGroup>
     <ItemGroup>
         <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')"/>

@@ -94,7 +94,7 @@ namespace Camera2
                 bundle.Unload(false);
             }
 
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Camera2.Shaders.latest.1_40_6_camera2utils");
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Camera2.Shaders.camera2utils");
             LoadNormalShaders(AssetBundle.LoadFromStream(stream));
 #endif
         }
