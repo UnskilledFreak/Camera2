@@ -161,7 +161,7 @@ namespace Camera2.UI
                         SetAndUpdateUnOverridenRotation(0, 0, 0);
                         break;
                     case CameraType.Positionable:
-                        if (CurrentCam.Settings.Type != CameraType.Follower)
+                        if (!CurrentCam.Settings.IsFollowerCam())
                         {
                             SetAndUpdateUnOverridenPosition(1.9f, 2.3f, -2.5f);
                         }
@@ -730,7 +730,7 @@ namespace Camera2.UI
         public void TargetNalulunaCatHead()
         {
             const string target = "Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head";
-            if (CurrentCam.Settings.Type == CameraType.Follower)
+            if (CurrentCam.Settings.IsFollowerCam())
             {
                 SetNewTarget(target);
                 return;
@@ -901,15 +901,15 @@ namespace Camera2.UI
             zOffsetSlider.gameObject.SetActive(Type == CameraType.FirstPerson);
             xRotationSlider.gameObject.SetActive(Type == CameraType.FirstPerson);
             pivotingOffsetToggle.gameObject.SetActive(Type == CameraType.FirstPerson);
-            followerRotAsPosToggle.gameObject.SetActive(Type == CameraType.Follower);
-            followerRelativeTypeInput.gameObject.SetActive(Type == CameraType.Follower);
+            followerRotAsPosToggle.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
+            followerRelativeTypeInput.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
             previewSizeSlider.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             modMapExtMoveWithMapSlider.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             worldCamVisibilityObj.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             smoothFollowTab.IsVisible = Type == CameraType.FirstPerson;
             follow360Tab.IsVisible = CurrentCam.Settings.IsPositionalCam();
-            attachingTab.IsVisible = Type == CameraType.Attached || Type == CameraType.Follower;
-            fakeZoomTab.IsVisible = Type == CameraType.Follower;
+            attachingTab.IsVisible = Type == CameraType.Attached || CurrentCam.Settings.IsFollowerCam();
+            fakeZoomTab.IsVisible = CurrentCam.Settings.IsFollowerCam();
             positionTab.IsVisible = Type != CameraType.FirstPerson;
 
             ToggleFollowerSpecificSettings();
@@ -918,8 +918,8 @@ namespace Camera2.UI
 
         private void ToggleFollowerSpecificSettings()
         {
-            followerPosRelativeToggle.gameObject.SetActive(Type == CameraType.Follower && FollowerRotAsPos);
-            followerUseOrganicToggle.gameObject.SetActive(Type == CameraType.Follower && !FollowerRotAsPos);
+            followerPosRelativeToggle.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam() && FollowerRotAsPos);
+            followerUseOrganicToggle.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam() && !FollowerRotAsPos);
         }
 
         private void SelectTab(int index)

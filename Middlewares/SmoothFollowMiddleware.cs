@@ -30,7 +30,7 @@ namespace Camera2.Middlewares
         public bool Pre()
         {
             // only handle first person and attached types
-            if (Settings.Type == CameraType.Positionable || Settings.Type == CameraType.Follower)
+            if (Settings.IsPositionalCam() || Settings.IsFollowerCam())
             {
                 RemoveTransformer(TransformerTypeAndOrder.SmoothFollow);
                 _parent = null;
@@ -137,7 +137,7 @@ namespace Camera2.Middlewares
             else
             {
                 Transformer!.Position = Vector3.Lerp(Transformer.Position, targetPosition, Cam.TimeSinceLastRender * Settings.SmoothFollow.Position);
-                Transformer.Rotation = Quaternion.Slerp(Transformer.Rotation, targetRotation, Cam.TimeSinceLastRender * Settings.SmoothFollow.Rotation);
+                Transformer!.Rotation = Transformer.Rotation.Slerp(targetRotation, Cam.TimeSinceLastRender * Settings.SmoothFollow.Rotation);
             }
 
             return true;
@@ -162,22 +162,8 @@ namespace Camera2.Middlewares
             var pBase = Settings.SmoothFollow.Limits.PositionBounds;
             var rBase = Settings.SmoothFollow.Limits.RotationBounds;
             
-            var eulerAngles = targetRotation.eulerAngles.ClampToMiddlePointAngles();
-            
-            // have to do it manually because bounds.Contains() does not work with negative values????
-            targetPosition = new Vector3(
-                Mathf.Clamp(targetPosition.x, pBase.min.x, pBase.max.x),
-                Mathf.Clamp(targetPosition.y, pBase.min.y, pBase.max.y),
-                Mathf.Clamp(targetPosition.z, pBase.min.z, pBase.max.z)
-            );
-
-            eulerAngles = new Vector3(
-                Mathf.Clamp(eulerAngles.x, rBase.min.x, rBase.max.x),
-                Mathf.Clamp(eulerAngles.y, rBase.min.y, rBase.max.y),
-                Mathf.Clamp(eulerAngles.z, rBase.min.z, rBase.max.z)
-            );
-            
-            targetRotation.eulerAngles = eulerAngles;
+            targetPosition = targetPosition.ClampToBoundary(pBase);
+            targetRotation.eulerAngles = targetRotation.eulerAngles.ClampToMiddlePointAngles().ClampToBoundary(rBase);
         }
         
         public void ForceReset() { }

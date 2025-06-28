@@ -68,7 +68,7 @@ namespace Camera2.Behaviours
 
                 grabbedCamera.Transformer.Position = position;                
                 // do not update rotation on follower type, will result in weird behavior otherwise
-                if (grabbedCamera.Settings.Type != CameraType.Follower)
+                if (!grabbedCamera.Settings.IsFollowerCam())
                 {
                     Snap(ref rotation.x);
                     Snap(ref rotation.y);

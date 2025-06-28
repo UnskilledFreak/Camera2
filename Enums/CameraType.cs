@@ -5,6 +5,7 @@
         FirstPerson,
         Attached,
         Positionable,
-        Follower
+        Follower,
+        FollowerDrunk
     }
 }

@@ -51,7 +51,7 @@ namespace Camera2.Middlewares
                 }
 
                 Transformer!.Rotation = _noodleOrigin!.transform.localRotation;
-                Transformer!.Position = Settings.Type == CameraType.Follower
+                Transformer!.Position = Settings.IsFollowerCam()
                     ? Cam.CalculatePositionOffsetOnRotation(_noodleOrigin.transform.localRotation, _noodleOrigin.transform.localPosition)
                     : _noodleOrigin.transform.localPosition;
 

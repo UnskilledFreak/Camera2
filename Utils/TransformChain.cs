@@ -88,7 +88,7 @@ namespace Camera2.Utils
                 }
                 else
                 {
-                    if ((TransformerTypeAndOrder)transformer.Order == TransformerTypeAndOrder.ModMapParenting && _cam.Settings.Type == CameraType.Follower)
+                    if ((TransformerTypeAndOrder)transformer.Order == TransformerTypeAndOrder.ModMapParenting && _cam.Settings.IsFollowerCam())
                     {
                         // why am I to stupid to negate this?
                     }

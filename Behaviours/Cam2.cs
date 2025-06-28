@@ -183,7 +183,7 @@ namespace Camera2.Behaviours
                                 || !SceneUtil.IsSongPlaying
                             );
 
-            WorldCam.gameObject.SetActive(doShowCam || (CameraSettingsViewController.CurrentCam == this && Settings.IsPositionalCam()));
+            WorldCam.gameObject.SetActive(doShowCam || (CameraSettingsViewController.CurrentCam == this && (Settings.IsPositionalCam() || Settings.IsFollowerCam())));
         }
 
         internal void UpdateDepthTextureActive()

@@ -115,7 +115,7 @@ namespace Camera2.Middlewares
             {
                 if (!_loadedScript.Loop)
                 {
-                    if (Settings.Type == CameraType.Follower)
+                    if (Settings.IsFollowerCam())
                     {
                         Chain.Remove(TransformerTypeAndOrder.MovementScriptProcessor);
                         Settings.UnOverriden(delegate
