@@ -105,16 +105,10 @@ namespace Camera2.Middlewares
             {
                 _wasInMovementScript = false;
             }
-
-
+            
             if (TeleportOnNextFrame)
             {
                 TeleportOnNextFrame = false;
-                /*
-                Transformer.Rotation = _wasInMovementScript
-                    ? lookRotation
-                    : Quaternion.identity;
-                */
                 Transformer!.Rotation = lookRotation;
             }
             else
@@ -124,11 +118,6 @@ namespace Camera2.Middlewares
             }
 
             GetRandomIf(3, 50, 20, 5, 10, -1.5f, 1.5f, ref _drunkPosition, v => Transformer.Position + v);
-            if (Settings.Type == CameraType.FollowerDrunk)
-            {
-                Cam.LogInfo($"Pos: {Transformer.Position} / Target: {_drunkPosition}");
-            }
-
             if (Settings.Type == CameraType.FollowerDrunk)
             {
                 if (_drunkPosition != Vector3.zero)
