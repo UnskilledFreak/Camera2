@@ -903,6 +903,7 @@ namespace Camera2.UI
             pivotingOffsetToggle.gameObject.SetActive(Type == CameraType.FirstPerson);
             followerRotAsPosToggle.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
             followerRelativeTypeInput.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
+            followerUseOrganicToggle.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
             previewSizeSlider.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             modMapExtMoveWithMapSlider.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             worldCamVisibilityObj.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
@@ -910,7 +911,6 @@ namespace Camera2.UI
             follow360Tab.IsVisible = CurrentCam.Settings.IsPositionalCam();
             attachingTab.IsVisible = Type == CameraType.Attached || CurrentCam.Settings.IsFollowerCam();
             fakeZoomTab.IsVisible = CurrentCam.Settings.IsFollowerCam();
-            positionTab.IsVisible = Type != CameraType.FirstPerson;
 
             ToggleFollowerSpecificSettings();
             SelectTab(0);
