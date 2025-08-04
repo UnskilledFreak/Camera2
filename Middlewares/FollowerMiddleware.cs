@@ -13,8 +13,8 @@ namespace Camera2.Middlewares
 {
     internal class FollowerMiddleware : CamMiddleware, IMHandler
     {
-        private bool _wasInMovementScript;
-        private readonly Dictionary<int, int> _inDrunkCooldown = new Dictionary<int, int>();
+        private bool _isInMovementScript;
+        private readonly Dictionary<int, int> _inDrunkCooldown = new();
         private Vector3 _drunkPosition = Vector3.zero;
         private Vector3 _drunkRotation = Vector3.zero;
         private Vector3 _drunkPositionOffset = Vector3.zero;
@@ -43,7 +43,7 @@ namespace Camera2.Middlewares
             {
                 // remove follower chain so rotations won't stick
                 RemoveTransformer(TransformerTypeAndOrder.Follower);
-                _wasInMovementScript = true;
+                _isInMovementScript = true;
                 return true;
             }
 
@@ -101,9 +101,9 @@ namespace Camera2.Middlewares
                 lookRotation *= rotOffset;
             }
 
-            if (_wasInMovementScript)
+            if (_isInMovementScript)
             {
-                _wasInMovementScript = false;
+                _isInMovementScript = false;
             }
             
             if (TeleportOnNextFrame)
@@ -161,11 +161,11 @@ namespace Camera2.Middlewares
 
         private float GetSlerpTime(float multiplier, float drunk = 1f) => Cam.TimeSinceLastRender * (Settings.Type == CameraType.FollowerDrunk ? multiplier / drunk : multiplier);
 
-        private void GetRandomIf(int t, int percentage, int p1, int p2, int p3, float min, float max, ref Vector3 writeTo, [CanBeNull] Func<Vector3, Vector3> callback)
+        private void GetRandomIf(int type, int percentage, int x, int y, int z, float min, float max, ref Vector3 writeTo, [CanBeNull] Func<Vector3, Vector3> callback)
         {
-            if (!_inDrunkCooldown.ContainsKey(t))
+            if (!_inDrunkCooldown.ContainsKey(type))
             {
-                _inDrunkCooldown.Add(t, 0);
+                _inDrunkCooldown.Add(type, 0);
             }
 
             if (Settings.Type != CameraType.FollowerDrunk || !IsRandomHeck(percentage))
@@ -173,17 +173,17 @@ namespace Camera2.Middlewares
                 return;
             }
 
-            if (_inDrunkCooldown[t] == 0)
+            if (_inDrunkCooldown[type] == 0)
             {
-                _inDrunkCooldown[t] = 1500;
-                writeTo = GetRandomVector(p1, p2, p3, min, max);
+                _inDrunkCooldown[type] = 1500;
+                writeTo = GetRandomVector(x, y, z, min, max);
                 if (callback != null)
                 {
                     writeTo = callback(writeTo);
                 }
             }
 
-            _inDrunkCooldown[t]--;
+            _inDrunkCooldown[type]--;
         }
 
         private static bool IsRandomHeck(int percentage) => new Random().Next(0, 100) < percentage;

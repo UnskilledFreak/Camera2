@@ -28,10 +28,10 @@
         <BSMLFolder>LATEST</BSMLFolder>
     </PropertyGroup>
     <PropertyGroup Condition="$(Configuration) == 'Release-Latest' Or $(Configuration) == 'Debug-Latest'">
-        <GameVersion>1.40.6</GameVersion>
-        <BSIPAVersion>4.3.5</BSIPAVersion>
+        <GameVersion>1.40.8</GameVersion>
+        <BSIPAVersion>4.3.6</BSIPAVersion>
         <BSMLVersion>1.12.5</BSMLVersion>
-        <SiraUtilVersion>3.1.14</SiraUtilVersion>
+        <SiraUtilVersion>3.2.1</SiraUtilVersion>
         <SongCoreVersion>3.15.3</SongCoreVersion>
         <BSMLFolder>LATEST</BSMLFolder>
     </PropertyGroup>

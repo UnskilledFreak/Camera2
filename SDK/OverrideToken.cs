@@ -15,7 +15,7 @@ namespace Camera2.SDK
         private Cam2 _cam;
         private string CamName { get; set; }
         
-        private static readonly Dictionary<string, OverrideToken> Tokens = new Dictionary<string, OverrideToken>();
+        private static readonly Dictionary<string, OverrideToken> Tokens = new();
 
         private float _fov;
         public Vector3 Position { get; [UsedImplicitly] set; }

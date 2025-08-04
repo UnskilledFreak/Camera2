@@ -30,7 +30,7 @@ namespace Camera2.Middlewares
         public bool Pre()
         {
             // only handle first person and attached types
-            if (Settings.IsPositionalCam() || Settings.IsFollowerCam())
+            if (Settings.IsPositionalCam())
             {
                 RemoveTransformer(TransformerTypeAndOrder.SmoothFollow);
                 _parent = null;
@@ -119,8 +119,9 @@ namespace Camera2.Middlewares
                     TeleportOnNextFrame = _lastScene != SceneUtil.CurrentScene || (HookFPFCToggle.isInFPFC && currentReplaySource == null);
                 }
             }
-
-            //if (!HookFPFCToggle.isInFPFC)
+#if !DEBUG
+            if (!HookFPFCToggle.isInFPFC)
+#endif
             {
                 CalculateLimits(ref targetPosition, ref targetRotation);
             }

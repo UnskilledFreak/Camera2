@@ -275,9 +275,9 @@ namespace Camera2.Configuration
             _parent = null;
         }
 
-        public bool IsPositionalCam() => Type == CameraType.Positionable || Type == CameraType.Follower;
+        public bool IsPositionalCam() => Type == CameraType.Positionable || IsFollowerCam();
         
-        public bool IsFollowerCam() => Type == CameraType.Follower || Type == CameraType.FollowerDrunk;
+        public bool IsFollowerCam() => Type is CameraType.Follower or CameraType.FollowerDrunk;
 
         public void Load(bool loadConfig = true)
         {
@@ -351,7 +351,6 @@ namespace Camera2.Configuration
                 Cam.Transformer.RotationEuler = TargetRotation;
             }
 
-            // Force pivoting offset for 360 Levels - Non-Pivoting offset on 360 levels just looks outright trash
             Cam.Transformer.ApplyAsAbsolute = IsFollowerCam() || (!IsPositionalCam() && !SmoothFollow.PivotingOffset && !HookLeveldata.Is360Level);
         }
 

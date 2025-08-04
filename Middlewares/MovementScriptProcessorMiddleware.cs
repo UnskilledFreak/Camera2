@@ -19,9 +19,15 @@ namespace Camera2.Middlewares
         private Quaternion _lastRot = Quaternion.identity;
         private float _lastAnimTime;
         private ScriptFrame TargetScriptFrame => _loadedScript.Frames[_frameIndex];
+        private bool _wasInAndIsFinished;
 
         private void Reset()
         {
+            if (_wasInAndIsFinished)
+            {
+                return;
+            }
+            
             if (Transformer != null)
             {
                 Transformer.Position = Vector3.zero;
@@ -63,7 +69,8 @@ namespace Camera2.Middlewares
         public bool Pre()
         {
             if (
-                Cam.Settings.Type == CameraType.FirstPerson
+                _wasInAndIsFinished
+                || Cam.Settings.Type == CameraType.FirstPerson
                 || Cam.Settings.Type == CameraType.Attached
                 || Settings.MovementScript.ScriptList.Length == 0
                 || (!SceneUtil.IsInSong && !Settings.MovementScript.EnableInMenu)
@@ -115,16 +122,18 @@ namespace Camera2.Middlewares
             {
                 if (!_loadedScript.Loop)
                 {
-                    if (Settings.IsFollowerCam())
+                    if (!Settings.IsFollowerCam())
                     {
-                        Chain.Remove(TransformerTypeAndOrder.MovementScriptProcessor);
-                        Settings.UnOverriden(delegate
-                        {
-                            Settings.TargetPosition = _loadedScript.Frames.Last().Position;
-                        });
-                        Settings.ApplyPositionAndRotation();
+                        return true;
                     }
 
+                    RemoveTransformer(TransformerTypeAndOrder.MovementScriptProcessor);
+                    Settings.UnOverriden(delegate
+                    {
+                        Settings.TargetPosition = _loadedScript.Frames.Last().Position;
+                    });
+                    Settings.ApplyPositionAndRotation();
+                    _wasInAndIsFinished  = true;
                     return true;
                 }
 
@@ -204,7 +213,10 @@ namespace Camera2.Middlewares
 
             return true;
         }
-        
-        public void ForceReset() { }
+
+        public void ForceReset()
+        {
+            _wasInAndIsFinished = false;
+        }
     }
 }

@@ -70,11 +70,11 @@ namespace Camera2.Behaviours
                 // do not update rotation on follower type, will result in weird behavior otherwise
                 if (!grabbedCamera.Settings.IsFollowerCam())
                 {
-                    Snap(ref rotation.x);
-                    Snap(ref rotation.y);
-                    Snap(ref rotation.z);
-                    
-                    grabbedCamera.Transformer.Rotation = Quaternion.Euler(rotation.x, rotation.y, rotation.z);
+                    grabbedCamera.Transformer.Rotation = Quaternion.Euler(
+                        Snap(rotation.x),
+                        Snap(rotation.y),
+                        Snap(rotation.z)
+                    );
                 }
 
                 grabbedCamera.TransformChain.Calculate();
@@ -88,7 +88,7 @@ namespace Camera2.Behaviours
             FinishCameraMove();
         }
 
-        private static void Snap(ref float angle, float snap = 4f, float step = 45f)
+        private static float Snap(float angle, float snap = 4f, float step = 45f)
         {
             var left = angle % step;
 
@@ -100,6 +100,8 @@ namespace Camera2.Behaviours
             {
                 angle += step - left;
             }
+
+            return angle;
         }
 
         private static void FinishCameraMove()
@@ -110,7 +112,10 @@ namespace Camera2.Behaviours
             }
             
             grabbedCamera.Settings.TargetPosition = grabbedCamera.Transformer.Position;
-            grabbedCamera.Settings.TargetRotation = grabbedCamera.Transformer.Rotation.eulerAngles;
+            if (!grabbedCamera.Settings.IsFollowerCam())
+            {
+                grabbedCamera.Settings.TargetRotation = grabbedCamera.Transformer.Rotation.eulerAngles;
+            }
 
             grabbedCamera.Settings.ApplyPositionAndRotation();
 
