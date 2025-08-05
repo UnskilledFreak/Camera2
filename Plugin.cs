@@ -7,6 +7,7 @@ using HarmonyLib;
 using IPA;
 using System.Reflection;
 using System.Threading.Tasks;
+using Camera2.Behaviours.Spout;
 using Camera2.Handler;
 using Camera2.Installers;
 using JetBrains.Annotations;
@@ -46,6 +47,7 @@ namespace Camera2
 
             Log.Info($"{Name} mod {ModdedVersion} loading...");
             LoadShaders();
+            SpoutLoader.LoadPlugin();
             Log.Info($"{Name} mod {ModdedVersion} loaded");
         }
 
@@ -80,7 +82,7 @@ namespace Camera2
                 LoadVRShaders(AssetBundle.LoadFromStream(stream));
             }
 #else
-        internal static void LoadShaders()
+        private static void LoadShaders()
         {
             void LoadNormalShaders(AssetBundle bundle)
             {

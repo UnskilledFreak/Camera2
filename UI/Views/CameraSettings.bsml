@@ -1,7 +1,7 @@
 ﻿<vertical child-control-height="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
     <horizontal vertical-fit="PreferredSize" horizontal-fit="PreferredSize" child-expand-width="true" child-expand-height="true" pref-height="7" pref-width="120">
         <page-button pref-width="6" pref-height="6" tags="LeftButton" direction="Left"/>
-        <tab-selector child-expand-width="true" child-control-width="true" tab-tag="tabs" id="tabSelector" page-count="5" left-button-tag="LeftButton" right-button-tag="RightButton"/>
+        <tab-selector child-expand-width="true" child-control-width="false" tab-tag="tabs" id="TabSelector" page-count="4" left-button-tag="LeftButton" right-button-tag="RightButton"/>
         <page-button pref-width="6" pref-height="6" tags="RightButton" direction="Right"/>
     </horizontal>
 
@@ -13,13 +13,9 @@
             <slider-setting text="Render Scale" min="0.2" max="3" increment="0.1" value="RenderScale" bind-value="true" apply-on-change="true" show-buttons="true"/>
             <list-setting text="Anti Aliasing" value="AntiAliasing" choices="AntiAliasingLevels" bind-value="true" apply-on-change="true"/>
 
-            <dropdown-list-setting id="worldCamVisibilityInput" text="Ingame Cam Visibility" value="WorldCamVisibility" choices="WorldCamVisibilities" bind-value="true" apply-on-change="true"/>
-            <slider-setting id="previewSizeSlider" text="Ingame preview size" min="0.3" max="3" increment="0.1" value="PreviewSize" bind-value="true" apply-on-change="true" show-buttons="true"/>
-            <slider-setting id="zOffsetSlider" text="Z Offset" min="-2" max="0.5" increment="0.1" value="ZOffset" bind-value="true" apply-on-change="true" show-buttons="true"/>
-            <slider-setting id="xRotationSlider" text="X Rotation Offset (Pitch)" min="-45" max="45" increment="0.5" value="XRotation" bind-value="true" apply-on-change="true" show-buttons="true"
-                            hover-hint="If you tend to tilt your head down / up a lot while playing you can use this to make the desktop view look more forward"
-            />
-            <checkbox id="pivotingOffsetToggle" text="Pivoting Firstperson Offset" value="MiscPivotingOffset" bind-value="true" apply-on-change="true"
+            <dropdown-list-setting id="MenuWorldCamVisibility" text="Ingame Cam Visibility" value="WorldCamVisibility" choices="WorldCamVisibilities" bind-value="true" apply-on-change="true"/>
+            <slider-setting id="SliderPreviewSize" text="Ingame preview size" min="0.3" max="3" increment="0.1" value="PreviewSize" bind-value="true" apply-on-change="true" show-buttons="true"/>
+            <checkbox id="TogglePivotingOffset" text="Pivoting Firstperson Offset" value="MiscPivotingOffset" bind-value="true" apply-on-change="true"
                       hover-hint="Turning this off changes the offset to be absolute (Like it works in Camera Plus) instead of pivoting around the head position. Both have their advantages and disadvantages"
             />
             <checkbox text="Lock Desktop screen position / size" value="ViewRectIsLocked" bind-value="true" apply-on-change="true"
@@ -54,7 +50,7 @@
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="Position" id="positionTab">
+    <tab tags="tabs" tab-name="Position / Rotation">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
             <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
                 <horizontal preferred-width="90">
@@ -63,18 +59,18 @@
                 <slider-setting text="Position X" min="-10" max="10" increment="0.01" show-buttons="true" value="TargetPosX" bind-value="true" apply-on-change="true"/>
                 <slider-setting text="Position Y" min="-10" max="10" increment="0.01" show-buttons="true" value="TargetPosY" bind-value="true" apply-on-change="true"/>
                 <slider-setting text="Position Z" min="-10" max="10" increment="0.01" show-buttons="true" value="TargetPosZ" bind-value="true" apply-on-change="true"/>
-                <slider-setting id="posRotOffsetXSlider" text="Rotation X" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotX" bind-value="true" apply-on-change="true"/>
-                <slider-setting id="posRotOffsetYSlider" text="Rotation Y" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotY" bind-value="true" apply-on-change="true"/>
-                <slider-setting id="posRotOffsetZSlider" text="Rotation Z" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotZ" bind-value="true" apply-on-change="true"/>
-                <checkbox id="followerRotAsPosToggle" text="Use Rotation as Look-At Position Offset" value="FollowerRotAsPos" bind-value="true" apply-on-change="true"/>
-                <checkbox id="followerPosRelativeToggle" text="Use Look-At Rotation Position Offset relatively" value="FollowerPosRelative" bind-value="true" apply-on-change="true"/>
-                <checkbox id="followerUseOrganicToggle" text="Use organic rotation" value="FollowerUseOrganic" bind-value="true" apply-on-change="true"/>
-                <dropdown-list-setting id="followerRelativeTypeInput" text="Relative Offset Type" value="FollowerRelativeType" choices="FollowerRelativeTypes" bind-value="true" apply-on-change="true"/>
+                <slider-setting id="SliderPosRotOffsetX" text="Rotation X" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotX" bind-value="true" apply-on-change="true"/>
+                <slider-setting id="SliderPosRotOffsetY" text="Rotation Y" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotY" bind-value="true" apply-on-change="true"/>
+                <slider-setting id="SliderPosRotOffsetZ" text="Rotation Z" min="-179.99" max="180" increment="0.01" show-buttons="true" value="TargetRotZ" bind-value="true" apply-on-change="true"/>
+                <checkbox id="ToggleFollowerRotAsPos" text="Use Rotation as Look-At Position Offset" value="FollowerRotAsPos" bind-value="true" apply-on-change="true"/>
+                <checkbox id="ToggleFollowerPosRelative" text="Use Look-At Rotation Position Offset relatively" value="FollowerPosRelative" bind-value="true" apply-on-change="true"/>
+                <checkbox id="ToggleFollowerUseOrganic" text="Use organic rotation" value="FollowerUseOrganic" bind-value="true" apply-on-change="true"/>
+                <dropdown-list-setting id="MenuFollowerRelativeType" text="Relative Offset Type" value="FollowerRelativeType" choices="FollowerRelativeTypes" bind-value="true" apply-on-change="true"/>
             </modifier-container>
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="Target" id="attachingTab">
+    <tab tags="tabs" tab-name="Target" id="TabTarget">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
             <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
                 <string-setting id="attachedTarget" text="Target" value="TargetParent" bind-value="true" apply-on-change="true"
@@ -90,7 +86,7 @@
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="Fake Zoom" id="fakeZoomTab">
+    <tab tags="tabs" tab-name="Fake Zoom" id="TabFakeZoom">
         <vertical preferred-width="72" vertical-fit="PreferredSize" pad-left="2" pad-right="2" spacing="2">
             <horizontal preferred-width="100" pad-top="3">
                 <text font-size="3" align="Center" word-wrapping="true"
@@ -107,7 +103,7 @@
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="Smoothing" id="smoothFollowTab">
+    <tab tags="tabs" tab-name="Smoothing" id="TabSmoothFollow">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
             <modifier-container child-expand-width="true">
                 <checkbox text="Force Upright" value="SmoothFollowForceUpright" bind-value="true" apply-on-change="true"
@@ -125,7 +121,7 @@
 
     <tab tags="tabs" tab-name="ModMaps">
         <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
-            <checkbox id="modMapExtMoveWithMapCheckbox" text="Follow Map movement" value="ModMapExtMoveWithMap" bind-value="true" apply-on-change="true"
+            <checkbox id="ToggleModMapExtMoveWithMap" text="Follow Map movement" value="ModMapExtMoveWithMap" bind-value="true" apply-on-change="true"
                       hover-hint="Make the Camera follow the Map movement / rotation"
             />
             <checkbox text="Auto-Visible Walls" value="ModMapExtAutoOpaqueWalls" bind-value="true" apply-on-change="true"
@@ -137,7 +133,7 @@
         </modifier-container>
     </tab>
 
-    <tab tags="tabs" tab-name="360/90" id="follow360Tab">
+    <tab tags="tabs" tab-name="360/90" id="TabFollow360">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
             <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
                 <checkbox text="Enabled" value="Follow360MoveWithMap" bind-value="true" apply-on-change="true"
@@ -149,7 +145,7 @@
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="Scenes" horizontal-fit="PreferredSize">
+    <tab tags="tabs" tab-name="Scenes">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize" spacing="5">
             <horizontal preferred-width="110" child-expand-width="true">
                 <grid cell-size-x="46" cell-size-y="6" spacing-x="7" spacing-y="2" child-align="MiddleCenter">
@@ -221,23 +217,38 @@
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="Display" horizontal-fit="PreferredSize" id="viewRectTab">
+    <tab tags="tabs" tab-name="Display" id="viewRectTab">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
-            <slider-setting text="X Position (Lower Left corner)" min="0" max="1" increment="0.02" value="ViewRectX" bind-value="true" apply-on-change="true" show-buttons="true"/>
-            <slider-setting text="Y Position (Lower Left corner)" min="0" max="1" increment="0.02" value="ViewRectY" bind-value="true" apply-on-change="true" show-buttons="true"/>
-            <slider-setting text="Width" min="0.04" max="1" increment="0.02" value="ViewRectWidth" bind-value="true" apply-on-change="true" show-buttons="true"/>
-            <slider-setting text="Height" min="0.04" max="1" increment="0.02" value="ViewRectHeight" bind-value="true" apply-on-change="true" show-buttons="true"/>
+            <horizontal preferred-width="100">
+                <text color="#DDD" font-size="4" align="Center" word-wrapping="true"
+                      text="Position is starting from bottom left corner. X and Y at 0 means its on the bottom left corner while 1 is the top right."
+                />
+            </horizontal>
+            <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
+                <slider-setting text="X Position" min="0" max="1" increment="0.01" value="ViewRectX" bind-value="true" apply-on-change="true" show-buttons="true"/>
+                <slider-setting text="Y Position" min="0" max="1" increment="0.01" value="ViewRectY" bind-value="true" apply-on-change="true" show-buttons="true"/>
+                <slider-setting text="Width" min="0.04" max="1" increment="0.02" value="ViewRectWidth" bind-value="true" apply-on-change="true" show-buttons="true"/>
+                <slider-setting text="Height" min="0.04" max="1" increment="0.02" value="ViewRectHeight" bind-value="true" apply-on-change="true" show-buttons="true"/>
+            </modifier-container>
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="MS" horizontal-fit="PreferredSize">
+    <tab tags="tabs" tab-name="Movement Scripts">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
-            <horizontal preferred-width="100">
-                <text color="#FFF" font-size="4" align="Center" word-wrapping="true" text="Movement Script Settings"/>
-            </horizontal>
             <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
                 <checkbox text="Start From Origin" value="MovementScriptFromOrigin" bind-value="true" apply-on-change="true" hover-hint="yeah ???"/>
                 <checkbox text="Enable in Menu" value="MovementScriptEnableInMenu" bind-value="true" apply-on-change="true" hover-hint="Enable Movement Scripts in menu"/>
+            </modifier-container>
+        </vertical>
+    </tab>
+
+    <tab tags="tabs" tab-name="Spout">
+        <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
+            <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
+                <checkbox text="Enabled" value="SpoutEnabled" bind-value="true" apply-on-change="true" hover-hint="Enable Spout Sender"/>
+                <slider-setting text="Width" min="1" max="16384" increment="1" value="SpoutWidth" bind-value="true" apply-on-change="true" hover-hint="Render resolution width" show-buttons="true" integer-only="true"/>
+                <slider-setting text="Height" min="1" max="16384" increment="1" value="SpoutHeight" bind-value="true" apply-on-change="true" hover-hint="Render resolution height" show-buttons="true" integer-only="true"/>
+                <string-setting text="Channel Name" value="SpoutChannelName" bind-value="true" apply-on-change="true" hover-hint="Channel name to send to"/>
             </modifier-container>
         </vertical>
     </tab>
@@ -251,19 +262,19 @@
             </horizontal>
             <vertical spacing="1.5" pad-bottom="2" preferred-width="60">
                 <horizontal preferred-width="80">
-                    <primary-button on-click="TargetAvatarsHead" text="Avatar Head" click-event="CloseTargetModal" horizontal-fit="Unconstrained"/>
-                    <primary-button on-click="TargetVrmHead" text="NalulunaAvatar Head" click-event="CloseTargetModal" horizontal-fit="Unconstrained"/>
+                    <primary-button on-click="TargetAvatarsHead" text="Avatar Head" click-event="CloseTargetModal"/>
+                    <primary-button on-click="TargetVrmHead" text="NalulunaAvatar Head" click-event="CloseTargetModal"/>
                 </horizontal>
-                <primary-button on-click="TargetLookAtPointer" text="Look at Pointer" click-event="CloseTargetModal" horizontal-fit="Unconstrained"/>
+                <primary-button on-click="TargetLookAtPointer" text="Look at Pointer" click-event="CloseTargetModal"/>
                 <horizontal preferred-width="80">
-                    <primary-button on-click="TargetLeftPanel" text="Left Panel" click-event="CloseTargetModal" horizontal-fit="Unconstrained"/>
-                    <primary-button on-click="TargetRightPanel" text="Right Panel" click-event="CloseTargetModal" horizontal-fit="Unconstrained"/>
+                    <primary-button on-click="TargetLeftPanel" text="Left Panel" click-event="CloseTargetModal"/>
+                    <primary-button on-click="TargetRightPanel" text="Right Panel" click-event="CloseTargetModal"/>
                 </horizontal>
                 <horizontal preferred-width="80">
-                    <primary-button on-click="TargetEnergyBar" text="Energy Bar" click-event="CloseTargetModal" horizontal-fit="Unconstrained"/>
-                    <primary-button on-click="TargetScore" text="Score" click-event="CloseTargetModal" horizontal-fit="Unconstrained"/>
+                    <primary-button on-click="TargetEnergyBar" text="Energy Bar" click-event="CloseTargetModal"/>
+                    <primary-button on-click="TargetScore" text="Score" click-event="CloseTargetModal"/>
                 </horizontal>
-                <primary-button on-click="TargetCatHead" text="NalulunaCat Head" click-event="CloseTargetModal" horizontal-fit="Unconstrained"/>
+                <primary-button on-click="TargetCatHead" text="NalulunaCat Head" click-event="CloseTargetModal"/>
             </vertical>
             <button text="Cancel" click-event="CloseTargetModal"/>
         </vertical>

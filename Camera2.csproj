@@ -308,6 +308,7 @@
         <EmbeddedResource Condition="$(GameVersion) == '1.29.1' Or $(GameVersion) == '1.34.2' Or $(GameVersion) == '1.37.1'" Include="Shaders\1.29.1\camera2utils" LogicalName="$(AssemblyName).Shaders.camera2utils"/>
         <EmbeddedResource Condition="$(GameVersion) == '1.29.1' Or $(GameVersion) == '1.34.2' Or $(GameVersion) == '1.37.1'" Include="Shaders\1.29.1\camera2utilsvr" LogicalName="$(AssemblyName).Shaders.camera2utilsvr"/>
         <EmbeddedResource Condition="$(GameVersion) != '1.29.1' And $(GameVersion) != '1.34.2' And $(GameVersion) != '1.37.1'" Include="Shaders\LATEST\camera2utils" LogicalName="$(AssemblyName).Shaders.camera2utils"/>
+        <EmbeddedResource Include="Resources\Spout\KlakSpout.dll" />
     </ItemGroup>
     <ItemGroup>
         <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')"/>

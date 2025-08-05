@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Camera2.Behaviours.Spout;
 using Camera2.Enums;
 using Camera2.Handler;
 using Camera2.Managers;
@@ -19,12 +20,12 @@ namespace Camera2.Behaviours
     internal class Cam2 : MonoBehaviour
     {
         private static ConfigHandler _config => ConfigHandler.Instance;
-        
+
         private static readonly HashSet<string> CameraBehavioursToDestroy = new HashSet<string>
         {
-            "AudioListener", 
-            "LIV", 
-            "MainCamera", 
+            "AudioListener",
+            "LIV",
+            "MainCamera",
             "MeshCollider",
 #if !V1_29_1
             "TrackedPoseDriver",
@@ -45,6 +46,7 @@ namespace Camera2.Behaviours
         internal Transformer Transformer;
         internal TransformChain TransformChain;
         private ParentShield _shield;
+        public SpoutHandler SpoutHandler { get; private set; }
 
         internal string ConfigPath => _config.GetCameraPath(Name);
 
@@ -53,10 +55,11 @@ namespace Camera2.Behaviours
         // Naluluna also uses reflection onto Kinsi's spaghetti... great...
         [UsedImplicitly]
         internal Camera UCamera => Camera;
-        
+
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
+            SpoutHandler = new SpoutHandler(this);
         }
 
         public void LogInfo(string message) => Plugin.Log.Info($"Cam '{Name}': {message}");
@@ -259,9 +262,9 @@ namespace Camera2.Behaviours
             Settings = new CameraSettings(this);
             Settings.Load(loadConfig);
 
-            Middlewares = new[]
-            {
-                MakeMiddleware<MultiplayerMiddleware>(), 
+            Middlewares =
+            [
+                MakeMiddleware<MultiplayerMiddleware>(),
                 MakeMiddleware<FpsLimiterMiddleware>(),
                 MakeMiddleware<SmoothFollowMiddleware>(),
                 MakeMiddleware<ModMapExtensionsMiddleware>(),
@@ -269,8 +272,10 @@ namespace Camera2.Behaviours
                 MakeMiddleware<FollowerMiddleware>(),
                 MakeMiddleware<MovementScriptProcessorMiddleware>(),
                 MakeMiddleware<VmcAvatarMiddleware>()
-            };
+            ];
             camClone.AddComponent<CamPostProcessor>().Init(this);
+
+            SpoutHandler.Init();
 
             LogInfo("loaded");
         }
@@ -369,6 +374,11 @@ namespace Camera2.Behaviours
             }
 
             Destroy(gameObject);
+        }
+
+        protected void Update()
+        {
+            SpoutHandler.UpdateIfDirty();
         }
     }
 }

@@ -47,11 +47,16 @@ namespace Camera2.Behaviours
             _camPreview.GetComponent<MeshRenderer>().material = _viewMaterial;
         }
 
+        public void SetRenderTexture(RenderTexture texture)
+        {
+            _viewMaterial.SetTexture(MainTex, texture);
+        }
+        
         public void SetSource(Cam2 cam)
         {
             Cam = cam;
 
-            _viewMaterial.SetTexture(MainTex, cam.RenderTexture);
+            SetRenderTexture(cam.RenderTexture);
             SetPreviewPositionAndSize();
         }
 

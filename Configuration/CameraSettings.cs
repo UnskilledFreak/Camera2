@@ -37,16 +37,18 @@ namespace Camera2.Configuration
         private Vector3 _targetPos = Vector3.zero;
         private Vector3 _targetRot = Vector3.zero;
 
-        [JsonIgnore] private Transform _parent;
+        [JsonIgnore]
+        private Transform _parent;
 
         public SettingsMultiplayer Multiplayer { get; private set; }
-        public SettingsSmoothFollow SmoothFollow { get; private set; }
-        public SettingsModmapExtensions ModMapExtensions { get; private set; }
+        public SettingsSmoothFollow SmoothFollow { get; }
+        public SettingsModmapExtensions ModMapExtensions { get; }
         public SettingsFollow360 Follow360 { get; private set; }
         public SettingsVmcAvatar VmcProtocol { get; private set; }
         public SettingsFPSLimiter FPSLimiter { get; private set; }
         public SettingsPostProcessing PostProcessing { get; private set; }
-        public SettingsMovementScript MovementScript { get; private set; } = new SettingsMovementScript();
+        public SettingsMovementScript MovementScript { get; private set; } = new();
+        public SettingsSpout Spout { get; private set; } = new();
 
         internal bool IsScreenLocked
         {
@@ -61,12 +63,12 @@ namespace Camera2.Configuration
             set
             {
                 _type = value;
-                
+
                 if (!IsLoaded)
                 {
                     return;
                 }
-                
+
                 Cam.ShowWorldCamIfNecessary();
                 ApplyLayerBitmask();
                 // Pos / Rot is applied differently depending on if it's an FP or TP cam
@@ -193,9 +195,11 @@ namespace Camera2.Configuration
             set => Cam.Camera.nearClipPlane = Mathf.Max(0.00f, value);
         }
 
-        [JsonIgnore] public GameObjects VisibleObjects => OverrideToken?.VisibleObjects ?? _visibleObjects;
+        [JsonIgnore]
+        public GameObjects VisibleObjects => OverrideToken?.VisibleObjects ?? _visibleObjects;
 
-        [JsonIgnore] internal ScreenRect ViewRect { get; private set; }
+        [JsonIgnore]
+        internal ScreenRect ViewRect { get; private set; }
 
         [JsonProperty("TargetPos")]
         [JsonConverter(typeof(Vector3Converter))]
@@ -213,7 +217,8 @@ namespace Camera2.Configuration
             set => _targetRot = value;
         }
 
-        [JsonProperty("visibleObjects")] private GameObjects _visibleObjects;
+        [JsonProperty("visibleObjects")]
+        private GameObjects _visibleObjects;
 
         [JsonConverter(typeof(ScreenRectConverter)), JsonProperty("viewRect")]
         private ScreenRect ViewRectCfg
@@ -276,8 +281,8 @@ namespace Camera2.Configuration
         }
 
         public bool IsPositionalCam() => Type == CameraType.Positionable || IsFollowerCam();
-        
-        public bool IsFollowerCam() => Type is CameraType.Follower or CameraType.FollowerDrunk;
+
+        public bool IsFollowerCam() => Parent == null && Type is CameraType.Follower or CameraType.FollowerDrunk;
 
         public void Load(bool loadConfig = true)
         {
