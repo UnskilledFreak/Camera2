@@ -3,6 +3,7 @@ using HarmonyLib;
 using IPA.Loader;
 using System;
 using System.Reflection;
+using Camera2.Handler;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -11,22 +12,34 @@ namespace Camera2.HarmonyPatches
     [HarmonyPatch]
     internal static class HookFPFCToggle
     {
-        public static Transform fpfcTransform { get; private set; }
-        public static bool isInFPFC => toggledIntoFPFC && fpfcTransform && fpfcTransform.gameObject && fpfcTransform.gameObject.activeInHierarchy;
-        private static bool toggledIntoFPFC;
+        public static Transform FpfcTransform { get; private set; }
+        public static bool IsInFpfc
+        {
+            get
+            {
+                if (!FoundSiraToggle)
+                {
+                    // fallback if this crashes on pre 1_39
+                    return FpfcHandler.Instance.IsActive;
+                }
+                return _toggledIntoFpfc && FpfcTransform && FpfcTransform.gameObject && FpfcTransform.gameObject.activeInHierarchy;
+            }
+        }
 
-        private static bool foundSiraToggle { get; set; }
-        private static PropertyInfo FIELD_SimpleCameraController_AllowInput;
+        private static bool _toggledIntoFpfc;
 
-        private static PluginMetadata SiraUtilSimpleCameraController = PluginManager.GetPluginFromId("SiraUtil");
+        private static bool FoundSiraToggle { get; set; }
+        private static PropertyInfo _fieldSimpleCameraControllerAllowInput;
+
+        private static readonly PluginMetadata SiraUtilSimpleCameraController = PluginManager.GetPluginFromId("SiraUtil");
 
         //TODO: remove next version
-        public static readonly bool isSiraSettingLocalPostionYes = SiraUtilSimpleCameraController != null && SiraUtilSimpleCameraController.HVersion > new Hive.Versioning.Version("3.0.5");
+        public static readonly bool IsSiraSettingLocalPostionYes = SiraUtilSimpleCameraController != null && SiraUtilSimpleCameraController.HVersion > new Hive.Versioning.Version("3.0.5");
 
-        private static void SetFPFCActive(Transform transform, bool isActive = true)
+        private static void SetFpfcActive(Transform transform, bool isActive = true)
         {
-            fpfcTransform = transform;
-            toggledIntoFPFC = isActive;
+            FpfcTransform = transform;
+            _toggledIntoFpfc = isActive;
 
             ScenesManager.ActiveSceneChanged();
         }
@@ -37,14 +50,14 @@ namespace Camera2.HarmonyPatches
         {
             var allowInput = true;
 
-            if (__instance.transform == fpfcTransform)
+            if (__instance.transform == FpfcTransform)
             {
-                if (FIELD_SimpleCameraController_AllowInput != null)
+                if (_fieldSimpleCameraControllerAllowInput != null)
                 {
-                    allowInput = (bool)FIELD_SimpleCameraController_AllowInput.GetValue(__instance);
+                    allowInput = (bool)_fieldSimpleCameraControllerAllowInput.GetValue(__instance);
                 }
 
-                if (allowInput == toggledIntoFPFC)
+                if (allowInput == _toggledIntoFpfc)
                 {
                     return;
                 }
@@ -53,7 +66,7 @@ namespace Camera2.HarmonyPatches
 #if DEBUG
             Plugin.Log.Info($"HookSiraFPFCToggle: SimpleCameraController.AllowInput => {allowInput}");
 #endif
-            SetFPFCActive(__instance.transform, allowInput);
+            SetFpfcActive(__instance.transform, allowInput);
         }
 
         [UsedImplicitly]
@@ -63,13 +76,23 @@ namespace Camera2.HarmonyPatches
         private static MethodBase TargetMethod()
         {
             var x = SiraUtilSimpleCameraController.Assembly.GetType("SiraUtil.Tools.FPFC.SimpleCameraController");
-
             var y = x?.GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance);
-            FIELD_SimpleCameraController_AllowInput = x?.GetProperty("AllowInput");
-
-            foundSiraToggle = y != null && FIELD_SimpleCameraController_AllowInput != null;
-
-            return foundSiraToggle ? y : null;
+            if (y == null)
+            {
+                Plugin.Log.Warn("HookFPFCToggle: update method not found!");
+            }
+            _fieldSimpleCameraControllerAllowInput = x?.GetProperty("AllowInput");
+            if (_fieldSimpleCameraControllerAllowInput == null)
+            {
+                Plugin.Log.Warn("HookFPFCToggle: FIELD_SimpleCameraController_AllowInput is null");
+            }
+            
+            FoundSiraToggle = y != null && _fieldSimpleCameraControllerAllowInput != null;
+            if (!FoundSiraToggle)
+            {
+                Plugin.Log.Warn("HookFPFCToggle: foundSiraToggle is false, Harmony will throw an exception now:");
+            }
+            return FoundSiraToggle ? y : null;
         }
 
         [HarmonyPatch(typeof(FirstPersonFlyingController), nameof(FirstPersonFlyingController.OnEnable))]
@@ -79,9 +102,9 @@ namespace Camera2.HarmonyPatches
             // ReSharper disable once InconsistentNaming
             private static void Postfix(Transform ____camera)
             {
-                if (!foundSiraToggle)
+                if (!FoundSiraToggle)
                 {
-                    SetFPFCActive(____camera.transform);
+                    SetFpfcActive(____camera.transform);
                 }
             }
         }

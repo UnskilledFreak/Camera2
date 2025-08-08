@@ -7,11 +7,11 @@ namespace Camera2.Middlewares
 {
     internal class VmcAvatarMiddleware : CamMiddleware, IMHandler
     {
-        private static OscClient sender;
+        private static OscClient _sender;
 
-        private float _prevFov;
-        private Vector3 _prevPos;
-        private Quaternion _prevRot;
+        private static float _prevFov;
+        private static Vector3 _prevPos;
+        private static Quaternion _prevRot;
 
         public bool Pre() => true;
 
@@ -29,9 +29,9 @@ namespace Camera2.Middlewares
 
             try
             {
-                sender ??= new OscClient(Cam.Settings.VmcProtocol.Address);
+                _sender ??= new OscClient(Cam.Settings.VmcProtocol.Address);
 
-                sender.SendCamPos(Cam);
+                _sender.SendCamPos(Cam);
             }
             catch
             {

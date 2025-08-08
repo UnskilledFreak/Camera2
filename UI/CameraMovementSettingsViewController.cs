@@ -52,7 +52,7 @@ namespace Camera2.UI
 
         internal void UpdateList()
         {
-#if PRE_1_40_6
+#if PRE_1_40_8
             scriptsList?.tableView.ClearSelection();
 #else
             scriptsList?.TableView.ClearSelection();
@@ -83,7 +83,7 @@ namespace Camera2.UI
 
             UnityMainThreadTaskScheduler.Factory.StartNew(() =>
             {
-#if PRE_1_40_6
+#if PRE_1_40_8
                 scriptsList?.tableView.ReloadData();
                 //scriptsList?.tableView.ScrollToCellWithIdx();
 #else

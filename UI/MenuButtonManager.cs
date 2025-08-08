@@ -58,7 +58,7 @@ internal class MenuButtonManager : IInitializable, IDisposable
         _menuButtons.RegisterButton(_menuButtonScene);
         //_menuButtons.RegisterButton(_menuButtonScript);
 #endif
-#if PRE_1_40_6
+#if PRE_1_40_8
         GameplaySetup.instance
 #else
         GameplaySetup.Instance
@@ -72,7 +72,7 @@ internal class MenuButtonManager : IInitializable, IDisposable
         _menuButtons.UnregisterButton(_menuButtonScene);
         //_menuButtons.UnregisterButton(_menuButtonScript);
         
-#if PRE_1_40_6
+#if PRE_1_40_8
         GameplaySetup.instance
 #else
         GameplaySetup.Instance

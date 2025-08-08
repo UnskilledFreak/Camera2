@@ -2,7 +2,7 @@
 using Camera2.Managers;
 using HarmonyLib;
 using System.Linq;
-#if PRE_1_40_6
+#if PRE_1_40_8
 using System.Threading.Tasks;
 #endif
 using JetBrains.Annotations;
@@ -95,7 +95,7 @@ namespace Camera2.HarmonyPatches
                 if (CamManager.Cams?.Count > 0)
                 {
                     QualitySettings.vSyncCount = 1;
-#if PRE_1_40_6
+#if PRE_1_40_8
                     var srr = Screen.currentResolution.refreshRate;
 #else
                     var srr = (int)Screen.currentResolution.refreshRateRatio.value;

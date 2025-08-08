@@ -10,7 +10,7 @@ namespace Camera2.HarmonyPatches
     internal static class InitOnMainAvailable
     {
         private static bool isInitialized;
-#if PRE_1_40_6
+#if PRE_1_40_8
         public static bool UseDepthTexture { get; private set; }
 #endif
 
@@ -36,7 +36,7 @@ namespace Camera2.HarmonyPatches
 #else
         private static void Postfix(SmoothCameraController __instance)
         {
-#if PRE_1_40_6
+#if PRE_1_40_8
             UseDepthTexture = false;
 #endif
             
@@ -47,7 +47,7 @@ namespace Camera2.HarmonyPatches
                 {
                     UseDepthTexture = pp.smokeGraphics;
                 }
-#elif PRE_1_40_6
+#elif PRE_1_40_8
                 UseDepthTexture = SceneUtil.GetMainCameraButReally().GetComponent<DepthTextureController>()._settingsManager.settings.quality.smokeGraphics;
 #endif
 #endif

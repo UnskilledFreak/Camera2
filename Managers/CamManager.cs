@@ -17,9 +17,9 @@ namespace Camera2.Managers
 {
     internal static class CamManager
     {
-        private static ConfigHandler _config => ConfigHandler.Instance;
+        private static ConfigHandler Config => ConfigHandler.Instance;
         
-        public static List<Cam2> Cams { get; } = new List<Cam2>();
+        public static List<Cam2> Cams { get; } = [];
         internal static CamerasViewport CustomScreen { get; private set; }
         public static int BaseCullingMask { get; internal set; }
         public static int ClearedBaseCullingMask { get; private set; }
@@ -57,7 +57,7 @@ namespace Camera2.Managers
         {
             var loadedNames = new List<string>();
 
-            foreach (var cam in _config.GetAllCameraFiles())
+            foreach (var cam in Config.GetAllCameraFiles())
             {
                 try
                 {
@@ -189,7 +189,7 @@ namespace Camera2.Managers
             
             Cams.Remove(cam);
 
-            var cfgPath = _config.GetCameraPath(cam.Name);
+            var cfgPath = Config.GetCameraPath(cam.Name);
 
             Object.DestroyImmediate(cam);
 

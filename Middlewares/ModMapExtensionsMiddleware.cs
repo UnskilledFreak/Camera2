@@ -44,7 +44,7 @@ namespace Camera2.Middlewares
                 }
                 
                 //if (!ScenesManager.IsOnCustomScene && !HookFPFCToggle.isInFPFC && ScenesManager.LoadedScene != SceneTypes.PlayingModmap)
-                if (!HookFPFCToggle.isInFPFC && ScenesManager.LoadedScene != SceneTypes.PlayingModmap)
+                if (!HookFPFCToggle.IsInFpfc && ScenesManager.LoadedScene != SceneTypes.PlayingModmap)
                 {
                     //Cam.LogInfo("modmap WITH movement");
                     ScenesManager.SwitchToScene(SceneTypes.PlayingModmap);

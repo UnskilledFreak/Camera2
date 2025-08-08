@@ -1,7 +1,7 @@
 ﻿<vertical child-control-height="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
     <horizontal vertical-fit="PreferredSize" horizontal-fit="PreferredSize" child-expand-width="true" child-expand-height="true" pref-height="7" pref-width="120">
         <page-button pref-width="6" pref-height="6" tags="LeftButton" direction="Left"/>
-        <tab-selector child-expand-width="true" child-control-width="false" tab-tag="tabs" id="TabSelector" page-count="4" left-button-tag="LeftButton" right-button-tag="RightButton"/>
+        <tab-selector tab-tag="tabs" page-count="4" child-expand-width="true" child-control-width="false" left-button-tag="LeftButton" right-button-tag="RightButton"/>
         <page-button pref-width="6" pref-height="6" tags="RightButton" direction="Right"/>
     </horizontal>
 
@@ -65,7 +65,7 @@
                 <checkbox id="ToggleFollowerRotAsPos" text="Use Rotation as Look-At Position Offset" value="FollowerRotAsPos" bind-value="true" apply-on-change="true"/>
                 <checkbox id="ToggleFollowerPosRelative" text="Use Look-At Rotation Position Offset relatively" value="FollowerPosRelative" bind-value="true" apply-on-change="true"/>
                 <checkbox id="ToggleFollowerUseOrganic" text="Use organic rotation" value="FollowerUseOrganic" bind-value="true" apply-on-change="true"/>
-                <dropdown-list-setting id="MenuFollowerRelativeType" text="Relative Offset Type" value="FollowerRelativeType" choices="FollowerRelativeTypes" bind-value="true" apply-on-change="true"/>
+                <dropdown-list-setting id="menuFollowerRotationType" text="Relative Offset Type" value="FollowerRelativeType" choices="FollowerRelativeTypes" bind-value="true" apply-on-change="true"/>
             </modifier-container>
         </vertical>
     </tab>
@@ -217,7 +217,7 @@
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="Display" id="viewRectTab">
+    <tab tags="tabs" tab-name="Display">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
             <horizontal preferred-width="100">
                 <text color="#DDD" font-size="4" align="Center" word-wrapping="true"
@@ -242,13 +242,19 @@
         </vertical>
     </tab>
 
-    <tab tags="tabs" tab-name="Spout">
+    <tab tags="tabs" tab-name="Spout2">
         <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
+            <horizontal preferred-width="100">
+                <text color="#DDD" font-size="3" align="Center" word-wrapping="true"
+                      text="Warning: Spout2 support is an experimental feature. It might not work properly or contains unwanted issues."
+                />
+            </horizontal>
             <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
                 <checkbox text="Enabled" value="SpoutEnabled" bind-value="true" apply-on-change="true" hover-hint="Enable Spout Sender"/>
                 <slider-setting text="Width" min="1" max="16384" increment="1" value="SpoutWidth" bind-value="true" apply-on-change="true" hover-hint="Render resolution width" show-buttons="true" integer-only="true"/>
                 <slider-setting text="Height" min="1" max="16384" increment="1" value="SpoutHeight" bind-value="true" apply-on-change="true" hover-hint="Render resolution height" show-buttons="true" integer-only="true"/>
                 <string-setting text="Channel Name" value="SpoutChannelName" bind-value="true" apply-on-change="true" hover-hint="Channel name to send to"/>
+                <checkbox text="Ignore Render Scale" value="SpoutIgnoreRenderScale" bind-value="true" apply-on-change="true" hover-hint="Forces the camera to use a render scale of 1 and ignoring the setting in general tab"/>
             </modifier-container>
         </vertical>
     </tab>

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Camera2.HarmonyPatches
 {
-#if PRE_1_40_6
+#if PRE_1_40_8
     [HarmonyPatch(typeof(StretchableObstacle), nameof(StretchableObstacle.SetSizeAndColor))]
 #else
     [HarmonyPatch(typeof(StretchableObstacle), nameof(StretchableObstacle.SetAllProperties))]

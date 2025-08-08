@@ -59,7 +59,6 @@ namespace Camera2.Behaviours
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
-            SpoutHandler = new SpoutHandler(this);
         }
 
         public void LogInfo(string message) => Plugin.Log.Info($"Cam '{Name}': {message}");
@@ -137,10 +136,15 @@ namespace Camera2.Behaviours
 
         internal void UpdateRenderTextureAndView()
         {
-            var round = (int)Math.Round(Settings.ViewRect.Width * Screen.width * Settings.RenderScale);
+            if (Settings.Spout.Enabled)
+            {
+                return;
+            }
+            
+            var width = (int)Math.Round(Settings.ViewRect.Width * Screen.width * Settings.RenderScale);
             var height = (int)Math.Round(Settings.ViewRect.Height * Screen.height * Settings.RenderScale);
 
-            var sizeChanged = RenderTexture == null || RenderTexture.width != round || RenderTexture.height != height || RenderTexture.antiAliasing != Settings.AntiAliasing;
+            var sizeChanged = RenderTexture == null || RenderTexture.width != width || RenderTexture.height != height || RenderTexture.antiAliasing != Settings.AntiAliasing;
 
             if (sizeChanged)
             {
@@ -149,13 +153,16 @@ namespace Camera2.Behaviours
                     RenderTexture.Release();
                 }
 
-                RenderTexture = new RenderTexture(round, height, 24)
+                RenderTexture = new RenderTexture(width, height, 24)
                 {
                     //, RenderTextureFormat.ARGB32
-                    useMipMap = false, antiAliasing = Settings.AntiAliasing, anisoLevel = 1, useDynamicScale = false
+                    useMipMap = false, 
+                    antiAliasing = Settings.AntiAliasing, 
+                    anisoLevel = 1, 
+                    useDynamicScale = false
                 };
 
-                Camera.aspect = (float)round / height;
+                Camera.aspect = (float)width / height;
                 Camera.targetTexture = RenderTexture;
 
                 if (WorldCam != null)
@@ -193,7 +200,7 @@ namespace Camera2.Behaviours
         {
             if (Camera != null)
             {
-#if PRE_1_40_6
+#if PRE_1_40_8
                 Camera.depthTextureMode = InitOnMainAvailable.UseDepthTexture || Settings?.PostProcessing.ForceDepthTexture == true ? DepthTextureMode.Depth : DepthTextureMode.None;
 #else
                 Camera.depthTextureMode = HookSettingsManager.UseDepthTexture || Settings?.PostProcessing.ForceDepthTexture == true ? DepthTextureMode.Depth : DepthTextureMode.None;
@@ -250,12 +257,6 @@ namespace Camera2.Behaviours
                 }
             }
 
-            //Cloning post process stuff to make it controlable on a per camera basis
-            //BloomShite.InstantiateBloomForCamera(UCamera).tag = null;
-            //typeof(VisualEffectsController)
-            //.GetField("_depthTextureEnabled", BindingFlags.Instance | BindingFlags.NonPublic)
-            //.SetValue(camClone.GetComponent<VisualEffectsController>(), new BoolSO() { value = UCamera.depthTextureMode != DepthTextureMode.None });
-
             WorldCam = new GameObject("WorldCam").AddComponent<PositionableCam>();
             WorldCam.transform.parent = camClone.transform;
 
@@ -275,7 +276,8 @@ namespace Camera2.Behaviours
             ];
             camClone.AddComponent<CamPostProcessor>().Init(this);
 
-            SpoutHandler.Init();
+            SpoutHandler = camClone.AddComponent<SpoutHandler>();
+            SpoutHandler.Init(this);
 
             LogInfo("loaded");
         }
@@ -376,9 +378,6 @@ namespace Camera2.Behaviours
             Destroy(gameObject);
         }
 
-        protected void Update()
-        {
-            SpoutHandler.UpdateIfDirty();
-        }
+        private void Update() => SpoutHandler.UpdateIfDirty();
     }
 }

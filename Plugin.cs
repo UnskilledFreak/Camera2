@@ -1,4 +1,4 @@
-#if PRE_1_40_6
+#if PRE_1_40_8
 using Camera2.HarmonyPatches;
 #endif
 using Camera2.Managers;
@@ -28,7 +28,7 @@ namespace Camera2
         internal static Material ShaderMatCa;
         internal static Shader ShaderVolumetricBlit;
         internal const string Name = "Camera 2.5";
-        private const string ModdedVersion = "0.4.5";
+        private const string ModdedVersion = "0.5.1";
         internal const string FullName = Name + " Mod " + ModdedVersion;
         internal static readonly string FullInfo = $"Version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}\nby Kinsi55\nmodified by UnskilledFreak\nVersion {ModdedVersion}";
 
@@ -51,7 +51,7 @@ namespace Camera2
             Log.Info($"{Name} mod {ModdedVersion} loaded");
         }
 
-#if PRE_1_40_6
+#if PRE_1_40_8
         private static void LoadShaders()
         {
             void LoadNormalShaders(AssetBundle bundle)

@@ -26,7 +26,7 @@ namespace Camera2.UI
     internal class CameraSettingsViewController : BSMLAutomaticViewController
     {
         internal static Cam2 CurrentCam { get; private set; }
-#if PRE_1_40_6
+#if PRE_1_40_8
         private static int lastTabSelectedIndex;
 #endif
 
@@ -58,62 +58,55 @@ namespace Camera2.UI
         [UsedImplicitly]
         private SceneToggle[] _scenes;
 
-#pragma warning disable CS0649
-
         #region UI Components
 
-        [UIComponent("TogglePivotingOffset"), UsedImplicitly]
+        [UIComponent("TogglePivotingOffset")]
         public ToggleSetting togglePivotingOffset;
 
-        [UIComponent("ToggleFollowerRotAsPos"), UsedImplicitly]
+        [UIComponent("ToggleFollowerRotAsPos")]
         public ToggleSetting toggleFollowerRotAsPos;
 
-        [UIComponent("ToggleFollowerPosRelative"), UsedImplicitly]
+        [UIComponent("ToggleFollowerPosRelative")]
         public ToggleSetting toggleFollowerPosRelative;
 
-        [UIComponent("ToggleFollowerUseOrganic"), UsedImplicitly]
+        [UIComponent("ToggleFollowerUseOrganic")]
         public ToggleSetting toggleFollowerUseOrganic;
 
-        [UIComponent("SliderPreviewSize"), UsedImplicitly]
+        [UIComponent("SliderPreviewSize")]
         public SliderSetting sliderPreviewSize;
 
-        [UIComponent("SliderPosRotOffsetX"), UsedImplicitly]
+        [UIComponent("SliderPosRotOffsetX")]
         public SliderSetting sliderPosRotX;
 
-        [UIComponent("SliderPosRotOffsetY"), UsedImplicitly]
+        [UIComponent("SliderPosRotOffsetY")]
         public SliderSetting sliderPosRotY;
 
-        [UIComponent("SliderPosRotOffsetZ"), UsedImplicitly]
+        [UIComponent("SliderPosRotOffsetZ")]
         public SliderSetting sliderPosRotZ;
 
-        [UIComponent("ToggleModMapExtMoveWithMap"), UsedImplicitly]
+        [UIComponent("ToggleModMapExtMoveWithMap")]
         public ToggleSetting sliderModMapExtMoveWithMap;
 
-        [UIComponent("MenuWorldCamVisibility"), UsedImplicitly]
+        [UIComponent("MenuWorldCamVisibility")]
         public LayoutElement menuWorldCamVisibility;
+        
+        [UIComponent("menuFollowerRotationType")]
+        public LayoutElement menuFollowerRotationType;
 
-        [UIComponent("MenuFollowerRelativeType"), UsedImplicitly]
-        public LayoutElement menuFollowerRelativeType;
-
-        [UIComponent("TabSmoothFollow"), UsedImplicitly]
+        [UIComponent("TabSmoothFollow")]
         public Tab tabSmoothFollow;
 
-        [UIComponent("TabFollow360"), UsedImplicitly]
+        [UIComponent("TabFollow360")]
         public Tab tabFollow360;
 
-        [UIComponent("TabTarget"), UsedImplicitly]
+        [UIComponent("TabTarget")]
         public Tab tabTarget;
 
-        [UIComponent("TabFakeZoom"), UsedImplicitly]
+        [UIComponent("TabFakeZoom")]
         public Tab tabFakeZoom;
 
-        [UIComponent("TabSelector"), UsedImplicitly]
-        public TabSelector tabSelector;
-
         #endregion
-
-#pragma warning restore CS0649
-
+        
         #region UI Getter and Setter
 
         [UsedImplicitly]
@@ -128,7 +121,7 @@ namespace Camera2.UI
                 }
 
                 NotifyPropertyChanged();
-#if PRE_1_40_6
+#if PRE_1_40_8
                 SettingsFlowCoordinator.Instance.CameraListViewController.list.tableView.ReloadData();
 #else
                 SettingsFlowCoordinator.Instance.CameraListViewController.list.TableView.ReloadData();
@@ -207,7 +200,11 @@ namespace Camera2.UI
         internal float RenderScale
         {
             get => CurrentCam.Settings.RenderScale;
-            set => CurrentCam.Settings.RenderScale = value;
+            set
+            {
+                CurrentCam.Settings.RenderScale = value;
+                CurrentCam.SpoutHandler.MarkDirty();
+            }
         }
 
         [UsedImplicitly]
@@ -689,8 +686,8 @@ namespace Camera2.UI
             get => CurrentCam.Settings.Spout.Height;
             set
             {
-                CurrentCam.SpoutHandler.MarkDirty();
                 CurrentCam.Settings.Spout.Height = Math.Max(0, value);
+                CurrentCam.SpoutHandler.MarkDirty();
                 NotifyPropertyChanged();
             }
         }
@@ -701,8 +698,20 @@ namespace Camera2.UI
             get => CurrentCam.Settings.Spout.ChannelName;
             set
             {
-                CurrentCam.SpoutHandler.MarkDirty();
                 CurrentCam.Settings.Spout.ChannelName = value.Length == 0 ? "Camera25" : value;
+                CurrentCam.SpoutHandler.MarkDirty();
+                NotifyPropertyChanged();
+            }
+        }
+
+        [UsedImplicitly]
+        internal bool SpoutIgnoreRenderScale
+        {
+            get => CurrentCam.Settings.Spout.IgnoreRenderScale;
+            set
+            {
+                CurrentCam.Settings.Spout.IgnoreRenderScale = value;
+                CurrentCam.SpoutHandler.MarkDirty();
                 NotifyPropertyChanged();
             }
         }
@@ -767,6 +776,21 @@ namespace Camera2.UI
 
         #endregion
 
+        public void Awake()
+        {
+            // Don't really care which cam it is, this is just for BSML to init
+            CurrentCam = CamManager.Cams.First();
+
+            props ??= typeof(CameraSettingsViewController).GetProperties(BindingFlags.Instance | BindingFlags.NonPublic)
+                .Select(x => x.Name)
+                .ToArray();
+
+            _scenes ??= Enum.GetValues(typeof(SceneTypes))
+                .Cast<SceneTypes>()
+                .Select(x => new SceneToggle { Type = x, Host = this })
+                .ToArray();
+        }
+
         private void SetNewTarget(string target, Vector3? overridePosition = null, Vector3? overrideRotation = null)
         {
             TargetParent = target;
@@ -788,24 +812,9 @@ namespace Camera2.UI
             NotifyTargetPosRotChanged();
         }
 
-        public void Awake()
-        {
-            // Don't really care which cam it is, this is just for BSML to init
-            CurrentCam = CamManager.Cams.First();
-
-            props ??= typeof(CameraSettingsViewController).GetProperties(BindingFlags.Instance | BindingFlags.NonPublic)
-                .Select(x => x.Name)
-                .ToArray();
-
-            _scenes ??= Enum.GetValues(typeof(SceneTypes))
-                .Cast<SceneTypes>()
-                .Select(x => new SceneToggle { Type = x, Host = this })
-                .ToArray();
-        }
-
         internal void ReselectLastTab()
         {
-#if PRE_1_40_6
+#if PRE_1_40_8
             SelectTab(lastTabSelectedIndex);
 #endif
         }
@@ -882,13 +891,13 @@ namespace Camera2.UI
                 x.transform.localScale = new Vector3(1.09f, 1f, 1f);
             }
 
-#if PRE_1_40_6
+#if PRE_1_40_8
             tabSelector.textSegmentedControl.didSelectCellEvent += (control, index) =>
             {
                 lastTabSelectedIndex = index;
             };
 #endif
-            
+
 
             SettingsFlowCoordinator.Instance.ShowSettingsForCam(CamManager.Cams.OrderByDescending(x => x.Settings.Layer).First());
         }
@@ -914,12 +923,13 @@ namespace Camera2.UI
         {
             toggleFollowerPosRelative.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam() && FollowerRotAsPos);
             toggleFollowerUseOrganic.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam() && !FollowerRotAsPos);
+            menuFollowerRotationType.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
         }
 
         private void SelectTab(int index)
         {
             // Apparently this is the best possible way to programmatically switch the selected tab
-#if PRE_1_40_6
+#if PRE_1_40_8
             tabSelector.textSegmentedControl.SelectCellWithNumber(index);
             AccessTools.Method(typeof(TabSelector), "TabSelected").Invoke(tabSelector, new object[]
             {

@@ -46,7 +46,7 @@ namespace Camera2.UI
 #endif
             override void BackButtonWasPressed(ViewController thisTopViewController)
         {
-            ScenesManager.SwitchToScene(HookFPFCToggle.isInFPFC ? SceneTypes.FPFC : SceneTypes.Menu);
+            ScenesManager.SwitchToScene(HookFPFCToggle.IsInFpfc ? SceneTypes.FPFC : SceneTypes.Menu);
             BeatSaberUI.MainFlowCoordinator.DismissFlowCoordinator(this);
         }
     }

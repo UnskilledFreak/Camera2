@@ -16,7 +16,7 @@ namespace Camera2.UI
         private int SceneCount => ScenesManager.Settings.Scenes.Values.Count(x => x.Contains(Name)) + ScenesManager.Settings.CustomScenes.Values.Count(x => x.Contains(Name));
 
         [UsedImplicitly]
-        private string Details => $"{Cam.Settings.Type}, assigned to {SceneCount} {(SceneCount == 1 ? "Scene" : "Scenes")}";
+        private string Details => $"{Cam.Settings.Type}, assigned to {SceneCount} {(SceneCount == 1 ? "Scene" : "Scenes")}" + (Cam.Settings.Spout.Enabled ? " | <color=\"green\">Spout2 output \u2713</color>" : "");
         [UsedImplicitly]
         private string LayerUIText => $"Layer {Cam.Settings.Layer}{(CamManager.Cams.Count(x => x.Settings.Layer == Cam.Settings.Layer) > 1 ? " <color=#d5a145>⚠</color>" : "")}";
 

@@ -12,7 +12,7 @@ namespace Camera2.Utils
         public static bool IsProbablyWallMap(IDifficultyBeatmap map) => IsModCapable && IsModdedMap(map);
         
         public static bool IsModdedMap(IDifficultyBeatmap map) => HasSongCore && IsModCapable && IsModdedMapFunc(map);
-#elif PRE_1_40_6
+#elif PRE_1_40_8
         public static bool IsProbablyWallMap(BeatmapLevel map, BeatmapKey beatmapKey) => IsModCapable && IsModdedMap(map, beatmapKey);
         
         public static bool IsModdedMap(BeatmapLevel map, BeatmapKey beatmapKey) => HasSongCore && IsModCapable && IsModdedMapFunc(map, beatmapKey);
@@ -26,7 +26,7 @@ namespace Camera2.Utils
         // Separate method so we dont throw if theres no SongCore
 #if PRE_1_37_1
         private static bool IsModdedMapFunc(IDifficultyBeatmap map)
-#elif PRE_1_40_6 
+#elif PRE_1_40_8 
         private static bool IsModdedMapFunc(BeatmapLevel map, BeatmapKey beatmapKey)
 #else
         private static bool IsModdedMapFunc(BeatmapKey beatmapKey)
@@ -39,7 +39,7 @@ namespace Camera2.Utils
                     ?.additionalDifficultyData
                     ._requirements
                     .Any(x => x == "Mapping Extensions" || x == "Noodle Extensions") == true;
-#elif PRE_1_40_6
+#elif PRE_1_40_8
                 return map != null && SongCore.Collections.RetrieveDifficultyData(map, beatmapKey)
                     ?.additionalDifficultyData
                     ._requirements

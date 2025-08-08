@@ -61,11 +61,11 @@ namespace Camera2.Middlewares
                 Transform parentToUse = null;
                 var currentReplaySource = GetCurrentReplaySourceIfAny();
 
-                if (Settings.Type == CameraType.FirstPerson && HookFPFCToggle.isInFPFC)
+                if (Settings.Type == CameraType.FirstPerson && HookFPFCToggle.IsInFpfc)
                 {
-                    parentToUse = HookFPFCToggle.fpfcTransform;
+                    parentToUse = HookFPFCToggle.FpfcTransform;
                     currentReplaySource = null;
-                    _useLocalPosition = HookFPFCToggle.isSiraSettingLocalPostionYes;
+                    _useLocalPosition = HookFPFCToggle.IsSiraSettingLocalPostionYes;
                 }
 
                 if (currentReplaySource == null)
@@ -95,7 +95,7 @@ namespace Camera2.Middlewares
 
                         if (Settings.Type == CameraType.FirstPerson && (HookRoomAdjust.Position != Vector3.zero || HookRoomAdjust.Rotation != Quaternion.identity))
                         {
-                            if (!HookFPFCToggle.isInFPFC)
+                            if (!HookFPFCToggle.IsInFpfc)
                             {
                                 targetPosition = (HookRoomAdjust.Rotation * targetPosition) + HookRoomAdjust.Position;
                                 targetRotation = HookRoomAdjust.Rotation * targetRotation;
@@ -116,7 +116,7 @@ namespace Camera2.Middlewares
 
                 if (!TeleportOnNextFrame)
                 {
-                    TeleportOnNextFrame = _lastScene != SceneUtil.CurrentScene || (HookFPFCToggle.isInFPFC && currentReplaySource == null);
+                    TeleportOnNextFrame = _lastScene != SceneUtil.CurrentScene || (HookFPFCToggle.IsInFpfc && currentReplaySource == null);
                 }
             }
 #if !DEBUG

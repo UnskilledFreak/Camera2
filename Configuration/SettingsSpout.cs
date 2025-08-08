@@ -6,6 +6,7 @@ public class SettingsSpout
     public int Width { get; set; }
     public int Height { get; set; }
     public string ChannelName { get; set; }
+    public bool IgnoreRenderScale { get; set; }
 
     public SettingsSpout()
     {
@@ -13,5 +14,6 @@ public class SettingsSpout
         Width = 1920;
         Height = 1080;
         ChannelName = "Camera25";
+        IgnoreRenderScale = true;
     }
 }

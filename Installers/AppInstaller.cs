@@ -16,5 +16,6 @@ internal class AppInstaller : Installer
     public override void InstallBindings()
     {
         Container.BindInstance(_config).AsSingle();
+        Container.Bind<FpfcHandler>().AsSingle().NonLazy();
     }
 }

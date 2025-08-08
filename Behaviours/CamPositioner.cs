@@ -31,7 +31,7 @@ namespace Camera2.Behaviours
             
             var controllers = Resources.FindObjectsOfTypeAll<VRLaserPointer>();
 
-            controller = (!HookFPFCToggle.isInFPFC
+            controller = (!HookFPFCToggle.IsInFpfc
                     ? controllers.LastOrDefault(x => x.isActiveAndEnabled)
                     : controllers.LastOrDefault(x =>
                     {
@@ -79,7 +79,7 @@ namespace Camera2.Behaviours
 
                 grabbedCamera.TransformChain.Calculate();
 
-                if (controller.triggerValue > 0.5f || (HookFPFCToggle.isInFPFC && Input.GetMouseButton(0)))
+                if (controller.triggerValue > 0.5f || (HookFPFCToggle.IsInFpfc && Input.GetMouseButton(0)))
                 {
                     return;
                 }

@@ -13,14 +13,15 @@ namespace Camera2.Behaviours
         
         private static CameraDesktopView TargetCam { get; set; }
         
-        private static Canvas canvas;
-        private static readonly int[][] DeltaSchemes = {
-            new[] { 1, 1, 1, 1 }, // Drag
-            new[] { 0, 1, 1, 0 }, // Resize from bottom right
-            new[] { 1, 0, 0, 1 }, // Resize from top left
-            new[] { 0, 0, 1, 1 }, // Resize from top right
-            new[] { 1, 1, 0, 0 } // Resize from bottom left
-        };
+        private static Canvas _canvas;
+        private static readonly int[][] DeltaSchemes =
+        [
+            [1, 1, 1, 1], // Drag
+            [0, 1, 1, 0], // Resize from bottom right
+            [1, 0, 0, 1], // Resize from top left
+            [0, 0, 1, 1], // Resize from top right
+            [1, 1, 0, 0] // Resize from bottom left
+        ];
 
         private Vector3 _lastMousePos;
         private Vector2 _mouseStartPos01;
@@ -32,9 +33,9 @@ namespace Camera2.Behaviours
         {
             DontDestroyOnLoad(gameObject);
 
-            canvas = gameObject.AddComponent<Canvas>();
+            _canvas = gameObject.AddComponent<Canvas>();
             // I know this logs a stupid warning because VR is active, no way to fix that it seems.
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         }
 
         public CameraDesktopView AddNewView()
@@ -131,7 +132,7 @@ namespace Camera2.Behaviours
 
             _lastScreenRes = curRes;
 
-            if (HookFPFCToggle.isInFPFC)
+            if (HookFPFCToggle.IsInFpfc)
             {
                 if ((int)_currentAction >= 2)
                 {

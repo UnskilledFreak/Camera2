@@ -39,7 +39,7 @@ namespace Camera2.UI
 
         public void Update(int setSelected = -1, bool reloadData = true)
         {
-#if PRE_1_40_6
+#if PRE_1_40_8
             if (_list == null || _list.tableView == null)
 #else
             if (_list == null || _list.TableView == null)
@@ -50,7 +50,7 @@ namespace Camera2.UI
 
             if (reloadData)
             {
-#if PRE_1_40_6
+#if PRE_1_40_8
                 _list.data = Scenes;
                 _list.tableView.ReloadData();
 #else
@@ -64,7 +64,7 @@ namespace Camera2.UI
                 return;
             }
 
-#if PRE_1_40_6
+#if PRE_1_40_8
             _list.tableView.SelectCellWithIdx(setSelected);
             _list.tableView.ScrollToCellWithIdx(setSelected, TableView.ScrollPositionType.Center, false);
 #else

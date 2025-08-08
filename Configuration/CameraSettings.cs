@@ -282,7 +282,7 @@ namespace Camera2.Configuration
 
         public bool IsPositionalCam() => Type == CameraType.Positionable || IsFollowerCam();
 
-        public bool IsFollowerCam() => Parent == null && Type is CameraType.Follower or CameraType.FollowerDrunk;
+        public bool IsFollowerCam() => Type is CameraType.Follower or CameraType.FollowerDrunk;
 
         public void Load(bool loadConfig = true)
         {
