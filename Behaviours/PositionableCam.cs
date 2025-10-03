@@ -27,10 +27,9 @@ namespace Camera2.Behaviours
             normalMaterial ??= new Material(Shader.Find("Standard"));
 
             DontDestroyOnLoad(gameObject);
-
+            
             _camOrigin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             _camOrigin.transform.parent = transform;
-
             _camOrigin.transform.localScale = new Vector3(0.08f, 0.08f, 0.2f);
             _camOrigin.transform.localPosition = new Vector3(0, 0, -(_camOrigin.transform.localScale.x * .3f));
             _camOrigin.transform.localEulerAngles = new Vector3(90f, 0, 0);
@@ -50,8 +49,7 @@ namespace Camera2.Behaviours
         public void SetSource(Cam2 cam)
         {
             Cam = cam;
-
-            _viewMaterial.SetTexture(MainTex, cam.RenderTexture);
+            _viewMaterial.SetTexture(MainTex, Cam.RenderTexture);
             SetPreviewPositionAndSize();
         }
 
@@ -76,7 +74,7 @@ namespace Camera2.Behaviours
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (!(eventData.currentInputModule is VRUIControls.VRInputModule))
+            if (eventData.currentInputModule is not VRUIControls.VRInputModule)
             {
                 return;
             }

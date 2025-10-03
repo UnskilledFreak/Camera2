@@ -18,7 +18,7 @@ namespace Camera2.UI
         private CameraMovementSettingsViewController _cameraMovementSettingsViewController;
         private CameraPreviewViewController _cameraPreviewViewController;
 
-        private Cam2 _lastSelected;
+        internal Cam2 LastSelected { get; private set; }
         private bool _isActive;
 
         [Inject]
@@ -35,15 +35,15 @@ namespace Camera2.UI
 
             _mainFlowCoordinator = mainFlowCoordinator;
             _cameraSettingsViewController = cameraSettingsViewController;
-            CameraListViewController = cameraListViewController;
             _cameraMovementSettingsViewController = cameraMovementSettingsViewController;
             _cameraPreviewViewController = cameraPreviewViewController;
+            CameraListViewController = cameraListViewController;
         }
 
         public void UpdateTitle(Cam2 cam)
         {
             SetTitle($"{Plugin.Name} | {cam.Name}");
-            _lastSelected = cam;
+            LastSelected = cam;
         }
 
         public void ShowSettingsForCam(Cam2 cam, bool reSelect = false)
@@ -98,9 +98,9 @@ namespace Camera2.UI
                     CameraListViewController.Init();
                 }
                 
-                if (_lastSelected != null)
+                if (LastSelected != null)
                 {
-                    ShowSettingsForCam(_lastSelected);
+                    ShowSettingsForCam(LastSelected);
                 }
             }
         }

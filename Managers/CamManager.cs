@@ -18,7 +18,7 @@ namespace Camera2.Managers
     internal static class CamManager
     {
         private static ConfigHandler Config => ConfigHandler.Instance;
-        
+
         public static List<Cam2> Cams { get; } = [];
         internal static CamerasViewport CustomScreen { get; private set; }
         public static int BaseCullingMask { get; internal set; }
@@ -41,7 +41,7 @@ namespace Camera2.Managers
             ScenesManager.Settings.Load(Cams);
 
             XRSettings.gameViewRenderMode = GameViewRenderMode.None;
-            
+
             _ = new GameObject("Cam2_Positioner", typeof(CamPositioner));
         }
 
@@ -107,7 +107,12 @@ namespace Camera2.Managers
          */
         public static void ApplyCameraValues(bool viewLayer = false, bool bitMask = false, bool worldCam = false, bool posRot = false)
         {
-            var collection = viewLayer ? Cams.OrderBy(x => x.IsCurrentlySelectedInSettings ? int.MaxValue : x.Settings.Layer).AsEnumerable() : Cams;
+            var collection = viewLayer
+                ? Cams.OrderBy(x => x.IsCurrentlySelectedInSettings
+                    ? int.MaxValue
+                    : x.Settings.Layer
+                ).AsEnumerable()
+                : Cams;
 
             foreach (var cam in collection)
             {
@@ -160,24 +165,36 @@ namespace Camera2.Managers
             }
 
             Cams.Add(cam);
-            
+
             //Newly added cameras should always be the last child and thus on top
             //ApplyCameraValues(viewLayer: true);
 
             return cam;
         }
 
-        public static Cam2 AddNewCamera(string namePrefix = "Unnamed Camera")
+        private static string GetUniqueName(string name)
         {
-            var nameToUse = namePrefix;
+            var nameToUse = name;
             var i = 2;
 
             while (GetCameraByName(nameToUse) != null)
             {
-                nameToUse = $"{namePrefix} {i++}";
+                nameToUse = $"{name} {i++}";
             }
+            return nameToUse;
+        }
 
-            return InitCamera(nameToUse, false);
+        public static Cam2 DuplicateCamera(Cam2 camera)
+        {
+            var newName = GetUniqueName(camera.Name + " Duplicate");
+            Config.Duplicate(camera.Name, newName);
+            
+            return InitCamera(newName, true, true);
+        }
+        
+        public static Cam2 AddNewCamera(string namePrefix = "Unnamed Camera")
+        {
+            return InitCamera(GetUniqueName(namePrefix), false);
         }
 
         public static void DeleteCamera(Cam2 cam)
@@ -186,7 +203,7 @@ namespace Camera2.Managers
             {
                 return;
             }
-            
+
             Cams.Remove(cam);
 
             var cfgPath = Config.GetCameraPath(cam.Name);

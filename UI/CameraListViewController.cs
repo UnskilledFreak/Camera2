@@ -39,6 +39,15 @@ namespace Camera2.UI
         
         public IEnumerable<CamListCellWrapper> ListDataOrdered => _listData.OrderByDescending(x => x.Cam.Settings.Layer);
 
+        [UIAction("duplicateCam")]
+        public void DuplicateCam()
+        {
+            var duplicate = CamManager.DuplicateCamera(SettingsFlowCoordinator.Instance.LastSelected);
+            _listData.Add(new CamListCellWrapper(duplicate));
+            UpdateCamListUI();
+            SettingsFlowCoordinator.Instance.ShowSettingsForCam(duplicate);
+        }
+
         private void UpdateCamListUI()
         {
             //var x = Sprite.Create(cam.screenImage.material, new Rect(0, 0, cam.renderTexture.width, cam.renderTexture.width), new Vector2(0.5f, 0.5f));

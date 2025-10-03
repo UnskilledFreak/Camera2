@@ -23,7 +23,9 @@ internal class ConfigHandler
         AutoCreateDirectory(_cameraDirectory);
         AutoCreateDirectory(_movementScriptsDirectory);
     }
-    
+
+    public void Duplicate(string original, string newName) => File.Copy(GetCameraPath(original), GetCameraPath(newName), true);
+
     public string GetCameraPath(string name) => Path.Combine(_cameraDirectory, $"{name}.json");
     
     public string GetMovementScriptPath(string name) => Path.Combine(_movementScriptsDirectory, $"{name}.json");

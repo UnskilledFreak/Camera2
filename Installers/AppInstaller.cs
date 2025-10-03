@@ -1,9 +1,10 @@
 using Camera2.Handler;
+using JetBrains.Annotations;
 using Zenject;
 
 namespace Camera2.Installers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+[UsedImplicitly]
 internal class AppInstaller : Installer
 {
     private readonly ConfigHandler _config;
@@ -16,6 +17,8 @@ internal class AppInstaller : Installer
     public override void InstallBindings()
     {
         Container.BindInstance(_config).AsSingle();
-        Container.Bind<FpfcHandler>().AsSingle().NonLazy();
+#if !PRE_1_40_8
+        Container.BindInterfacesTo<FpfcHandler>().AsSingle().NonLazy();
+#endif
     }
 }

@@ -44,11 +44,13 @@ namespace Camera2.Behaviours
                     Graphics.Blit(src, dest, Plugin.ShaderMatLuminanceKey);
                 }
 
+#if PRE_1_40_8
                 if (Settings.PostProcessing.ChromaticAberrationAmount > 0)
                 {
                     Plugin.ShaderMatCa.SetFloat(ChromaticAberration, Settings.PostProcessing.ChromaticAberrationAmount / 1000);
                     Graphics.Blit(dest, dest, Plugin.ShaderMatCa);
-                }
+                }          
+#endif
             }
             else
             {

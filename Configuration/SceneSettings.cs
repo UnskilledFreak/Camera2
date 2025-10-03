@@ -19,13 +19,13 @@ namespace Camera2.Configuration
         private static ConfigHandler _config => ConfigHandler.Instance;
         
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public Dictionary<SceneTypes, List<string>> Scenes = new Dictionary<SceneTypes, List<string>>();
+        public Dictionary<SceneTypes, List<string>> Scenes = new();
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public Dictionary<string, List<string>> CustomScenes = new Dictionary<string, List<string>>();
+        public Dictionary<string, List<string>> CustomScenes = new();
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public Dictionary<KeyCode, string> CustomSceneBindings = new Dictionary<KeyCode, string>();
+        public Dictionary<KeyCode, string> CustomSceneBindings = new();
 
         public bool AutoSwitchFromCustom = false;
         
@@ -67,7 +67,7 @@ namespace Camera2.Configuration
             {
                 if (!Scenes.ContainsKey(type))
                 {
-                    Scenes.Add(type, new List<string>());
+                    Scenes.Add(type, []);
                 }
             }
 

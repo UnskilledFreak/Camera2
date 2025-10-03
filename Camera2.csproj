@@ -42,10 +42,10 @@
         <DefineConstants>TRACE;PRE_1_40_8;V1_37_1;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-Latest' ">
-        <DefineConstants>TRACE;DEBUG;V_1_40_8;</DefineConstants>
+        <DefineConstants>TRACE;DEBUG;V1_40_8;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release-Latest' ">
-        <DefineConstants>TRACE;V_1_40_8;</DefineConstants>
+        <DefineConstants>TRACE;V1_40_8;</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
         <Compile Remove="Utils\BloomShite.cs"/>

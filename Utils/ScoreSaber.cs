@@ -17,7 +17,6 @@ namespace Camera2.Utils
 
         public static bool IsInReplayProp { get; internal set; }
         public static Transform SpectateParent { get; private set; }
-
         private static Camera ReplayCamera { get; set; }
 
         private static MethodBase scoreSaberPlaybackEnabled;

@@ -4,8 +4,9 @@
 	</horizontal>
 	<horizontal>
 		<vertical preferred-width="27">
-			<button click-event="addCamModal" text="Add Camera" horizontal-fit="Unconstrained"/>
-			<button id="deleteButton" click-event="showDelConf" text="Delete Camera" horizontal-fit="Unconstrained"/>
+			<button click-event="addCamModal" text="Add" horizontal-fit="Unconstrained"/>
+			<button on-click="duplicateCam" text="Duplicate" horizontal-fit="Unconstrained"/>
+			<button id="deleteButton" click-event="showDelConf" text="Delete" horizontal-fit="Unconstrained"/>
 			<text text="~_cam2Version" align="Center" font-size="3" font-color="#CC6E3B"/>
 		</vertical>
 		<vertical pad-left="3" pad-right="3">

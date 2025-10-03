@@ -132,7 +132,7 @@ namespace Camera2.Behaviours
 
             _lastScreenRes = curRes;
 
-            if (HookFPFCToggle.IsInFpfc)
+            if (HookFPFCToggle.isInFPFC)
             {
                 if ((int)_currentAction >= 2)
                 {

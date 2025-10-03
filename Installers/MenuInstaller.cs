@@ -1,9 +1,11 @@
+using Camera2.Handler;
 using Camera2.UI;
+using JetBrains.Annotations;
 using Zenject;
 
 namespace Camera2.Installers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+[UsedImplicitly]
 internal class MenuInstaller : Installer
 {
     public override void InstallBindings()
@@ -16,5 +18,8 @@ internal class MenuInstaller : Installer
         Container.Bind<UI.SettingsFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
         Container.Bind<UI.SceneFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
         Container.BindInterfacesTo<MenuButtonManager>().AsSingle();
+        
+        // ugly that this sits here. but it will force Fpfc to behave...
+        FpfcHandler.Instance.ForceUpdate();
     }
 }

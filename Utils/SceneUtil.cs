@@ -30,7 +30,7 @@ namespace Camera2.Utils
             IsInMenu = !IsInSong && ScenesManager.MenuSceneNames.Contains(CurrentScene.name);
 
             // added support for MultiplayerExtensions which adds a scene called MultiplayerEnvironment
-            if (oldScene.name == "GameCore" || oldScene.name == "MultiplayerEnvironment")
+            if (oldScene.name is "GameCore" or "MultiplayerEnvironment")
             {
                 ScoreSaber.IsInReplayProp = false;
                 AudioTimeSyncController = null;

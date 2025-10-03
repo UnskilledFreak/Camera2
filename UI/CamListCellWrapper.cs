@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using BeatSaberMarkupLanguage.Attributes;
 using Camera2.Behaviours;
+using Camera2.Extensions;
 using Camera2.Managers;
 using HMUI;
 using JetBrains.Annotations;
@@ -16,15 +18,39 @@ namespace Camera2.UI
         private int SceneCount => ScenesManager.Settings.Scenes.Values.Count(x => x.Contains(Name)) + ScenesManager.Settings.CustomScenes.Values.Count(x => x.Contains(Name));
 
         [UsedImplicitly]
-        private string Details => $"{Cam.Settings.Type}, assigned to {SceneCount} {(SceneCount == 1 ? "Scene" : "Scenes")}" + (Cam.Settings.Spout.Enabled ? " | <color=\"green\">Spout2 output \u2713</color>" : "");
+        private string Details => string.Join(
+            " | ",
+            new List<string>
+                {
+                    $"{Cam.Settings.Type}",
+                    SceneCount == 0
+                        ? "0 Scenes".ToBSMLRed()
+                        : $"{SceneCount} {(SceneCount == 1 ? "Scene" : "Scenes")}",
+                    Cam.Settings.Spout.Enabled
+                        ? "Spout2 output".ToBSMLGreen()
+                        : ""
+                }
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+        );
+
         [UsedImplicitly]
-        private string LayerUIText => $"Layer {Cam.Settings.Layer}{(CamManager.Cams.Count(x => x.Settings.Layer == Cam.Settings.Layer) > 1 ? " <color=#d5a145>⚠</color>" : "")}";
+        private string LayerUIText
+        {
+            get
+            {
+                var text = $"Layer {Cam.Settings.Layer}"; 
+                var hasDuplicates = CamManager.Cams.Count(x => x.Settings.Layer == Cam.Settings.Layer) > 1;
+                return hasDuplicates 
+                    ? $"{text} ".ToBSMLYellow()
+                    : text;
+            }
+        }
 
 #pragma warning disable CS0649
-        
+
         [UIComponent("bgContainer"), UsedImplicitly]
         private ImageView _bg;
-        
+
 #pragma warning restore CS0649
 
         public CamListCellWrapper(Cam2 cam)

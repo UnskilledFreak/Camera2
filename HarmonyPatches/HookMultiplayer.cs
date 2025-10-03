@@ -33,7 +33,7 @@ namespace Camera2.HarmonyPatches
         private static void Postfix(MultiplayerSpectatorController __instance)
         {
 #if DEBUG
-            Plugin.Log.Info($"MultiplayerSpectatorController.Start()");
+            Plugin.Log.Info("MultiplayerSpectatorController.Start()");
 #endif
             _instance = __instance;
             ScenesManager.ActiveSceneChanged();

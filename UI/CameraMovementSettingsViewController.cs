@@ -4,6 +4,7 @@ using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using Camera2.Behaviours;
+using Camera2.Extensions;
 using Camera2.Managers;
 using HMUI;
 using IPA.Utilities.Async;
@@ -15,7 +16,6 @@ namespace Camera2.UI
     [HotReload(RelativePathToLayout = "Views.CameraMovementSettings.bsml")]
     public class CameraMovementSettingsViewController : BSMLAutomaticViewController
     {
-       
         internal Cam2 CurrentCam { get; private set; }
 
         [UIComponent("movementScripts")]
@@ -24,7 +24,7 @@ namespace Camera2.UI
 
         [UsedImplicitly]
         [UIValue("scripts")]
-        internal List<object> AvailableScripts { get; } = new List<object>();
+        internal List<object> AvailableScripts { get; } = [];
 
         [UsedImplicitly]
         [UIAction("script-selected")]
@@ -70,8 +70,8 @@ namespace Camera2.UI
                         };
                         tmp.IsEnabled = Exists(tmp);
                         tmp.Enabled = tmp.IsEnabled
-                                ? "<color=\"green\">in use \u2713</color>"
-                                : "<color=\"red\">not used \u2717</color>";
+                                ? "in use".ToBSMLGreen()
+                                : "not used".ToBSMLRed();
 
                         return tmp;
                     })

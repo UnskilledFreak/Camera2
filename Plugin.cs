@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Camera2.Behaviours.Spout;
 using Camera2.Handler;
+using Camera2.HarmonyPatches;
 using Camera2.Installers;
 using JetBrains.Annotations;
 using SiraUtil.Zenject;
@@ -22,10 +23,16 @@ namespace Camera2
     [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin
     {
+        // if you want to know if the player is running Kinsi's original mod
+        // or my modded version, check if this property exists, if so, it's the modded one :3
+        [UsedImplicitly]
+        public const bool ImModded = true;
         internal static IPALogger Log { get; private set; }
         internal static Material ShaderMatLuminanceKey;
         internal static Material ShaderMatOutline;
+#if PRE_1_40_8
         internal static Material ShaderMatCa;
+#endif
         internal static Shader ShaderVolumetricBlit;
         internal const string Name = "Camera 2.5";
         private const string ModdedVersion = "0.5.1";
@@ -36,16 +43,16 @@ namespace Camera2
 
         [UsedImplicitly]
         [Init]
-        public Plugin(IPALogger logger, Zenjector zenjector)
+        public Plugin(IPALogger logger, Zenjector injector)
         {
             Log = logger;
-
+            Log.Info($"{Name} mod {ModdedVersion} loading...");
+            
             ConfigHandler.Instance = new ConfigHandler();
 
-            zenjector.Install<AppInstaller>(Location.App, ConfigHandler.Instance);
-            zenjector.Install<MenuInstaller>(Location.Menu);
+            injector.Install<AppInstaller>(Location.App, ConfigHandler.Instance);
+            injector.Install<MenuInstaller>(Location.Menu);
 
-            Log.Info($"{Name} mod {ModdedVersion} loading...");
             LoadShaders();
             SpoutLoader.LoadPlugin();
             Log.Info($"{Name} mod {ModdedVersion} loaded");
@@ -108,9 +115,7 @@ namespace Camera2
             Harmony = new Harmony("Kinsi55.BeatSaber.Cam2");
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-#if V1_29_1
             GlobalFPSCap.Init();
-#endif
 
             MovementScriptManager.LoadMovementScripts();
 
