@@ -24,28 +24,34 @@
         <DisableZipRelease>True</DisableZipRelease>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-1.29.1' ">
-        <DefineConstants>TRACE;DEBUG;PRE_1_37_1;PRE_1_40_8;V1_29_1;</DefineConstants>
+        <DefineConstants>TRACE;DEBUG;PRE_1_37_1;PRE_1_40_8;PRE_1_42_2;V1_29_1;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release-1.29.1' ">
-        <DefineConstants>TRACE;PRE_1_37_1;PRE_1_40_8;V1_29_1;</DefineConstants>
+        <DefineConstants>TRACE;PRE_1_37_1;PRE_1_40_8;PRE_1_42_2;V1_29_1;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-1.34.2' ">
-        <DefineConstants>TRACE;DEBUG;PRE_1_37_1;PRE_1_40_8;V1_34_2;</DefineConstants>
+        <DefineConstants>TRACE;DEBUG;PRE_1_37_1;PRE_1_40_8;PRE_1_42_2;V1_34_2;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release-1.34.2' ">
-        <DefineConstants>TRACE;PRE_1_37_1;PRE_1_40_8;V1_34_2;</DefineConstants>
+        <DefineConstants>TRACE;PRE_1_37_1;PRE_1_40_8;PRE_1_42_2;V1_34_2;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-1.37.1' ">
-        <DefineConstants>TRACE;DEBUG;PRE_1_40_8;V1_37_1;</DefineConstants>
+        <DefineConstants>TRACE;DEBUG;PRE_1_40_8;PRE_1_42_2;V1_37_1;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release-1.37.1' ">
-        <DefineConstants>TRACE;PRE_1_40_8;V1_37_1;</DefineConstants>
+        <DefineConstants>TRACE;PRE_1_40_8;PRE_1_42_2;V1_37_1;</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug-1.40.8' ">
+        <DefineConstants>TRACE;DEBUG;PRE_1_42_2;V1_40_8;</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release-1.40.8' ">
+        <DefineConstants>TRACE;PRE_1_42_2;V1_37_1;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-Latest' ">
-        <DefineConstants>TRACE;DEBUG;V1_40_8;</DefineConstants>
+        <DefineConstants>TRACE;DEBUG;V1_42_2;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release-Latest' ">
-        <DefineConstants>TRACE;V1_40_8;</DefineConstants>
+        <DefineConstants>TRACE;V1_42_2;</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
         <Compile Remove="Utils\BloomShite.cs"/>
@@ -58,6 +64,7 @@
     </ItemGroup>
     <ItemGroup>
         <Reference Include="Microsoft.CSharp"/>
+        <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Data.DataSetExtensions"/>
         <Reference Include="System.Data"/>
@@ -81,9 +88,15 @@
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.GameSettings.dll</HintPath>
             <Private>false</Private>
         </Reference>
-        <Reference Include="BeatSaber.Settings" Condition="$(GameVersion) == '1.40.8'">
+        <Reference Include="BeatSaber.Multiplayer.Core" Condition="$(GameVersion) == '1.42.2'">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.Multiplayer.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="BeatSaber.Settings" Condition="$(GameVersion) == '1.40.8' Or $(GameVersion) == '1.42.2'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.Settings.dll</HintPath>
             <Private>false</Private>
+        </Reference>
+        <Reference Include="BeatSaber.ViewSystem" Condition="$(GameVersion) == '1.42.2'">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.ViewSystem.dll</HintPath>
         </Reference>
         <Reference Include="BeatSaber.PerformancePresets" Condition="$(GameVersion) == '1.37.1'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.PerformancePresets.dll</HintPath>
@@ -111,7 +124,7 @@
             <Private>false</Private>
             <SpecificVersion>False</SpecificVersion>
         </Reference>
-        <Reference Include="GameInit" Condition="$(GameVersion) == '1.40.8'">
+        <Reference Include="GameInit" Condition="$(GameVersion) == '1.40.8' Or $(GameVersion) == '1.42.2'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GameInit.dll</HintPath>
             <Private>false</Private>
         </Reference>
@@ -141,7 +154,10 @@
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMRendering.dll</HintPath>
             <Private>false</Private>
         </Reference>
-        <Reference Include="Heck">
+        <Reference Include="SegmentedControl" Condition="$(GameVersion) == '1.42.2'">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\SegmentedControl.dll</HintPath>
+        </Reference>
+        <Reference Include="Heck" Condition="$(GameVersion) != '1.42.2'">
             <HintPath>$(BeatSaberDir)\Plugins\Heck.dll</HintPath>
             <Private>false</Private>
         </Reference>
@@ -158,14 +174,17 @@
             <Private>false</Private>
         </Reference>
         <Reference Include="System.Data.DataSetExtensions"/>
-        <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL" Condition="$(GameVersion) != '1.40.8'">
+        <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL" Condition="$(GameVersion) != '1.40.8' AND $(GameVersion) != '1.42.2'">
             <SpecificVersion>False</SpecificVersion>
             <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="0Harmony">
+        <Reference Include="0Harmony" Condition="$(GameVersion) == '1.40.8'">
             <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
             <Private>False</Private>
+        </Reference>
+        <Reference Include="0Harmony" Condition="$(GameVersion) == '1.42.2'">
+            <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
         </Reference>
         <Reference Include="Oculus.VR" Condition="$(GameVersion) == '1.29.1'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Oculus.VR.dll</HintPath>
@@ -189,7 +208,15 @@
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="Unity.Mathematics" Condition="$(GameVersion) == '1.40.8'">
+        <Reference Include="Unity.Mathematics" Condition="$(GameVersion) != '1.40.8'">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.Mathematics.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Unity.Mathematics" Condition="$(GameVersion) != '1.40.8'">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.Mathematics.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$(GameVersion) == '1.42.2'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.Mathematics.dll</HintPath>
             <Private>False</Private>
         </Reference>
@@ -268,6 +295,9 @@
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
             <Private>False</Private>
         </Reference>
+        <Reference Include="Newtonsoft.Json" Condition="$(GameVersion) == '1.42.2'">
+            <HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="BeatSaberModdingTools.Tasks">
@@ -289,7 +319,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         -->
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" Condition="$(GameVersion) != '1.42.2'"/>
     </ItemGroup>
     <ItemGroup>
         <None Include="Utils\BloomShite.cs"/>

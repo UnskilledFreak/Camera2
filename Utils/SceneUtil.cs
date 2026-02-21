@@ -14,8 +14,14 @@ namespace Camera2.Utils
         public static bool IsInSong { get; private set; }
         public static AudioTimeSyncController AudioTimeSyncController { get; private set; }
         public static bool HasSongPlayer => AudioTimeSyncController != null;
+#if PRE_1_42_2
         public static bool IsSongPlaying => HasSongPlayer && AudioTimeSyncController.state == AudioTimeSyncController.State.Playing;
         public static bool IsInMultiplayer => HookMultiplayer.instance != null && HookMultiplayer.instance.isConnected;
+#else
+        public static bool IsSongPlaying => HasSongPlayer && AudioTimeSyncController.state == IAudioTimeSource.State.Playing;
+        public static bool IsInMultiplayer => HookMultiplayer.instance != null && HookMultiplayer.instance._lobbyGameStateController.state != MultiplayerLobbyState.None;
+#endif
+        
 
         public static GameObject GetMainCameraButReally()
         {

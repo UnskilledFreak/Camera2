@@ -1,4 +1,7 @@
 ﻿using System;
+#if V1_42_2
+using System.Linq;
+#endif
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -24,7 +27,12 @@ namespace Camera2.Behaviours
         public void Awake()
         {
             hoverMaterial ??= new Material(Shader.Find("Hidden/Internal-DepthNormalsTexture"));
+#if PRE_1_42_2
             normalMaterial ??= new Material(Shader.Find("Standard"));
+            #else
+            normalMaterial ??= new Material(Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name == "MenuShockwave"));
+#endif
+            
 
             DontDestroyOnLoad(gameObject);
             
