@@ -16,7 +16,7 @@ namespace Camera2.Extensions
         }
 
         public static string ToBSMLGreen(this string input, bool addIcon = true) => GetColorString("green", input, "\u2713", addIcon);
-        public static string ToBSMLRed(this string input, bool addIcon = true) => GetColorString("red", input, "\u2717", addIcon);
+        public static string ToBSMLRed(this string input, bool addIcon = true) => GetColorString("red", input, "\u00D7", addIcon);
         public static string ToBSMLYellow(this string input, bool addIcon = true) => GetColorString("#d5a145", input, "\u26A0", addIcon);
         //public static string ToBSMLYellow(this string input, bool addIcon = true) => GetColorString("#d5a145", input, "⚠", addIcon);
 
