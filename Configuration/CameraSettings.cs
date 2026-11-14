@@ -37,11 +37,12 @@ namespace Camera2.Configuration
         private Vector3 _targetPos = Vector3.zero;
         private Vector3 _targetRot = Vector3.zero;
 
-        private const float ParentLookupInterval = 0.5f;
+        internal const float MinParentLookupDelay = 0.01f;
+        internal const float MaxParentLookupDelay = 5f;
 
         [JsonIgnore]
         private Transform _parent;
-        private float _nextParentLookup;
+        private float _lastParentLookup = float.NegativeInfinity;
 
         public SettingsMultiplayer Multiplayer { get; private set; }
         public SettingsSmoothFollow SmoothFollow { get; }
@@ -253,12 +254,12 @@ namespace Camera2.Configuration
                     return _parent;
                 }
 
-                if (Time.unscaledTime < _nextParentLookup)
+                if (Time.unscaledTime - _lastParentLookup < SmoothFollow.TargetParentLookupDelay)
                 {
                     return _parent;
                 }
 
-                _nextParentLookup = Time.unscaledTime + ParentLookupInterval;
+                _lastParentLookup = Time.unscaledTime;
 
                 var tmp = GameObject.Find(SmoothFollow.TargetParent)?.transform;
                 if (tmp?.gameObject.activeInHierarchy ?? false)
@@ -288,7 +289,7 @@ namespace Camera2.Configuration
         public void ParentReset()
         {
             _parent = null;
-            _nextParentLookup = 0f;
+            _lastParentLookup = float.NegativeInfinity;
         }
 
         public bool IsPositionalCam() => Type == CameraType.Positionable || IsFollowerCam();

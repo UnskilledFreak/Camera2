@@ -1,6 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+#if !PRE_1_40_8
+using UnityEngine.Rendering;
+#endif
 
 namespace Camera2.Behaviours
 {
@@ -27,7 +30,7 @@ namespace Camera2.Behaviours
 #if PRE_1_40_8
             normalMaterial ??= new Material(Shader.Find("Standard")) { color = new Color(255, 255, 175, 0.7f) };
 #else
-            normalMaterial ??= new Material(Plugin.ShaderVolumetricBlit);
+            normalMaterial ??= CreateNormalMaterial();
 #endif
             
 
@@ -50,6 +53,25 @@ namespace Camera2.Behaviours
             _camPreview.GetComponent<MeshRenderer>().material = _viewMaterial;
         }
         
+#if !PRE_1_40_8
+        private static Material CreateNormalMaterial()
+        {
+            var shader = Shader.Find("Hidden/Internal-Colored");
+            if (shader == null)
+            {
+                return new Material(Plugin.ShaderVolumetricBlit) { mainTexture = Texture2D.whiteTexture };
+            }
+
+            var material = new Material(shader) { color = new Color(1f, 1f, 1f, 0f) };
+            material.SetInt("_SrcBlend", (int)BlendMode.One);
+            material.SetInt("_DstBlend", (int)BlendMode.Zero);
+            material.SetInt("_Cull", (int)CullMode.Back);
+            material.SetInt("_ZWrite", 1);
+
+            return material;
+        }
+#endif
+
         private void OnDestroy()
         {
             Destroy(_viewMaterial);

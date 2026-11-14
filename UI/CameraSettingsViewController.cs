@@ -85,6 +85,9 @@ namespace Camera2.UI
         [UIComponent("ToggleModMapExtMoveWithMap")]
         public ToggleSetting sliderModMapExtMoveWithMap;
 
+        [UIComponent("SliderFollowerParentLookupDelay")]
+        public SliderSetting sliderFollowerParentLookupDelay;
+
         [UIComponent("MenuWorldCamVisibility")]
         public LayoutElement menuWorldCamVisibility;
         
@@ -348,6 +351,20 @@ namespace Camera2.UI
         {
             get => CurrentCam.Settings.ModMapExtensions.AutoHideHUD;
             set => CurrentCam.Settings.ModMapExtensions.AutoHideHUD = value;
+        }
+
+        [UsedImplicitly]
+        internal float ModMapExtParentLookupDelay
+        {
+            get => CurrentCam.Settings.ModMapExtensions.ParentLookupDelay;
+            set => CurrentCam.Settings.ModMapExtensions.ParentLookupDelay = value;
+        }
+
+        [UsedImplicitly]
+        internal float FollowerParentLookupDelay
+        {
+            get => CurrentCam.Settings.SmoothFollow.TargetParentLookupDelay;
+            set => CurrentCam.Settings.SmoothFollow.TargetParentLookupDelay = value;
         }
 
         [UsedImplicitly]
@@ -732,6 +749,10 @@ namespace Camera2.UI
         [UsedImplicitly]
         public string FormatThreeDecimals(float value) => value.ToString("N3");
 
+        [UIAction("FormatSeconds")]
+        [UsedImplicitly]
+        public string FormatSeconds(float value) => $"{value:N2} s";
+
         #endregion
 
         #region UI Buttons
@@ -920,6 +941,7 @@ namespace Camera2.UI
             toggleFollowerPosRelative.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
             sliderPreviewSize.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             sliderModMapExtMoveWithMap.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
+            sliderFollowerParentLookupDelay.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
             menuWorldCamVisibility.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             tabSmoothFollow.IsVisible = Type == CameraType.FirstPerson;
             tabFollow360.IsVisible = CurrentCam.Settings.IsPositionalCam();
