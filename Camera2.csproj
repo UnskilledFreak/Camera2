@@ -336,6 +336,10 @@
         <EmbeddedResource Include="UI\Views\CameraSettings.bsml"/>
         <EmbeddedResource Include="UI\Views\CustomScenesList.bsml"/>
         <EmbeddedResource Include="UI\Views\SceneView.bsml"/>
+        <EmbeddedResource Include="UI\Views\ScriptList.bsml"/>
+        <EmbeddedResource Include="UI\Views\ScriptPreview.bsml"/>
+        <EmbeddedResource Include="UI\Views\ScriptStepList.bsml"/>
+        <EmbeddedResource Include="UI\Views\ScriptStepSettings.bsml"/>
         <!-- version specific -->
         <!--<EmbeddedResource Include="UI\Views\$(BSMLFolder)\CustomSceneList.bsml" LogicalName="$(AssemblyName).UI.BSML.Empty.bsml" />-->
         <!-- shaders -->

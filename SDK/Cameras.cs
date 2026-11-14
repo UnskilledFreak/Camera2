@@ -12,13 +12,13 @@ namespace Camera2.SDK
         /// names of all cameras available
         /// </summary>
         [UsedImplicitly]
-        public static IEnumerable<string> Available => CamManager.Cams.Select(x => x.Name).AsEnumerable();
+        public static IEnumerable<string> Available => CamManager.Cams.Where(x => !x.IsTemporary).Select(x => x.Name).AsEnumerable();
 
         /// <summary>
         /// Names of all cameras which are currently active
         /// </summary>
         [UsedImplicitly]
-        public static IEnumerable<string> Active => CamManager.Cams.Where(x => x.gameObject.activeSelf).Select(x => x.Name);
+        public static IEnumerable<string> Active => CamManager.Cams.Where(x => !x.IsTemporary && x.gameObject.activeSelf).Select(x => x.Name);
 
         /// <summary>
         /// Enables or disables a given camera

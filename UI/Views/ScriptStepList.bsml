@@ -1,0 +1,53 @@
+﻿<vertical xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
+    <horizontal bg="panel-top-gradient" anchor-min-y="-1">
+        <text text="Steps" align="Center"/>
+    </horizontal>
+    <horizontal>
+        <vertical preferred-width="27">
+            <button id="addButton" on-click="AddStep" text="Add" horizontal-fit="Unconstrained"
+                    hover-hint="Adds a step behind the selected one, at the current pose of the editor camera"
+            />
+            <button id="deleteButton" on-click="DeleteStep" text="Delete" horizontal-fit="Unconstrained"/>
+            <button id="moveUpButton" on-click="MoveStepUp" text="Move up" horizontal-fit="Unconstrained"/>
+            <button id="moveDownButton" on-click="MoveStepDown" text="Move down" horizontal-fit="Unconstrained"/>
+        </vertical>
+        <vertical pad-left="3" pad-right="3">
+            <custom-list id="stepList" select-cell="SelectStep" contents="Steps" visible-cells="5" stick-scrolling="true">
+                <vertical id="bgContainer" bg="round-rect-panel" pad="1" horizontal-fit="Unconstrained">
+                    <horizontal>
+                        <text text="~Name" align="MidlineLeft" font-size="3"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="~Details" align="MidlineLeft" font-size="2.3" font-color="#BBB"/>
+                    </horizontal>
+                </vertical>
+            </custom-list>
+        </vertical>
+        <vertical preferred-width="4">
+            <page-button event-click="stepList#PageUp" direction="Up" pref-height="3" pref-width="4"/>
+            <page-button event-click="stepList#PageDown" direction="Down" pref-height="3" pref-width="4"/>
+        </vertical>
+    </horizontal>
+    <horizontal horizontal-fit="PreferredSize" pad-top="1">
+        <vertical preferred-width="80" spacing="1">
+            <button text="Take pose from editor camera" on-click="TakePose" horizontal-fit="Unconstrained"
+                    hover-hint="Writes the position and rotation of the editor camera into the selected step, e.g. after dragging it"
+            />
+            <horizontal spacing="2">
+                <vertical preferred-width="25">
+                    <button text="Play" on-click="PlayScript" horizontal-fit="Unconstrained"
+                            hover-hint="Plays the whole script on the editor camera, or continues it when paused"
+                    />
+                </vertical>
+                <vertical preferred-width="25">
+                    <button text="Pause" on-click="PauseScript" horizontal-fit="Unconstrained"
+                            hover-hint="Freezes the camera where it is right now, press again to continue"
+                    />
+                </vertical>
+                <vertical preferred-width="25">
+                    <button text="Stop" on-click="StopScript" horizontal-fit="Unconstrained"/>
+                </vertical>
+            </horizontal>
+        </vertical>
+    </horizontal>
+</vertical>

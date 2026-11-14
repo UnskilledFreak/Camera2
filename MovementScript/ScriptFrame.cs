@@ -18,11 +18,17 @@ namespace Camera2.MovementScript
         [JsonIgnore]
         public Quaternion Rotation = Quaternion.identity;
 
+        private Vector3 _rotationEuler = Vector3.zero;
+
         [JsonConverter(typeof(Vector3Converter)), JsonProperty("rotation")]
         public Vector3 RotationEuler
         {
-            get => Rotation.eulerAngles;
-            set => Rotation = Quaternion.Euler(value);
+            get => _rotationEuler;
+            set
+            {
+                _rotationEuler = value;
+                Rotation = Quaternion.Euler(value);
+            }
         }
 
 
@@ -44,5 +50,7 @@ namespace Camera2.MovementScript
         public bool OnFollowerIgnoreRotation;
 
         public bool OnFollowerEnableFakeZoom;
+
+        public ScriptFrame Clone() => (ScriptFrame)MemberwiseClone();
     }
 }

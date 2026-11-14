@@ -46,7 +46,7 @@ namespace Camera2.Managers
         }
 
         [CanBeNull]
-        public static Cam2 GetCameraByName(string name) => Cams.FirstOrDefault(x => x.Name == name);
+        public static Cam2 GetCameraByName(string name) => Cams.FirstOrDefault(x => !x.IsTemporary && x.Name == name);
 
         public static void CompleteReload()
         {
@@ -79,7 +79,7 @@ namespace Camera2.Managers
 
             if (reload)
             {
-                foreach (var deletedCam in Cams.Where(x => !loadedNames.Contains(x.Name)))
+                foreach (var deletedCam in Cams.Where(x => !x.IsTemporary && !loadedNames.Contains(x.Name)).ToList())
                 {
                     Object.Destroy(deletedCam);
                     Cams.Remove(deletedCam);
@@ -197,6 +197,26 @@ namespace Camera2.Managers
             return InitCamera(GetUniqueName(namePrefix), false);
         }
 
+        public static Cam2 AddTemporaryCamera()
+        {
+            var cam = new GameObject("Cam2_Temporary").AddComponent<Cam2>();
+            cam.IsTemporary = true;
+
+            try
+            {
+                cam.Init("", CustomScreen.AddNewView());
+            }
+            catch
+            {
+                Object.DestroyImmediate(cam);
+                throw;
+            }
+
+            Cams.Add(cam);
+
+            return cam;
+        }
+
         public static void DeleteCamera(Cam2 cam)
         {
             if (!Cams.Contains(cam))
@@ -206,9 +226,15 @@ namespace Camera2.Managers
 
             Cams.Remove(cam);
 
+            var isTemporary = cam.IsTemporary;
             var cfgPath = Config.GetCameraPath(cam.Name);
 
             Object.DestroyImmediate(cam);
+
+            if (isTemporary)
+            {
+                return;
+            }
 
             if (File.Exists(cfgPath))
             {

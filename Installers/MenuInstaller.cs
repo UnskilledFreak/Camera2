@@ -15,8 +15,13 @@ internal class MenuInstaller : Installer
         Container.Bind<CameraMovementSettingsViewController>().FromNewComponentAsViewController().AsSingle();
         Container.Bind<CameraPreviewViewController>().FromNewComponentAsViewController().AsSingle();
         Container.Bind<SceneViewController>().FromNewComponentAsViewController().AsSingle();
+        Container.Bind<ScriptListViewController>().FromNewComponentAsViewController().AsSingle();
+        Container.Bind<ScriptStepSettingsViewController>().FromNewComponentAsViewController().AsSingle();
+        Container.Bind<ScriptStepListViewController>().FromNewComponentAsViewController().AsSingle();
+        Container.Bind<ScriptPreviewViewController>().FromNewComponentAsViewController().AsSingle();
         Container.Bind<UI.SettingsFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
         Container.Bind<UI.SceneFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
+        Container.Bind<UI.ScriptFlowCoordinator>().FromNewComponentOnNewGameObject().AsSingle();
         Container.BindInterfacesTo<MenuButtonManager>().AsSingle();
         
         // ugly that this sits here. but it will force Fpfc to behave...

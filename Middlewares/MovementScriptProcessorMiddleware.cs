@@ -20,6 +20,7 @@ namespace Camera2.Middlewares
         private float _lastAnimTime;
         private ScriptFrame TargetScriptFrame => _loadedScript.Frames[_frameIndex];
         private bool _wasInAndIsFinished;
+        private bool _isPaused;
 
         private void Reset()
         {
@@ -27,7 +28,9 @@ namespace Camera2.Middlewares
             {
                 return;
             }
-            
+
+            _isPaused = false;
+
             if (Transformer != null)
             {
                 Transformer.Position = Vector3.zero;
@@ -80,6 +83,11 @@ namespace Camera2.Middlewares
                 return true;
             }
 
+            if (_isPaused && _loadedScript != null)
+            {
+                return true;
+            }
+
             if (_loadedScript == null)
             {
                 _loadedScript = MovementScriptManager.GetRandomFromPossibles(Settings.MovementScript.ScriptList);
@@ -96,6 +104,17 @@ namespace Camera2.Middlewares
                 Cam.LogInfo($"Applying Movement script {_loadedScript.Name} for camera {Cam.Name}");
 
                 AddTransformer(TransformerTypeAndOrder.MovementScriptProcessor);
+            }
+
+            if (!_loadedScript.IsPlayable)
+            {
+                Reset();
+                return true;
+            }
+
+            if (_frameIndex >= _loadedScript.Frames.Count)
+            {
+                _frameIndex = 0;
             }
 
             if (_loadedScript.SyncToSong && SceneUtil.IsInSong)
@@ -217,6 +236,17 @@ namespace Camera2.Middlewares
         public void ForceReset()
         {
             _wasInAndIsFinished = false;
+        }
+
+        internal void StopScript()
+        {
+            _wasInAndIsFinished = false;
+            Reset();
+        }
+
+        internal void SetPaused(bool isPaused)
+        {
+            _isPaused = isPaused;
         }
     }
 }

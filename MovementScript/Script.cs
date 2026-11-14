@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using Camera2.Enums;
 using Camera2.Handler;
 using Camera2.Utils;
@@ -12,10 +14,10 @@ namespace Camera2.MovementScript
     internal class Script
     {
         [JsonProperty("syncToSong")] 
-        public bool SyncToSong { get; private set; }
+        public bool SyncToSong { get; set; }
 
-        [JsonProperty("loop")] 
-        public bool Loop { get; private set; } = true;
+        [JsonProperty("loop"), DefaultValue(true)] 
+        public bool Loop { get; set; } = true;
 
         public List<ScriptFrame> Frames { get; } = new List<ScriptFrame>();
 
@@ -26,9 +28,12 @@ namespace Camera2.MovementScript
         public string Name { get; set; } = "";
         
         [JsonIgnore]
-        private string Path { get; set; } = "";
+        private string Path => ConfigHandler.Instance.GetMovementScriptPath(Name);
 
-        private void PopulateTimes()
+        [JsonIgnore]
+        public bool IsPlayable => Frames.Count >= 2;
+
+        public void PopulateTimes()
         {
             var time = 0f;
             foreach (var frame in Frames)
@@ -52,7 +57,6 @@ namespace Camera2.MovementScript
             var script = new Script
             {
                 Name = name,
-                Path = scriptPath,
             };
 
             var scriptContent = File.ReadAllText(scriptPath);
@@ -95,6 +99,52 @@ namespace Camera2.MovementScript
             script.PopulateTimes();
 
             return script;
+        }
+
+        public static Script Create(string name)
+        {
+            var script = new Script { Name = name };
+            script.Save();
+
+            return script;
+        }
+
+        public Script Duplicate(string newName)
+        {
+            var copy = new Script
+            {
+                Name = newName,
+                SyncToSong = SyncToSong,
+                Loop = Loop
+            };
+            copy.Frames.AddRange(Frames.Select(x => x.Clone()));
+            copy.PopulateTimes();
+            copy.Save();
+
+            return copy;
+        }
+
+        public void Rename(string newName)
+        {
+            var oldPath = Path;
+            Name = newName;
+
+            if (File.Exists(oldPath))
+            {
+                File.Move(oldPath, Path);
+            }
+            else
+            {
+                Save();
+            }
+        }
+
+        public void Delete()
+        {
+            if (File.Exists(Path))
+            {
+                File.Delete(Path);
+            }
         }
 
         public void Save()

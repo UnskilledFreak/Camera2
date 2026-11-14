@@ -42,6 +42,7 @@ namespace Camera2.Behaviours
         internal IMHandler[] Middlewares { get; private set; }
         internal float TimeSinceLastRender { get; private set; }
         internal bool Destroying { get; private set; }
+        internal bool IsTemporary { get; set; }
 
         internal Transformer Transformer;
         internal TransformChain TransformChain;
@@ -376,6 +377,17 @@ namespace Camera2.Behaviours
             if (_shield != null)
             {
                 Destroy(_shield.gameObject);
+            }
+
+            if (RenderTexture != null)
+            {
+                if (Camera != null)
+                {
+                    Camera.targetTexture = null;
+                }
+
+                RenderTexture.Release();
+                Destroy(RenderTexture);
             }
 
             Destroy(gameObject);

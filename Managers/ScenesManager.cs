@@ -187,7 +187,7 @@ namespace Camera2.Managers
                 var isContained = cams?.Contains(cam.Name);
                 
                 cam.ForceResetMiddleWares();
-                cam.gameObject.SetActive((activateAllWhenEmpty && isContained != false) || isContained == true || UI.CameraSettingsViewController.CurrentCam == cam);
+                cam.gameObject.SetActive((activateAllWhenEmpty && isContained != false) || isContained == true || UI.CameraSettingsViewController.CurrentCam == cam || MovementScriptManager.EditorCam == cam);
             }
 
             GL.Clear(true, true, Color.black);

@@ -330,7 +330,7 @@ namespace Camera2.Configuration
 
         public void Save()
         {
-            if (Cam == null)
+            if (Cam == null || Cam.IsTemporary)
             {
                 return;
             }

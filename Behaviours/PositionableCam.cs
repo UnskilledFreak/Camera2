@@ -50,6 +50,11 @@ namespace Camera2.Behaviours
             _camPreview.GetComponent<MeshRenderer>().material = _viewMaterial;
         }
         
+        private void OnDestroy()
+        {
+            Destroy(_viewMaterial);
+        }
+
         public void SetSource(Cam2 cam)
         {
             Cam = cam;

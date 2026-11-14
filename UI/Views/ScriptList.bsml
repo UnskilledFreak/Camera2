@@ -1,0 +1,49 @@
+﻿<vertical xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
+    <horizontal bg="panel-top-gradient" anchor-min-y="-1">
+        <text text="Movement Scripts" align="Center"/>
+    </horizontal>
+    <horizontal>
+        <vertical preferred-width="27">
+            <button on-click="AddScript" text="Add" horizontal-fit="Unconstrained"/>
+            <button id="duplicateButton" on-click="DuplicateScript" text="Duplicate" horizontal-fit="Unconstrained"/>
+            <button id="deleteButton" click-event="showDelConf" text="Delete" horizontal-fit="Unconstrained"/>
+        </vertical>
+        <vertical pad-left="3" pad-right="3">
+            <custom-list id="scriptList" select-cell="SelectScript" contents="Scripts" visible-cells="4" stick-scrolling="true">
+                <vertical id="bgContainer" bg="round-rect-panel" pad="1" horizontal-fit="Unconstrained">
+                    <horizontal>
+                        <text text="~Name" align="MidlineLeft" font-size="3"/>
+                    </horizontal>
+                    <horizontal>
+                        <text text="~Details" align="MidlineLeft" font-size="2.3" font-color="#BBB"/>
+                    </horizontal>
+                </vertical>
+            </custom-list>
+        </vertical>
+        <vertical preferred-width="4">
+            <page-button event-click="scriptList#PageUp" direction="Up" pref-height="3" pref-width="4"/>
+            <page-button event-click="scriptList#PageDown" direction="Down" pref-height="3" pref-width="4"/>
+        </vertical>
+    </horizontal>
+    <vertical id="scriptSettings" horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
+        <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
+            <string-setting text="Name" value="ScriptName" bind-value="true" apply-on-change="true"/>
+            <checkbox text="Loop" value="ScriptLoop" bind-value="true" apply-on-change="true"
+                      hover-hint="Starts over when the last step is done. Without it the camera stays at the last step"
+            />
+            <checkbox text="Sync to Song" value="ScriptSyncToSong" bind-value="true" apply-on-change="true"
+                      hover-hint="Runs along the song time instead of freely, so it follows pausing and skipping in replays"
+            />
+        </modifier-container>
+    </vertical>
+
+    <modal clickerino-offerino-closerino="true" move-to-center="true" hide-event="closeDelConf" show-event="showDelConf" size-delta-x="70" size-delta-y="30">
+        <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize" pad="8">
+            <text text="Do you really want to delete this Movement Script?"/>
+            <horizontal spacing="10" pad-top="4">
+                <primary-button on-click="DeleteScript" text="Yes" click-event="closeDelConf"/>
+                <button text="Cancel" click-event="closeDelConf"/>
+            </horizontal>
+        </vertical>
+    </modal>
+</vertical>
