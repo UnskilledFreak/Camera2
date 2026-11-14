@@ -154,7 +154,7 @@
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMRendering.dll</HintPath>
             <Private>false</Private>
         </Reference>
-        <Reference Include="SegmentedControl" Condition="$(GameVersion) == '1.42.2'">
+        <Reference Include="SegmentedControl" Condition="$(GameVersion) == '1.40.8' Or $(GameVersion) == '1.42.2'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\SegmentedControl.dll</HintPath>
         </Reference>
         <Reference Include="Heck" Condition="$(GameVersion) != '1.42.2'">
