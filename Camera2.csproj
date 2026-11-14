@@ -212,11 +212,15 @@
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.Mathematics.dll</HintPath>
             <Private>False</Private>
         </Reference>
-        <Reference Include="Unity.Mathematics" Condition="$(GameVersion) != '1.40.8'">
+        <Reference Include="Unity.Mathematics" Condition="$(GameVersion) != '1.40.8' And $(GameVersion) != '1.42.2'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.Mathematics.dll</HintPath>
             <Private>False</Private>
         </Reference>
         <Reference Include="Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$(GameVersion) == '1.42.2'">
+            <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.Mathematics.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Unity.Mathematics, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Condition="$(GameVersion) == '1.40.8'">
             <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.Mathematics.dll</HintPath>
             <Private>False</Private>
         </Reference>

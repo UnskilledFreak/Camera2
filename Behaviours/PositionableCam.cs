@@ -1,4 +1,7 @@
 ﻿using System;
+#if V1_40_8
+using System.Linq;
+#endif
 #if V1_42_2
 using System.Linq;
 #endif
@@ -27,7 +30,7 @@ namespace Camera2.Behaviours
         public void Awake()
         {
             hoverMaterial ??= new Material(Shader.Find("Hidden/Internal-DepthNormalsTexture"));
-#if PRE_1_42_2
+#if PRE_1_40_8
             normalMaterial ??= new Material(Shader.Find("Standard"));
             #else
             normalMaterial ??= new Material(Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name == "MenuShockwave"));
