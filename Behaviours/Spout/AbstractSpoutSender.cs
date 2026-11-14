@@ -5,32 +5,19 @@ namespace Camera2.Behaviours.Spout
 {
     public abstract class AbstractSpoutSender : MonoBehaviour
     {
-        public Shader blitShader;
         public string channelName = "SpoutSender";
-
-        #region Format options
-
-        [SerializeField]
-        private bool alphaSupport;
-
-        public bool AlphaSupport
-        {
-            get => alphaSupport;
-            set => alphaSupport = value;
-        }
-
-        #endregion
 
         #region Private members
 
+        // Unity stores render textures bottom-up on Direct3D, Spout receivers read the shared texture top-down.
+        // Mirroring V while copying (v => 1 - v) makes the image arrive the right way up.
+        private static readonly Vector2 FlipScale = new Vector2(1f, -1f);
+        private static readonly Vector2 FlipOffset = new Vector2(0f, 1f);
+
         private IntPtr _plugin;
         private Texture2D _sharedTexture;
-        private Material _blitMaterial;
         private bool _sharedTextureInitialized;
-        private bool _blitMaterialInitialized;
         private bool _pluginInitialized;
-
-        private const string ClearAlphaKeyword = "CLEAR_ALPHA";
 
         private void SendRenderTexture(Texture source)
         {
@@ -52,19 +39,8 @@ namespace Camera2.Behaviours.Spout
                 return;
             }
 
-            InitializeBlitMaterial();
-
-            if (alphaSupport)
-            {
-                _blitMaterial.DisableKeyword(ClearAlphaKeyword);
-            }
-            else
-            {
-                _blitMaterial.EnableKeyword(ClearAlphaKeyword);
-            }
-
             var tempRT = RenderTexture.GetTemporary(_sharedTexture.width, _sharedTexture.height);
-            Graphics.Blit(source, tempRT, _blitMaterial, 0);
+            Graphics.Blit(source, tempRT, FlipScale, FlipOffset);
             Graphics.CopyTexture(tempRT, _sharedTexture);
             RenderTexture.ReleaseTemporary(tempRT);
         }
@@ -107,17 +83,6 @@ namespace Camera2.Behaviours.Spout
             _sharedTextureInitialized = true;
         }
 
-        private void InitializeBlitMaterial()
-        {
-            if (_blitMaterialInitialized)
-            {
-                return;
-            }
-
-            _blitMaterial = new Material(blitShader) { hideFlags = HideFlags.DontSave };
-            _blitMaterialInitialized = true;
-        }
-
         #endregion
 
         #region Protected members
@@ -156,11 +121,6 @@ namespace Camera2.Behaviours.Spout
 
             Util.Destroy(_sharedTexture);
             _sharedTextureInitialized = false;
-        }
-
-        protected virtual void OnDestroy()
-        {
-            Util.Destroy(_blitMaterial);
         }
 
         #endregion

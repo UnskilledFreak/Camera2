@@ -1,5 +1,4 @@
 using System;
-using BeatSaber.Settings;
 using Camera2.Behaviours.Spout;
 using Camera2.Managers;
 using UnityEngine;
@@ -22,7 +21,6 @@ public class SpoutHandler : MonoBehaviour
     {
         _cam = cam;
         _spoutSender = gameObject.AddComponent<TextureSpoutSender>();
-        _spoutSender.blitShader = Plugin.ShaderVolumetricBlit;
         _spoutSender.enabled = false;
     }
 
