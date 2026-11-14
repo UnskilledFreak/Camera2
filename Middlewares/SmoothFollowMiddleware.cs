@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Camera2.Extensions;
+﻿using Camera2.Extensions;
 using Camera2.HarmonyPatches;
 using Camera2.Interfaces;
 using Camera2.SDK;
@@ -155,7 +154,15 @@ namespace Camera2.Middlewares
                 return null;
             }
 
-            return ReplaySources.Sources.FirstOrDefault(source => source.IsInReplay);
+            foreach (var source in ReplaySources.Sources)
+            {
+                if (source.IsInReplay)
+                {
+                    return source;
+                }
+            }
+
+            return null;
         }
 
         private void CalculateLimits(ref Vector3 targetPosition, ref Quaternion targetRotation)

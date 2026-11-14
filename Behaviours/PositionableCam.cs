@@ -1,8 +1,5 @@
 ﻿using System;
-#if V1_40_8
-using System.Linq;
-#endif
-#if V1_42_2
+#if !PRE_1_40_8
 using System.Linq;
 #endif
 using UnityEngine;
@@ -85,12 +82,12 @@ namespace Camera2.Behaviours
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.currentInputModule is not VRUIControls.VRInputModule)
+            if (eventData.currentInputModule is not VRUIControls.VRInputModule inputModule)
             {
                 return;
             }
 
-            CamPositioner.BeingDragCamera(Cam);
+            CamPositioner.BeingDragCamera(Cam, inputModule);
         }
 
         public void OnPointerEnter(PointerEventData eventData)

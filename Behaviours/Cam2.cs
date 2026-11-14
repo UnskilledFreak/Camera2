@@ -50,7 +50,7 @@ namespace Camera2.Behaviours
 
         internal string ConfigPath => _config.GetCameraPath(Name);
 
-        internal bool IsCurrentlySelectedInSettings => UI.SettingsFlowCoordinator.Instance && UI.SettingsFlowCoordinator.Instance.CameraListViewController.isActiveAndEnabled && CameraSettingsViewController.CurrentCam == this;
+        internal bool IsCurrentlySelectedInSettings => UI.SettingsFlowCoordinator.Instance != null && UI.SettingsFlowCoordinator.Instance.CameraListViewController.isActiveAndEnabled && CameraSettingsViewController.CurrentCam == this;
 
         // Naluluna also uses reflection onto Kinsi's spaghetti... great...
         [UsedImplicitly]
@@ -296,7 +296,7 @@ namespace Camera2.Behaviours
         {
             TimeSinceLastRender += Time.deltaTime;
 
-            if (Camera && RenderTexture)
+            if (Camera != null && RenderTexture != null)
             {
                 PrepareMiddleWareRender();
             }
@@ -304,14 +304,17 @@ namespace Camera2.Behaviours
 
         internal void PrepareMiddleWareRender(bool forceRender = false)
         {
-            if (!Camera || !RenderTexture || Middlewares == null)
+            if (Camera == null || RenderTexture == null || Middlewares == null)
             {
                 return;
             }
 
-            if (Middlewares.Any(t => !t.Pre() && !forceRender))
+            foreach (var middleware in Middlewares)
             {
-                return;
+                if (!middleware.Pre() && !forceRender)
+                {
+                    return;
+                }
             }
 
             TransformChain.Calculate();

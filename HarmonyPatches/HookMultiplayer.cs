@@ -4,12 +4,12 @@ using JetBrains.Annotations;
 
 namespace Camera2.HarmonyPatches
 {
-#if PRE_1_42_2
+#if PRE_1_44_1
     [HarmonyPatch(typeof(MultiplayerSessionManager), "UpdateConnectionState")]
 #endif
     internal static class HookMultiplayer
     {
-#if PRE_1_42_2
+#if PRE_1_44_1
         private static MultiplayerSessionManager _instance;
         public static MultiplayerSessionManager instance => _instance == null ? null : _instance;
 #else
@@ -19,7 +19,7 @@ namespace Camera2.HarmonyPatches
 
 
         [UsedImplicitly]
-#if PRE_1_42_2
+#if PRE_1_44_1
         // ReSharper disable once InconsistentNaming
         private static void Postfix(MultiplayerSessionManager __instance)
 #else
@@ -29,7 +29,7 @@ namespace Camera2.HarmonyPatches
 
         {
 #if DEBUG
-#if PRE_1_42_2
+#if PRE_1_44_1
             Plugin.Log.Info($"Multiplayer connection state changed. Connected: {__instance.isConnected}");
 #else
             Plugin.Log.Info($"Multiplayer connection state changed. Connected: {__instance._lobbyGameStateController?.state}");

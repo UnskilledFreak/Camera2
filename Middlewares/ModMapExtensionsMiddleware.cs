@@ -11,8 +11,11 @@ namespace Camera2.Middlewares
 {
     internal class ModMapExtensionsMiddleware : CamMiddleware, IMHandler
     {
+        private const float OriginLookupInterval = 0.1f;
+
         [CanBeNull]
         private GameObject _noodleOrigin;
+        private float _nextOriginLookup;
 
         public bool Pre()
         {
@@ -34,7 +37,11 @@ namespace Camera2.Middlewares
             }
 
             // Noodle maps do not *necessarily* have a player track if it not actually used            
-            _noodleOrigin ??= GameObject.Find("NoodlePlayerTrackHead") ?? GameObject.Find("NoodlePlayerTrackRoot");
+            if (_noodleOrigin is null && Time.unscaledTime >= _nextOriginLookup)
+            {
+                _nextOriginLookup = Time.unscaledTime + OriginLookupInterval;
+                _noodleOrigin = GameObject.Find("NoodlePlayerTrackHead") ?? GameObject.Find("NoodlePlayerTrackRoot");
+            }
 
             if (!(_noodleOrigin is null))
             {
@@ -85,6 +92,7 @@ namespace Camera2.Middlewares
         {
             RemoveTransformer(TransformerTypeAndOrder.ModMapParenting);
             _noodleOrigin = null;
+            _nextOriginLookup = 0f;
         }
     }
 }

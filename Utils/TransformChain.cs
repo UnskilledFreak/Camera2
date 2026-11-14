@@ -70,7 +70,7 @@ namespace Camera2.Utils
             Position = _targetBase.position;
             Rotation = _targetBase.rotation;
 
-            foreach (var transformer in _transformers.Select(mapper => mapper.Value))
+            foreach (var transformer in _transformers.Values)
             {
                 if (transformer.Position != Vector3.zero)
                 {

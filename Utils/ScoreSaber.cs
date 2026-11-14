@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Camera2.HarmonyPatches;
 using Camera2.Interfaces;
 using UnityEngine;
@@ -19,16 +20,22 @@ namespace Camera2.Utils
         public static Transform SpectateParent { get; private set; }
         private static Camera ReplayCamera { get; set; }
 
-        private static MethodBase scoreSaberPlaybackEnabled;
+        private static Func<bool> scoreSaberPlaybackEnabled;
 
         public static bool Reflect()
         {
-            return (scoreSaberPlaybackEnabled = IPA.Loader.PluginManager
-                    .GetPluginFromId("ScoreSaber")
-                    ?.Assembly
-                    .GetType("ScoreSaber.Core.ReplaySystem.HarmonyPatches.PatchHandleHMDUnmounted")
-                    ?.GetMethod("Prefix", BindingFlags.Static | BindingFlags.NonPublic)
-                ) != null;
+            var prefix = IPA.Loader.PluginManager
+                .GetPluginFromId("ScoreSaber")
+                ?.Assembly
+                .GetType("ScoreSaber.Core.ReplaySystem.HarmonyPatches.PatchHandleHMDUnmounted")
+                ?.GetMethod("Prefix", BindingFlags.Static | BindingFlags.NonPublic);
+
+            if (prefix != null)
+            {
+                scoreSaberPlaybackEnabled = (Func<bool>)Delegate.CreateDelegate(typeof(Func<bool>), prefix, false);
+            }
+
+            return scoreSaberPlaybackEnabled != null;
         }
 
         public static void UpdateIsInReplay()
@@ -84,7 +91,7 @@ namespace Camera2.Utils
         {
             try
             {
-                return scoreSaberPlaybackEnabled != null && !(bool)scoreSaberPlaybackEnabled.Invoke(null, null);
+                return scoreSaberPlaybackEnabled != null && !scoreSaberPlaybackEnabled();
             }
             catch
             {

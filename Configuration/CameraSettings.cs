@@ -37,8 +37,11 @@ namespace Camera2.Configuration
         private Vector3 _targetPos = Vector3.zero;
         private Vector3 _targetRot = Vector3.zero;
 
+        private const float ParentLookupInterval = 0.5f;
+
         [JsonIgnore]
         private Transform _parent;
+        private float _nextParentLookup;
 
         public SettingsMultiplayer Multiplayer { get; private set; }
         public SettingsSmoothFollow SmoothFollow { get; }
@@ -250,6 +253,13 @@ namespace Camera2.Configuration
                     return _parent;
                 }
 
+                if (Time.unscaledTime < _nextParentLookup)
+                {
+                    return _parent;
+                }
+
+                _nextParentLookup = Time.unscaledTime + ParentLookupInterval;
+
                 var tmp = GameObject.Find(SmoothFollow.TargetParent)?.transform;
                 if (tmp?.gameObject.activeInHierarchy ?? false)
                 {
@@ -278,6 +288,7 @@ namespace Camera2.Configuration
         public void ParentReset()
         {
             _parent = null;
+            _nextParentLookup = 0f;
         }
 
         public bool IsPositionalCam() => Type == CameraType.Positionable || IsFollowerCam();
@@ -286,7 +297,7 @@ namespace Camera2.Configuration
 
         public void Load(bool loadConfig = true)
         {
-            _parent = null;
+            ParentReset();
             IsLoaded = false;
             // Set default value in case they're not loaded from JSON
             FOV = 90f;

@@ -1,5 +1,6 @@
 ﻿using Camera2.HarmonyPatches;
-using System.Linq;
+using System.Reflection;
+using HarmonyLib;
 using UnityEngine;
 using VRUIControls;
 using CameraType = Camera2.Enums.CameraType;
@@ -8,6 +9,8 @@ namespace Camera2.Behaviours
 {
     internal class CamPositioner : MonoBehaviour
     {
+        private static readonly FieldInfo VrPointerField = AccessTools.Field(typeof(VRInputModule), "_vrPointer");
+
         private static VRController controller;
         private static Cam2 grabbedCamera;
         private static Vector3 grabStartPos;
@@ -19,7 +22,7 @@ namespace Camera2.Behaviours
             DontDestroyOnLoad(gameObject);
         }
 
-        public static void BeingDragCamera(Cam2 camera)
+        public static void BeingDragCamera(Cam2 camera, VRInputModule inputModule)
         {
             if (isGrabbingCam)
             {
@@ -29,21 +32,16 @@ namespace Camera2.Behaviours
             //camera.LogDebug("pos: " + camera.Transformer.Position);
             //camera.LogDebug(camera.TransformChain.DebugChain());
             
-            var controllers = Resources.FindObjectsOfTypeAll<VRLaserPointer>();
-
-            controller = (!HookFPFCToggle.isInFPFC
-                    ? controllers.LastOrDefault(x => x.isActiveAndEnabled)
-                    : controllers.LastOrDefault(x =>
-                    {
-                        var controllerTransform = x.transform;
-                        return controllerTransform.eulerAngles + controllerTransform.position != Vector3.zero;
-                    })
-                )?.GetComponentInParent<VRController>();
+            controller = GetPointingController(inputModule);
 
             if (controller == null)
             {
                 return;
             }
+
+#if DEBUG
+            camera.LogInfo($"grabbed by {controller.name} at {controller.transform.position}, fpfc: {HookFPFCToggle.isInFPFC}");
+#endif
             
             grabbedCamera = camera;
             isGrabbingCam = true;
@@ -52,6 +50,21 @@ namespace Camera2.Behaviours
             grabStartRot = Quaternion.Inverse(controller.rotation) * grabbedCamera.Transformer.Rotation;
             
             grabbedCamera.WorldCam.SetPreviewPositionAndSize(false);
+        }
+
+        private static VRController GetPointingController(VRInputModule inputModule)
+        {
+            var pointer = VrPointerField?.GetValue(inputModule) as VRPointer;
+            if (pointer == null)
+            {
+                return null;
+            }
+
+#if V1_29_1
+            return pointer.vrController;
+#else
+            return pointer.lastSelectedVrController;
+#endif
         }
 
         public void Update()

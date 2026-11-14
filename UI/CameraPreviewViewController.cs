@@ -35,7 +35,7 @@ namespace Camera2.UI
 
         public void OnDisable()
         {
-            if (image)
+            if (image != null)
             {
                 image.texture = null;
             }
@@ -62,7 +62,7 @@ namespace Camera2.UI
             while (isActiveAndEnabled)
             {
                 yield return new UnityEngine.WaitForEndOfFrame();
-                if (_renderTexture)
+                if (_renderTexture != null)
                 {
                     UnityEngine.ScreenCapture.CaptureScreenshotIntoRenderTexture(_renderTexture);
                 }

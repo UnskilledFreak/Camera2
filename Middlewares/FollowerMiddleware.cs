@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Camera2.Enums;
 using Camera2.Extensions;
 using Camera2.Interfaces;
 using Camera2.Utils;
-using JetBrains.Annotations;
 using UnityEngine;
 using CameraType = Camera2.Enums.CameraType;
 using Random = System.Random;
@@ -13,6 +11,9 @@ namespace Camera2.Middlewares
 {
     internal class FollowerMiddleware : CamMiddleware, IMHandler
     {
+        private static readonly Random SeedSource = new();
+
+        private Random _random = new(SeedSource.Next());
         private bool _isInMovementScript;
         private readonly Dictionary<int, int> _inDrunkCooldown = new();
         private Vector3 _drunkPosition = Vector3.zero;
@@ -22,6 +23,7 @@ namespace Camera2.Middlewares
         public void OnEnable()
         {
             TeleportOnNextFrame = true;
+            _random = new Random(SeedSource.Next());
         }
 
         public bool Pre()
@@ -58,7 +60,7 @@ namespace Camera2.Middlewares
             // position to look at, not the cams position, why do I have to negate it? ö.o
             var realTargetPosition = -(Cam.Camera.transform.localPosition - Settings.Parent.position);
             
-            GetRandomIf(1, 80, 20, 20, 20, -10, 10, ref _drunkPositionOffset, null);
+            GetRandomIf(1, 80, 20, 20, 20, -10, 10, ref _drunkPositionOffset);
             var targetPositionWitOffset = realTargetPosition.Clone() + _drunkPositionOffset;
             if (Settings.SmoothFollow.FollowerUseOffsetRotationAsPosition)
             {
@@ -113,11 +115,11 @@ namespace Camera2.Middlewares
             }
             else
             {
-                GetRandomIf(2, 70, 30, 30, 45, -30, 30, ref _drunkRotation, null);
+                GetRandomIf(2, 70, 30, 30, 45, -30, 30, ref _drunkRotation);
                 Transformer!.Rotation = Transformer.Rotation.Slerp(lookRotation * Quaternion.Euler(_drunkRotation), GetSlerpTime( Settings.SmoothFollow.Rotation, GetRandomNumber(5f, 50f)));
             }
 
-            GetRandomIf(3, 50, 20, 5, 10, -1.5f, 1.5f, ref _drunkPosition, v => Transformer.Position + v);
+            GetRandomIf(3, 50, 20, 5, 10, -1.5f, 1.5f, ref _drunkPosition, true);
             if (Settings.Type == CameraType.FollowerDrunk)
             {
                 if (_drunkPosition != Vector3.zero)
@@ -161,7 +163,7 @@ namespace Camera2.Middlewares
 
         private float GetSlerpTime(float multiplier, float drunk = 1f) => Cam.TimeSinceLastRender * (Settings.Type == CameraType.FollowerDrunk ? multiplier / drunk : multiplier);
 
-        private void GetRandomIf(int type, int percentage, int x, int y, int z, float min, float max, ref Vector3 writeTo, [CanBeNull] Func<Vector3, Vector3> callback)
+        private void GetRandomIf(int type, int percentage, int x, int y, int z, float min, float max, ref Vector3 writeTo, bool relativeToPosition = false)
         {
             if (!_inDrunkCooldown.ContainsKey(type))
             {
@@ -177,18 +179,18 @@ namespace Camera2.Middlewares
             {
                 _inDrunkCooldown[type] = 1500;
                 writeTo = GetRandomVector(x, y, z, min, max);
-                if (callback != null)
+                if (relativeToPosition)
                 {
-                    writeTo = callback(writeTo);
+                    writeTo += Transformer.Position;
                 }
             }
 
             _inDrunkCooldown[type]--;
         }
 
-        private static bool IsRandomHeck(int percentage) => new Random().Next(0, 100) < percentage;
+        private bool IsRandomHeck(int percentage) => _random.Next(0, 100) < percentage;
 
-        private static Vector3 GetRandomVector(int p1, int p2, int p3, float min, float max)
+        private Vector3 GetRandomVector(int p1, int p2, int p3, float min, float max)
         {
             return new Vector3(
                 IsRandomHeck(p1) ? GetRandomNumber(min, max) : 0,
@@ -197,10 +199,9 @@ namespace Camera2.Middlewares
             );
         }
         
-        private static float GetRandomNumber(float minimum, float maximum)
+        private float GetRandomNumber(float minimum, float maximum)
         { 
-            var random = new Random();
-            return (float)((random.NextDouble() * (maximum - minimum)) + minimum);
+            return (float)((_random.NextDouble() * (maximum - minimum)) + minimum);
         }
     }
 }

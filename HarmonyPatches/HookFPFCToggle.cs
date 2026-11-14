@@ -13,7 +13,7 @@ namespace Camera2.HarmonyPatches
     internal static class HookFPFCToggle
     {
         public static Transform fpfcTransform { get; set; } = null;
-        public static bool isInFPFC => toggledIntoFPFC && fpfcTransform && fpfcTransform.gameObject && fpfcTransform.gameObject.activeInHierarchy;
+        public static bool isInFPFC => toggledIntoFPFC && fpfcTransform != null && fpfcTransform.gameObject != null && fpfcTransform.gameObject.activeInHierarchy;
         public static bool toggledIntoFPFC = false;
         
 #if V1_29_1
