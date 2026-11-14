@@ -726,6 +726,14 @@ namespace Camera2.UI
 
         #endregion
 
+        #region UI Formatter
+
+        [UIAction("FormatThreeDecimals")]
+        [UsedImplicitly]
+        public string FormatThreeDecimals(float value) => value.ToString("N3");
+
+        #endregion
+
         #region UI Buttons
 
         [UIAction("SetRenderDistanceNear")]
