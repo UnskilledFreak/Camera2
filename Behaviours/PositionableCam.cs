@@ -1,7 +1,4 @@
 ﻿using System;
-#if !PRE_1_40_8
-using System.Linq;
-#endif
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -28,9 +25,9 @@ namespace Camera2.Behaviours
         {
             hoverMaterial ??= new Material(Shader.Find("Hidden/Internal-DepthNormalsTexture"));
 #if PRE_1_40_8
-            normalMaterial ??= new Material(Shader.Find("Standard"));
-            #else
-            normalMaterial ??= new Material(Resources.FindObjectsOfTypeAll<Material>().FirstOrDefault(m => m.name == "MenuShockwave"));
+            normalMaterial ??= new Material(Shader.Find("Standard")) { color = new Color(255, 255, 175, 0.7f) };
+#else
+            normalMaterial ??= new Material(Plugin.ShaderVolumetricBlit);
 #endif
             
 
@@ -43,7 +40,6 @@ namespace Camera2.Behaviours
             _camOrigin.transform.localEulerAngles = new Vector3(90f, 0, 0);
 
             _renderer = _camOrigin.GetComponent<MeshRenderer>();
-            normalMaterial.color = new Color(255, 255, 175, 0.7f);
             _renderer.material = normalMaterial;
 
             _camPreview = GameObject.CreatePrimitive(PrimitiveType.Quad);
