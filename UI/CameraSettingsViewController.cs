@@ -105,6 +105,11 @@ namespace Camera2.UI
         [UIComponent("TabFakeZoom")]
         public Tab tabFakeZoom;
 
+#if PRE_1_40_8
+        [UIComponent("TabSelector")]
+        public TabSelector tabSelector;
+#endif
+
         #endregion
         
         #region UI Getter and Setter

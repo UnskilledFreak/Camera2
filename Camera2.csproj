@@ -12,7 +12,7 @@
         <Product>Camera2</Product>
         <Copyright>Kinsi55 &amp; UnskilledFreak</Copyright>
         <BSMTProjectType>BSIPA</BSMTProjectType>
-        <Configurations>Release-Latests;Debug-Latest;Debug-1.40.8;Release-1.40.8;Debug-1.37.1;Release-1.37.1;Debug-1.34.2;Release-1.34.2;Debug-1.29.1;Release-1.29.1</Configurations>
+        <Configurations>Release-Latest;Debug-Latest;Debug-1.40.8;Release-1.40.8;Debug-1.37.1;Release-1.37.1;Debug-1.34.2;Release-1.34.2;Debug-1.29.1;Release-1.29.1</Configurations>
         <Platforms>AnyCPU</Platforms>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -45,7 +45,7 @@
         <DefineConstants>TRACE;DEBUG;PRE_1_42_2;V1_40_8;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release-1.40.8' ">
-        <DefineConstants>TRACE;PRE_1_42_2;V1_37_1;</DefineConstants>
+        <DefineConstants>TRACE;PRE_1_42_2;V1_40_8;</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug-Latest' ">
         <DefineConstants>TRACE;DEBUG;V1_42_2;</DefineConstants>

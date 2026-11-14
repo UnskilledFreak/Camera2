@@ -1,7 +1,7 @@
 ﻿<vertical child-control-height="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
     <horizontal vertical-fit="PreferredSize" horizontal-fit="PreferredSize" child-expand-width="true" child-expand-height="true" pref-height="7" pref-width="120">
         <page-button pref-width="6" pref-height="6" tags="LeftButton" direction="Left"/>
-        <tab-selector tab-tag="tabs" page-count="4" child-expand-width="true" child-control-width="false" left-button-tag="LeftButton" right-button-tag="RightButton"/>
+        <tab-selector id="TabSelector" tab-tag="tabs" page-count="4" child-expand-width="true" child-control-width="false" left-button-tag="LeftButton" right-button-tag="RightButton"/>
         <page-button pref-width="6" pref-height="6" tags="RightButton" direction="Right"/>
     </horizontal>
 
