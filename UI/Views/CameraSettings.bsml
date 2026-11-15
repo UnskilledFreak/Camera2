@@ -80,7 +80,7 @@
                 </horizontal>
                 <slider-setting text="Position Smoothing *" min="0.1" max="50" increment="0.1" value="SmoothFollowPosition" bind-value="true" apply-on-change="true" show-buttons="true"/>
                 <slider-setting text="Rotation Smoothing *" min="0.1" max="50" increment="0.1" value="SmoothFollowRotation" bind-value="true" apply-on-change="true" show-buttons="true"/>
-                <slider-setting id="SliderFollowerParentLookupDelay" text="Parental lookup delay" min="0.01" max="5" increment="0.01" formatter="FormatSeconds" value="FollowerParentLookupDelay" bind-value="true" apply-on-change="true" show-buttons="true"
+                <slider-setting text="Parental lookup delay" min="0.01" max="5" increment="0.01" formatter="FormatSeconds" value="TargetParentLookupDelay" bind-value="true" apply-on-change="true" show-buttons="true"
                                 hover-hint="How often this Camera looks for its Target while it does not exist yet. Lower = picks up a late appearing Target sooner"
                 />
             </modifier-container>

@@ -85,9 +85,6 @@ namespace Camera2.UI
         [UIComponent("ToggleModMapExtMoveWithMap")]
         public ToggleSetting sliderModMapExtMoveWithMap;
 
-        [UIComponent("SliderFollowerParentLookupDelay")]
-        public SliderSetting sliderFollowerParentLookupDelay;
-
         [UIComponent("MenuWorldCamVisibility")]
         public LayoutElement menuWorldCamVisibility;
         
@@ -361,7 +358,7 @@ namespace Camera2.UI
         }
 
         [UsedImplicitly]
-        internal float FollowerParentLookupDelay
+        internal float TargetParentLookupDelay
         {
             get => CurrentCam.Settings.SmoothFollow.TargetParentLookupDelay;
             set => CurrentCam.Settings.SmoothFollow.TargetParentLookupDelay = value;
@@ -941,7 +938,6 @@ namespace Camera2.UI
             toggleFollowerPosRelative.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
             sliderPreviewSize.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             sliderModMapExtMoveWithMap.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
-            sliderFollowerParentLookupDelay.gameObject.SetActive(CurrentCam.Settings.IsFollowerCam());
             menuWorldCamVisibility.gameObject.SetActive(CurrentCam.Settings.IsPositionalCam());
             tabSmoothFollow.IsVisible = Type == CameraType.FirstPerson;
             tabFollow360.IsVisible = CurrentCam.Settings.IsPositionalCam();
