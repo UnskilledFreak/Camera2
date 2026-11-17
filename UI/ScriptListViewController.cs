@@ -92,6 +92,19 @@ internal class ScriptListViewController : BSMLAutomaticViewController
         }
     }
 
+    [UsedImplicitly]
+    internal string TestTarget
+    {
+        get => ScriptFlowCoordinator.TestTarget;
+        set
+        {
+            if (!_isRefreshing)
+            {
+                Coordinator.SetTestTarget(value);
+            }
+        }
+    }
+
     [UIAction("#post-parse")]
     [UsedImplicitly]
     internal void Refresh()
@@ -127,6 +140,7 @@ internal class ScriptListViewController : BSMLAutomaticViewController
             NotifyPropertyChanged(nameof(ScriptName));
             NotifyPropertyChanged(nameof(ScriptLoop));
             NotifyPropertyChanged(nameof(ScriptSyncToSong));
+            NotifyPropertyChanged(nameof(TestTarget));
         }
         finally
         {
@@ -176,4 +190,38 @@ internal class ScriptListViewController : BSMLAutomaticViewController
     [UIAction("DeleteScript")]
     [UsedImplicitly]
     private void DeleteScript() => Coordinator.DeleteScript();
+
+    [UIAction("TestTargetAvatarHead")]
+    [UsedImplicitly]
+    private void TestTargetAvatarHead() => SetTestTarget(TargetTemplates.AvatarHead);
+
+    [UIAction("TestTargetNalulunaAvatarHead")]
+    [UsedImplicitly]
+    private void TestTargetNalulunaAvatarHead() => SetTestTarget(TargetTemplates.NalulunaAvatarHead);
+
+    [UIAction("TestTargetNalulunaCatHead")]
+    [UsedImplicitly]
+    private void TestTargetNalulunaCatHead() => SetTestTarget(TargetTemplates.NalulunaCatHead);
+
+    [UIAction("TestTargetPointer")]
+    [UsedImplicitly]
+    private void TestTargetPointer() => SetTestTarget(TargetTemplates.Pointer);
+
+    [UIAction("TestTargetLeftPanel")]
+    [UsedImplicitly]
+    private void TestTargetLeftPanel() => SetTestTarget(TargetTemplates.LeftPanel);
+
+    [UIAction("TestTargetRightPanel")]
+    [UsedImplicitly]
+    private void TestTargetRightPanel() => SetTestTarget(TargetTemplates.RightPanel);
+
+    [UIAction("TestTargetNone")]
+    [UsedImplicitly]
+    private void TestTargetNone() => SetTestTarget("");
+
+    private void SetTestTarget(string target)
+    {
+        Coordinator.SetTestTarget(target);
+        NotifyScriptSettings();
+    }
 }

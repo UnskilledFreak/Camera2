@@ -25,6 +25,16 @@
             <page-button event-click="scriptList#PageDown" direction="Down" pref-height="3" pref-width="4"/>
         </vertical>
     </horizontal>
+    <vertical horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
+        <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
+            <string-setting text="Test Target" value="TestTarget" bind-value="true" apply-on-change="true"
+                            hover-hint="Insert a path or name of any GameObject here. The editor camera then acts as a Follower camera looking at it, while playing and on steps with 'Follower: Pos only'. Empty = normal camera"
+            />
+            <horizontal ignore-layout="true" anchor-pos-x="-10">
+                <button text="Templates" click-event="showTestTargetModal"/>
+            </horizontal>
+        </modifier-container>
+    </vertical>
     <vertical id="scriptSettings" horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
         <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
             <string-setting text="Name" value="ScriptName" bind-value="true" apply-on-change="true"/>
@@ -44,6 +54,32 @@
                 <primary-button on-click="DeleteScript" text="Yes" click-event="closeDelConf"/>
                 <button text="Cancel" click-event="closeDelConf"/>
             </horizontal>
+        </vertical>
+    </modal>
+
+    <modal clickerino-offerino-closerino="true" move-to-center="true" hide-event="closeTestTargetModal" show-event="showTestTargetModal" size-delta-x="90" size-delta-y="60">
+        <vertical preferred-width="72" vertical-fit="PreferredSize" pad-left="2" pad-right="2" spacing="2">
+            <horizontal pad-bottom="2" pad-top="1">
+                <horizontal bg="panel-top-gradient">
+                    <text text="Camera 2.5 - Test target template" align="Center" font-size="3"/>
+                </horizontal>
+            </horizontal>
+            <vertical spacing="1.5" pad-bottom="2" preferred-width="60">
+                <horizontal preferred-width="80">
+                    <primary-button on-click="TestTargetAvatarHead" text="Avatar Head" click-event="closeTestTargetModal"/>
+                    <primary-button on-click="TestTargetNalulunaAvatarHead" text="NalulunaAvatar Head" click-event="closeTestTargetModal"/>
+                </horizontal>
+                <horizontal preferred-width="80">
+                    <primary-button on-click="TestTargetNalulunaCatHead" text="NalulunaCat Head" click-event="closeTestTargetModal"/>
+                    <primary-button on-click="TestTargetPointer" text="Look at Pointer" click-event="closeTestTargetModal"/>
+                </horizontal>
+                <horizontal preferred-width="80">
+                    <primary-button on-click="TestTargetLeftPanel" text="Left Panel" click-event="closeTestTargetModal"/>
+                    <primary-button on-click="TestTargetRightPanel" text="Right Panel" click-event="closeTestTargetModal"/>
+                </horizontal>
+                <button on-click="TestTargetNone" text="No target" click-event="closeTestTargetModal"/>
+            </vertical>
+            <button text="Cancel" click-event="closeTestTargetModal"/>
         </vertical>
     </modal>
 </vertical>

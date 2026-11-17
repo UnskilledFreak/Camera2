@@ -14,6 +14,7 @@ using Camera2.Handler;
 using Camera2.Managers;
 using JetBrains.Annotations;
 using UnityEngine;
+using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.Behaviours
 {
@@ -194,7 +195,7 @@ namespace Camera2.Behaviours
                                 || !SceneUtil.IsSongPlaying
                             );
 
-            WorldCam.gameObject.SetActive(doShowCam || (CameraSettingsViewController.CurrentCam == this && (Settings.IsPositionalCam() || Settings.IsFollowerCam())));
+            WorldCam.gameObject.SetActive(doShowCam || (CameraSettingsViewController.CurrentCam == this && Settings.Type != CameraType.FirstPerson));
         }
 
         internal void UpdateDepthTextureActive()
@@ -288,18 +289,55 @@ namespace Camera2.Behaviours
             return (quaternion * (Transformer.Position - HookRoomAdjust.Position)) + HookRoomAdjust.Position - Transformer.Position + offset;
         }
 
-        internal void GetParentPose(out Vector3 position, out Quaternion rotation)
+        internal void BaseToWorldPose(out Vector3 position, out Quaternion rotation)
         {
-            foreach (var middleware in Middlewares)
+            GetParentPose(out var parentPosition, out var parentRotation, out var isAbsolute);
+
+            if (isAbsolute)
             {
-                if (middleware is ModMapExtensionsMiddleware modMapExtensions && modMapExtensions.TryGetParentPose(out position, out rotation))
+                position = parentPosition + Transformer.Position;
+                rotation = Transformer.Rotation * parentRotation;
+            }
+            else
+            {
+                position = parentPosition + (parentRotation * Transformer.Position);
+                rotation = parentRotation * Transformer.Rotation;
+            }
+        }
+
+        internal void WorldToBasePose(Vector3 worldPosition, Quaternion worldRotation, out Vector3 position, out Quaternion rotation)
+        {
+            GetParentPose(out var parentPosition, out var parentRotation, out var isAbsolute);
+            var toParentSpace = Quaternion.Inverse(parentRotation);
+
+            if (isAbsolute)
+            {
+                position = worldPosition - parentPosition;
+                rotation = worldRotation * toParentSpace;
+            }
+            else
+            {
+                position = toParentSpace * (worldPosition - parentPosition);
+                rotation = toParentSpace * worldRotation;
+            }
+        }
+
+        private void GetParentPose(out Vector3 position, out Quaternion rotation, out bool isAbsolute)
+        {
+            if (Settings.IsFollowerCam())
+            {
+                foreach (var middleware in Middlewares)
                 {
-                    return;
+                    if (middleware is ModMapExtensionsMiddleware modMapExtensions && modMapExtensions.TryGetFollowerParentPose(out position, out rotation))
+                    {
+                        isAbsolute = false;
+                        return;
+                    }
                 }
             }
 
-            position = Vector3.zero;
-            rotation = Quaternion.identity;
+            TransformChain.CalculateBefore(TransformerTypeAndOrder.PositionOffset, out position, out rotation);
+            isAbsolute = Transformer.ApplyAsAbsolute;
         }
 
         private IMHandler MakeMiddleware<T>() where T : CamMiddleware, IMHandler
@@ -332,6 +370,7 @@ namespace Camera2.Behaviours
                 }
             }
 
+            CamPositioner.UpdateGrabbedPose(this);
             TransformChain.Calculate();
             Camera.enabled = true;
 

@@ -46,10 +46,10 @@ namespace Camera2.Behaviours
             grabbedCamera = camera;
             isGrabbingCam = true;
             
-            grabbedCamera.GetParentPose(out var parentPosition, out var parentRotation);
+            grabbedCamera.BaseToWorldPose(out var worldPosition, out var worldRotation);
 
-            grabStartPos = controller.transform.InverseTransformPoint(parentPosition + (parentRotation * grabbedCamera.Transformer.Position));
-            grabStartRot = Quaternion.Inverse(controller.rotation) * parentRotation * grabbedCamera.Transformer.Rotation;
+            grabStartPos = controller.transform.InverseTransformPoint(worldPosition);
+            grabStartRot = Quaternion.Inverse(controller.rotation) * worldRotation;
             
             grabbedCamera.WorldCam.SetPreviewPositionAndSize(false);
         }
@@ -69,6 +69,36 @@ namespace Camera2.Behaviours
 #endif
         }
 
+        internal static void UpdateGrabbedPose(Cam2 camera)
+        {
+            if (isGrabbingCam && grabbedCamera == camera && controller != null)
+            {
+                ApplyGrabPose();
+            }
+        }
+
+        private static void ApplyGrabPose()
+        {
+            grabbedCamera.WorldToBasePose(
+                controller.transform.TransformPoint(grabStartPos),
+                controller.rotation * grabStartRot,
+                out var position,
+                out var baseRotation
+            );
+            var rotation = baseRotation.eulerAngles;
+
+            grabbedCamera.Transformer.Position = position;
+            // do not update rotation on follower type, will result in weird behavior otherwise
+            if (!grabbedCamera.Settings.IsFollowerCam())
+            {
+                grabbedCamera.Transformer.Rotation = Quaternion.Euler(
+                    Snap(rotation.x),
+                    Snap(rotation.y),
+                    Snap(rotation.z)
+                );
+            }
+        }
+
         public void Update()
         {
             if (!isGrabbingCam)
@@ -78,22 +108,7 @@ namespace Camera2.Behaviours
 
             if (controller != null && grabbedCamera.WorldCam.isActiveAndEnabled)
             {
-                grabbedCamera.GetParentPose(out var parentPosition, out var parentRotation);
-                var toParentSpace = Quaternion.Inverse(parentRotation);
-
-                var position = toParentSpace * (controller.transform.TransformPoint(grabStartPos) - parentPosition);
-                var rotation = (toParentSpace * controller.rotation * grabStartRot).eulerAngles;
-
-                grabbedCamera.Transformer.Position = position;                
-                // do not update rotation on follower type, will result in weird behavior otherwise
-                if (!grabbedCamera.Settings.IsFollowerCam())
-                {
-                    grabbedCamera.Transformer.Rotation = Quaternion.Euler(
-                        Snap(rotation.x),
-                        Snap(rotation.y),
-                        Snap(rotation.z)
-                    );
-                }
+                ApplyGrabPose();
 
                 grabbedCamera.TransformChain.Calculate();
 

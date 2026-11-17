@@ -6,7 +6,9 @@ using Camera2.Managers;
 using Camera2.MovementScript;
 using HMUI;
 using JetBrains.Annotations;
+using UnityEngine;
 using Zenject;
+using CameraType = Camera2.Enums.CameraType;
 
 namespace Camera2.UI;
 
@@ -28,6 +30,9 @@ internal class ScriptFlowCoordinator : FlowCoordinator
     internal int CurrentStepIndex { get; private set; } = -1;
     internal bool IsPlaying { get; private set; }
     internal bool IsPaused { get; private set; }
+    internal static string TestTarget { get; private set; } = "";
+
+    private static bool HasTestTarget => TestTarget.Length > 0;
 
     [CanBeNull]
     internal ScriptFrame CurrentStep => CurrentScript != null && CurrentStepIndex >= 0 && CurrentStepIndex < CurrentScript.Frames.Count
@@ -136,6 +141,19 @@ internal class ScriptFlowCoordinator : FlowCoordinator
 
         CurrentScript.SyncToSong = syncToSong;
         ScriptSettingChanged();
+    }
+
+    internal void SetTestTarget(string target)
+    {
+        target = target?.Trim() ?? "";
+        if (target == TestTarget)
+        {
+            return;
+        }
+
+        StopPlayback();
+        TestTarget = target;
+        ShowCurrentStep();
     }
 
     internal void SelectStep(int index)
@@ -251,8 +269,12 @@ internal class ScriptFlowCoordinator : FlowCoordinator
         }
         else
         {
+            var rotation = EditorCam.Settings.IsFollowerCam()
+                ? EditorCam.TransformChain.Rotation.eulerAngles
+                : EditorCam.Settings.TargetRotation;
+
             step.Position = EditorCam.Settings.TargetPosition;
-            step.RotationEuler = EditorCam.Settings.TargetRotation.ClampToMiddlePointAngles();
+            step.RotationEuler = rotation.ClampToMiddlePointAngles();
         }
     }
 
@@ -270,6 +292,7 @@ internal class ScriptFlowCoordinator : FlowCoordinator
         }
 
         MovementScriptManager.StopScript(EditorCam);
+        SetEditorCamFollower(HasTestTarget);
         EditorCam.Settings.MovementScript.ScriptList = [CurrentScript.Name];
         IsPlaying = true;
         IsPaused = false;
@@ -391,10 +414,43 @@ internal class ScriptFlowCoordinator : FlowCoordinator
             return;
         }
 
+        var isFollower = HasTestTarget && step.OnFollowerIgnoreRotation;
+        SetEditorCamFollower(isFollower);
+
         EditorCam.Settings.TargetPosition = step.Position;
-        EditorCam.Settings.TargetRotation = step.RotationEuler;
+        if (!isFollower)
+        {
+            EditorCam.Settings.TargetRotation = step.RotationEuler;
+        }
+
         EditorCam.Settings.FOV = GetFovAtCurrentStep();
         EditorCam.Settings.ApplyPositionAndRotation();
+    }
+
+    private static void SetEditorCamFollower(bool isFollower)
+    {
+        var settings = EditorCam.Settings;
+        var target = isFollower ? TestTarget : "";
+
+        if (settings.SmoothFollow.TargetParent != target)
+        {
+            settings.SmoothFollow.TargetParent = target;
+            settings.ParentReset();
+        }
+
+        if (isFollower)
+        {
+            settings.TargetRotation = Vector3.zero;
+        }
+
+        var type = isFollower ? CameraType.Follower : CameraType.Positionable;
+        if (settings.Type == type)
+        {
+            return;
+        }
+
+        settings.Type = type;
+        EditorCam.Transformer.Rotation = Quaternion.identity;
     }
 
     private float GetFovAtCurrentStep()

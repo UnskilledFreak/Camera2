@@ -153,7 +153,7 @@ internal class ScriptStepSettingsViewController : BSMLAutomaticViewController
             if (CanApply())
             {
                 Step.OnFollowerIgnoreRotation = value;
-                Coordinator.StepValueChanged(false);
+                Coordinator.StepValueChanged(true);
             }
         }
     }

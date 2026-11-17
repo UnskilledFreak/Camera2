@@ -67,37 +67,16 @@ namespace Camera2.Utils
                 return;
             }
 
-            Position = _targetBase.position;
-            Rotation = _targetBase.rotation;
+            var position = _targetBase.position;
+            var rotation = _targetBase.rotation;
 
             foreach (var transformer in _transformers.Values)
             {
-                if (transformer.Position != Vector3.zero)
-                {
-                    Position += transformer.ApplyAsAbsolute ? transformer.Position : Rotation * transformer.Position;
-                }
-
-                if (transformer.Rotation == Quaternion.identity)
-                {
-                    continue;
-                }
-                
-                if (transformer.ApplyAsAbsolute)
-                {
-                    Rotation = transformer.Rotation * Rotation;
-                }
-                else
-                {
-                    if ((TransformerTypeAndOrder)transformer.Order == TransformerTypeAndOrder.ModMapParenting && _cam.Settings.IsFollowerCam())
-                    {
-                        // why am I to stupid to negate this?
-                    }
-                    else
-                    {
-                        Rotation *= transformer.Rotation;
-                    }
-                }
+                Apply(transformer, ref position, ref rotation);
             }
+
+            Position = position;
+            Rotation = rotation;
 
             if (_target == null || !apply)
             {
@@ -106,6 +85,49 @@ namespace Camera2.Utils
 
             _target.position = Position;
             _target.rotation = Rotation;
+        }
+
+        public void CalculateBefore(TransformerTypeAndOrder type, out Vector3 position, out Quaternion rotation)
+        {
+            position = _targetBase.position;
+            rotation = _targetBase.rotation;
+
+            foreach (var transformer in _transformers.Values)
+            {
+                if (transformer.Order < (int)type)
+                {
+                    Apply(transformer, ref position, ref rotation);
+                }
+            }
+        }
+
+        private void Apply(Transformer transformer, ref Vector3 position, ref Quaternion rotation)
+        {
+            if (transformer.Position != Vector3.zero)
+            {
+                position += transformer.ApplyAsAbsolute ? transformer.Position : rotation * transformer.Position;
+            }
+
+            if (transformer.Rotation == Quaternion.identity)
+            {
+                return;
+            }
+
+            if (transformer.ApplyAsAbsolute)
+            {
+                rotation = transformer.Rotation * rotation;
+            }
+            else
+            {
+                if ((TransformerTypeAndOrder)transformer.Order == TransformerTypeAndOrder.ModMapParenting && _cam.Settings.IsFollowerCam())
+                {
+                    // why am I to stupid to negate this?
+                }
+                else
+                {
+                    rotation *= transformer.Rotation;
+                }
+            }
         }
 
         private void Resort(bool calculate = true)

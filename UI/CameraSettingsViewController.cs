@@ -750,13 +750,13 @@ namespace Camera2.UI
 
         [UIAction("TargetAvatarsHead")]
         [UsedImplicitly]
-        public void TargetAvatarsHead() => SetNewTarget("Hips/Spine/Chest/Neck/Head");
+        public void TargetAvatarsHead() => SetNewTarget(TargetTemplates.AvatarHead);
 
         [UIAction("TargetCatHead")]
         [UsedImplicitly]
         public void TargetNalulunaCatHead()
         {
-            const string target = "Cat/Root/Spine/Spine.1/Spine.2/Spine.3/Neck/Neck.1/Head";
+            const string target = TargetTemplates.NalulunaCatHead;
             if (CurrentCam.Settings.IsFollowerCam())
             {
                 SetNewTarget(target);
@@ -768,27 +768,27 @@ namespace Camera2.UI
 
         [UIAction("TargetVrmHead")]
         [UsedImplicitly]
-        public void TargetVrmHead() => SetNewTarget("VRMAvatar/Head");
+        public void TargetVrmHead() => SetNewTarget(TargetTemplates.NalulunaAvatarHead);
 
         [UIAction("TargetLookAtPointer")]
         [UsedImplicitly]
-        public void TargetLookAtPointer() => SetNewTarget("VRLaserPointer(Clone)");
+        public void TargetLookAtPointer() => SetNewTarget(TargetTemplates.Pointer);
 
         [UIAction("TargetRightPanel")]
         [UsedImplicitly]
-        public void TargetRightPanel() => SetNewTarget("RightPanel", new Vector3(0f, .85f, -1.1f));
+        public void TargetRightPanel() => SetNewTarget(TargetTemplates.RightPanel, new Vector3(0f, .85f, -1.1f));
 
         [UIAction("TargetLeftPanel")]
         [UsedImplicitly]
-        public void TargetLeftPanel() => SetNewTarget("LeftPanel", new Vector3(0f, .85f, -1.1f));
+        public void TargetLeftPanel() => SetNewTarget(TargetTemplates.LeftPanel, new Vector3(0f, .85f, -1.1f));
 
         [UIAction("TargetEnergyBar")]
         [UsedImplicitly]
-        public void TargetEnergyBar() => SetNewTarget("EnergyPanel");
+        public void TargetEnergyBar() => SetNewTarget(TargetTemplates.EnergyBar);
 
         [UIAction("TargetScore")]
         [UsedImplicitly]
-        public void TargetScore() => SetNewTarget("ScoreCanvas", new Vector3(0f, .3f, -1.1f));
+        public void TargetScore() => SetNewTarget(TargetTemplates.Score, new Vector3(0f, .3f, -1.1f));
 
         #endregion
 

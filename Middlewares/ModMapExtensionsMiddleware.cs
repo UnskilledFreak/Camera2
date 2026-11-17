@@ -92,7 +92,7 @@ namespace Camera2.Middlewares
             _noodleOrigin = null;
         }
 
-        internal bool TryGetParentPose(out Vector3 position, out Quaternion rotation)
+        internal bool TryGetFollowerParentPose(out Vector3 position, out Quaternion rotation)
         {
             if (Transformer == null || _noodleOrigin == null)
             {
@@ -103,12 +103,7 @@ namespace Camera2.Middlewares
 
             var origin = _noodleOrigin.transform;
             rotation = origin.localRotation;
-            position = origin.localPosition;
-
-            if (Settings.IsFollowerCam())
-            {
-                position += HookRoomAdjust.Position - (rotation * HookRoomAdjust.Position);
-            }
+            position = origin.localPosition + HookRoomAdjust.Position - (rotation * HookRoomAdjust.Position);
 
             return true;
         }
