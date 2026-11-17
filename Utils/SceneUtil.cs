@@ -35,6 +35,8 @@ namespace Camera2.Utils
             IsInSong = CurrentScene.name == "GameCore";
             IsInMenu = !IsInSong && ScenesManager.MenuSceneNames.Contains(CurrentScene.name);
 
+            ParentManager.Clear();
+
             // added support for MultiplayerExtensions which adds a scene called MultiplayerEnvironment
             if (oldScene.name is "GameCore" or "MultiplayerEnvironment")
             {

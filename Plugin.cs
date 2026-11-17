@@ -5,9 +5,12 @@ using Camera2.Managers;
 using Camera2.Utils;
 using HarmonyLib;
 using IPA;
+using IPA.Config;
+using IPA.Config.Stores;
 using System.Reflection;
 using System.Threading.Tasks;
 using Camera2.Behaviours.Spout;
+using Camera2.Configuration;
 using Camera2.Handler;
 using Camera2.HarmonyPatches;
 using Camera2.Installers;
@@ -43,9 +46,10 @@ namespace Camera2
 
         [UsedImplicitly]
         [Init]
-        public Plugin(IPALogger logger, Zenjector injector)
+        public Plugin(IPALogger logger, Config config, Zenjector injector)
         {
             Log = logger;
+            PluginConfig.Instance = config.Generated<PluginConfig>();
             Log.Info($"{Name} mod {ModdedVersion} loading...");
             
             ConfigHandler.Instance = new ConfigHandler();

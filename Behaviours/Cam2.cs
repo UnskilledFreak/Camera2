@@ -288,6 +288,20 @@ namespace Camera2.Behaviours
             return (quaternion * (Transformer.Position - HookRoomAdjust.Position)) + HookRoomAdjust.Position - Transformer.Position + offset;
         }
 
+        internal void GetParentPose(out Vector3 position, out Quaternion rotation)
+        {
+            foreach (var middleware in Middlewares)
+            {
+                if (middleware is ModMapExtensionsMiddleware modMapExtensions && modMapExtensions.TryGetParentPose(out position, out rotation))
+                {
+                    return;
+                }
+            }
+
+            position = Vector3.zero;
+            rotation = Quaternion.identity;
+        }
+
         private IMHandler MakeMiddleware<T>() where T : CamMiddleware, IMHandler
         {
             return gameObject.AddComponent<T>().Init(this);

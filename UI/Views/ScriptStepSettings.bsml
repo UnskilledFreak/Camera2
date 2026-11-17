@@ -1,28 +1,39 @@
 ﻿<vertical child-control-height="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
     <text id="emptyHint" text="" align="Center" font-size="4" color="#CCC"/>
-    <vertical id="stepSettings" horizontal-fit="PreferredSize" vertical-fit="PreferredSize">
-        <modifier-container child-expand-width="true" horizontal-fit="PreferredSize">
-            <slider-setting text="Position X" min="-20" max="20" increment="0.01" show-buttons="true" value="PosX" bind-value="true" apply-on-change="true"/>
-            <slider-setting text="Position Y" min="-20" max="20" increment="0.01" show-buttons="true" value="PosY" bind-value="true" apply-on-change="true"/>
-            <slider-setting text="Position Z" min="-20" max="20" increment="0.01" show-buttons="true" value="PosZ" bind-value="true" apply-on-change="true"/>
-            <slider-setting text="Rotation X" min="-179.99" max="180" increment="0.01" show-buttons="true" value="RotX" bind-value="true" apply-on-change="true"/>
-            <slider-setting text="Rotation Y" min="-179.99" max="180" increment="0.01" show-buttons="true" value="RotY" bind-value="true" apply-on-change="true"/>
-            <slider-setting text="Rotation Z" min="-179.99" max="180" increment="0.01" show-buttons="true" value="RotZ" bind-value="true" apply-on-change="true"/>
-            <slider-setting text="Field of View" min="0" max="140" increment="0.5" show-buttons="true" value="Fov" bind-value="true" apply-on-change="true"
-                            hover-hint="0 keeps the field of view of the step before"
-            />
-            <slider-setting text="Move Duration" min="0" max="60" increment="0.1" show-buttons="true" value="Duration" bind-value="true" apply-on-change="true"
-                            hover-hint="Seconds the camera takes to get here from the step before"
-            />
-            <slider-setting text="Hold Time" min="0" max="60" increment="0.1" show-buttons="true" value="HoldTime" bind-value="true" apply-on-change="true"
-                            hover-hint="Seconds the camera stays at this step before moving on"
-            />
-            <checkbox text="Eased movement" value="Eased" bind-value="true" apply-on-change="true"
-                      hover-hint="Accelerates and slows down smoothly instead of moving at a constant speed"
-            />
-            <checkbox text="Position only on Follower cameras" value="IgnoreRotation" bind-value="true" apply-on-change="true"
-                      hover-hint="Follower cameras keep looking at their target and only take the position of this step"
-            />
-        </modifier-container>
-    </vertical>
+    <horizontal id="stepSettings" horizontal-fit="PreferredSize" pad="4" spacing="2" child-control-height="false">
+        <vertical spacing="2">
+            <vertical child-control-height="false" bg="panel-top" pad="2" pad-bottom="1" pad-top="1" preferred-width="64">
+                <text text="&lt;color=#DDD>Pose" align="Center" underlined="true" bold="true" font-size="3.5" color="#69B" size-delta-y="5"/>
+                <slider-setting text="Pos X" min="-20" max="20" increment="0.01" show-buttons="true" value="PosX" bind-value="true" apply-on-change="true"/>
+                <slider-setting text="Pos Y" min="-20" max="20" increment="0.01" show-buttons="true" value="PosY" bind-value="true" apply-on-change="true"/>
+                <slider-setting text="Pos Z" min="-20" max="20" increment="0.01" show-buttons="true" value="PosZ" bind-value="true" apply-on-change="true"/>
+                <slider-setting text="Rot X" min="-179.99" max="180" increment="0.01" show-buttons="true" value="RotX" bind-value="true" apply-on-change="true"/>
+                <slider-setting text="Rot Y" min="-179.99" max="180" increment="0.01" show-buttons="true" value="RotY" bind-value="true" apply-on-change="true"/>
+                <slider-setting text="Rot Z" min="-179.99" max="180" increment="0.01" show-buttons="true" value="RotZ" bind-value="true" apply-on-change="true"/>
+            </vertical>
+        </vertical>
+        <vertical spacing="2">
+            <vertical id="timingSettings" child-control-height="false" bg="panel-top" pad="2" pad-bottom="1" pad-top="1" preferred-width="64">
+                <text text="&lt;color=#DDD>Timing / Follower" align="Center" underlined="true" bold="true" font-size="3.5" color="#69B" size-delta-y="5"/>
+                <slider-setting text="Field of View" min="0" max="140" increment="0.5" show-buttons="true" value="Fov" bind-value="true" apply-on-change="true"
+                                hover-hint="0 keeps the field of view of the step before"
+                />
+                <slider-setting text="Move Duration" min="0" max="60" increment="0.1" show-buttons="true" value="Duration" bind-value="true" apply-on-change="true"
+                                hover-hint="Seconds the camera takes to get here from the step before"
+                />
+                <slider-setting text="Hold Time" min="0" max="60" increment="0.1" show-buttons="true" value="HoldTime" bind-value="true" apply-on-change="true"
+                                hover-hint="Seconds the camera stays at this step before moving on"
+                />
+                <checkbox text="Eased movement" value="Eased" bind-value="true" apply-on-change="true"
+                          hover-hint="Accelerates and slows down smoothly instead of moving at a constant speed"
+                />
+                <checkbox text="Follower: Pos only" value="IgnoreRotation" bind-value="true" apply-on-change="true"
+                          hover-hint="Follower cameras keep looking at their target and only take the position of this step"
+                />
+                <checkbox text="Follower: smooth Rot" value="SmoothRotation" bind-value="true" apply-on-change="true"
+                          hover-hint="Follower cameras turn smoothly while moving to this step when it switches between looking at the target and the rotation of a step, instead of snapping"
+                />
+            </vertical>
+        </vertical>
+    </horizontal>
 </vertical>

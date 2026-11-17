@@ -1,5 +1,4 @@
 ﻿using Camera2.Enums;
-using UnityEngine;
 
 namespace Camera2.Configuration
 {
@@ -15,14 +14,7 @@ namespace Camera2.Configuration
         public FollowerFakeZoom FollowerFakeZoom = new FollowerFakeZoom();
         
         private bool _pivotingOffset = true;
-        private float _targetParentLookupDelay = 0.5f;
         public string TargetParent { get; set; } = "";
-        public float TargetParentLookupDelay
-        {
-            get => _targetParentLookupDelay;
-            set => _targetParentLookupDelay = Mathf.Clamp(value, CameraSettings.MinParentLookupDelay, CameraSettings.MaxParentLookupDelay);
-        }
-
         public bool PivotingOffset
         {
             get => _pivotingOffset;

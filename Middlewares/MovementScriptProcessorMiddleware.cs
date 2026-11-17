@@ -21,9 +21,15 @@ namespace Camera2.Middlewares
         private ScriptFrame TargetScriptFrame => _loadedScript.Frames[_frameIndex];
         private bool _wasInAndIsFinished;
         private bool _isPaused;
+        private ScriptFrame _blendFrame;
+
+        internal bool FollowerControlsRotation { get; private set; }
 
         private void Reset()
         {
+            FollowerControlsRotation = false;
+            _blendFrame = null;
+
             if (_wasInAndIsFinished)
             {
                 return;
@@ -104,6 +110,7 @@ namespace Camera2.Middlewares
                 Cam.LogInfo($"Applying Movement script {_loadedScript.Name} for camera {Cam.Name}");
 
                 AddTransformer(TransformerTypeAndOrder.MovementScriptProcessor);
+                FollowerControlsRotation = Settings.IsFollowerCam();
             }
 
             if (!_loadedScript.IsPlayable)
@@ -116,6 +123,8 @@ namespace Camera2.Middlewares
             {
                 _frameIndex = 0;
             }
+
+            Transformer.ApplyAsAbsolute = Settings.IsFollowerCam();
 
             if (_loadedScript.SyncToSong && SceneUtil.IsInSong)
             {
@@ -187,10 +196,7 @@ namespace Camera2.Middlewares
                 if (TargetScriptFrame.TransitionEndTime <= _currentAnimationTime)
                 {
                     _lastPos = Transformer.Position = TargetScriptFrame.Position;
-                    if (!TargetScriptFrame.OnFollowerIgnoreRotation)
-                    {
-                        _lastRot = Transformer.Rotation = TargetScriptFrame.Rotation;
-                    }
+                    ApplyRotation(TargetScriptFrame, 1f, true);
                     if (TargetScriptFrame.FOV > 0)
                     {
                         _lastFov = Cam.Camera.fieldOfView = TargetScriptFrame.FOV;
@@ -206,10 +212,7 @@ namespace Camera2.Middlewares
                     }
 
                     Transformer.Position = Vector3.LerpUnclamped(_lastPos, TargetScriptFrame.Position, frameProgress);
-                    if (!TargetScriptFrame.OnFollowerIgnoreRotation)
-                    {
-                        Transformer.Rotation = Quaternion.LerpUnclamped(_lastRot, TargetScriptFrame.Rotation, frameProgress);
-                    }
+                    ApplyRotation(TargetScriptFrame, frameProgress, false);
 
                     if (TargetScriptFrame.FOV > 0f)
                     {
@@ -231,6 +234,57 @@ namespace Camera2.Middlewares
             _lastAnimTime = _currentAnimationTime;
 
             return true;
+        }
+
+        private void ApplyRotation(ScriptFrame frame, float frameProgress, bool isReached)
+        {
+            var followerControlsRotation = Settings.IsFollowerCam() && frame.OnFollowerIgnoreRotation;
+
+            if (followerControlsRotation != FollowerControlsRotation)
+            {
+                FollowerControlsRotation = followerControlsRotation;
+                _blendFrame = frame.OnFollowerSmoothRotation && !isReached ? frame : null;
+
+                if (!followerControlsRotation)
+                {
+                    if (_blendFrame != null)
+                    {
+                        _lastRot = Chain.Rotation;
+                    }
+
+                    Chain.Remove(TransformerTypeAndOrder.Follower);
+                }
+            }
+
+            if (!followerControlsRotation)
+            {
+                if (isReached)
+                {
+                    _lastRot = Transformer.Rotation = frame.Rotation;
+                }
+                else
+                {
+                    Transformer.Rotation = Quaternion.LerpUnclamped(_lastRot, frame.Rotation, frameProgress);
+                }
+            }
+            else if (!Chain.HasType(TransformerTypeAndOrder.Follower))
+            {
+                Transformer.Rotation = _lastRot;
+            }
+            else if (isReached || _blendFrame != frame)
+            {
+                Transformer.Rotation = Quaternion.identity;
+            }
+            else
+            {
+                var followerRotation = GetTransformer(TransformerTypeAndOrder.Follower).Rotation;
+                Transformer.Rotation = Quaternion.LerpUnclamped(_lastRot, followerRotation, frameProgress) * Quaternion.Inverse(followerRotation);
+            }
+
+            if (isReached)
+            {
+                _blendFrame = null;
+            }
         }
 
         public void ForceReset()

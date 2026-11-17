@@ -1,4 +1,5 @@
 using BeatSaberMarkupLanguage.Attributes;
+using BeatSaberMarkupLanguage.Components.Settings;
 using BeatSaberMarkupLanguage.ViewControllers;
 using Camera2.Enums;
 using Camera2.MovementScript;
@@ -17,8 +18,10 @@ internal class ScriptStepSettingsViewController : BSMLAutomaticViewController
         nameof(PosX), nameof(PosY), nameof(PosZ),
         nameof(RotX), nameof(RotY), nameof(RotZ),
         nameof(Fov), nameof(Duration), nameof(HoldTime),
-        nameof(Eased), nameof(IgnoreRotation)
+        nameof(Eased), nameof(IgnoreRotation), nameof(SmoothRotation)
     ];
+
+    private const float CompactSliderWidth = 40f;
 
     private static ScriptFlowCoordinator Coordinator => ScriptFlowCoordinator.Instance;
 
@@ -32,6 +35,10 @@ internal class ScriptStepSettingsViewController : BSMLAutomaticViewController
     [UsedImplicitly]
     [UIComponent("stepSettings")]
     public RectTransform stepSettings;
+
+    [UsedImplicitly]
+    [UIComponent("timingSettings")]
+    public RectTransform timingSettings;
 
     [UsedImplicitly]
     [UIComponent("emptyHint")]
@@ -151,6 +158,20 @@ internal class ScriptStepSettingsViewController : BSMLAutomaticViewController
         }
     }
 
+    [UsedImplicitly]
+    internal bool SmoothRotation
+    {
+        get => Step?.OnFollowerSmoothRotation ?? false;
+        set
+        {
+            if (CanApply())
+            {
+                Step.OnFollowerSmoothRotation = value;
+                Coordinator.StepValueChanged(false);
+            }
+        }
+    }
+
     [UIAction("#post-parse")]
     [UsedImplicitly]
     internal void Refresh()
@@ -158,6 +179,11 @@ internal class ScriptStepSettingsViewController : BSMLAutomaticViewController
         if (stepSettings == null)
         {
             return;
+        }
+
+        foreach (var slider in timingSettings.GetComponentsInChildren<SliderSetting>(true))
+        {
+            SetSliderWidth(slider.transform, CompactSliderWidth);
         }
 
         var hasStep = Step != null;
@@ -182,6 +208,19 @@ internal class ScriptStepSettingsViewController : BSMLAutomaticViewController
     }
 
     private bool CanApply() => !_isRefreshing && Step != null;
+
+    private static void SetSliderWidth(Transform setting, float width)
+    {
+        if (setting.Find("BSMLSlider") is RectTransform slider)
+        {
+            slider.sizeDelta = new Vector2(width, slider.sizeDelta.y);
+        }
+
+        if (setting.Find("Title") is RectTransform title)
+        {
+            title.offsetMax = new Vector2(-width, title.offsetMax.y);
+        }
+    }
 
     private void SetPosition(int axis, float value)
     {

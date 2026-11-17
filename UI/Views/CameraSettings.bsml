@@ -80,9 +80,6 @@
                 </horizontal>
                 <slider-setting text="Position Smoothing *" min="0.1" max="50" increment="0.1" value="SmoothFollowPosition" bind-value="true" apply-on-change="true" show-buttons="true"/>
                 <slider-setting text="Rotation Smoothing *" min="0.1" max="50" increment="0.1" value="SmoothFollowRotation" bind-value="true" apply-on-change="true" show-buttons="true"/>
-                <slider-setting text="Parental lookup delay" min="0.01" max="5" increment="0.01" formatter="FormatSeconds" value="TargetParentLookupDelay" bind-value="true" apply-on-change="true" show-buttons="true"
-                                hover-hint="How often this Camera looks for its Target while it does not exist yet. Lower = picks up a late appearing Target sooner"
-                />
             </modifier-container>
             <text text="* Lower value = More smoothing" color="#CCC" font-size="3" align="Center"/>
             <text text="* Setting might not take effect depending on other settings" color="#CCC" font-size="3" align="Center"/>
@@ -132,9 +129,6 @@
             />
             <checkbox text="Auto-Hide HUD" value="ModMapExtAutoHideHUD" bind-value="true" apply-on-change="true"
                       hover-hint="When playing a modded Map automatically hide the HUD for this Camera"
-            />
-            <slider-setting text="Noodle parental lookup delay" min="0.01" max="5" increment="0.01" formatter="FormatSeconds" value="ModMapExtParentLookupDelay" bind-value="true" apply-on-change="true" show-buttons="true"
-                            hover-hint="How often this Camera looks for the Noodle player track while a Map does not have one yet. Lower = picks up a late appearing track sooner"
             />
         </modifier-container>
     </tab>

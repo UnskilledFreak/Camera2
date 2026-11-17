@@ -49,6 +49,8 @@ namespace Camera2.MovementScript
 
         public bool OnFollowerIgnoreRotation;
 
+        public bool OnFollowerSmoothRotation;
+
         public bool OnFollowerEnableFakeZoom;
 
         public ScriptFrame Clone() => (ScriptFrame)MemberwiseClone();

@@ -351,20 +351,6 @@ namespace Camera2.UI
         }
 
         [UsedImplicitly]
-        internal float ModMapExtParentLookupDelay
-        {
-            get => CurrentCam.Settings.ModMapExtensions.ParentLookupDelay;
-            set => CurrentCam.Settings.ModMapExtensions.ParentLookupDelay = value;
-        }
-
-        [UsedImplicitly]
-        internal float TargetParentLookupDelay
-        {
-            get => CurrentCam.Settings.SmoothFollow.TargetParentLookupDelay;
-            set => CurrentCam.Settings.SmoothFollow.TargetParentLookupDelay = value;
-        }
-
-        [UsedImplicitly]
         internal bool Follow360MoveWithMap
         {
             get => CurrentCam.Settings.Follow360.Enabled;
@@ -745,10 +731,6 @@ namespace Camera2.UI
         [UIAction("FormatThreeDecimals")]
         [UsedImplicitly]
         public string FormatThreeDecimals(float value) => value.ToString("N3");
-
-        [UIAction("FormatSeconds")]
-        [UsedImplicitly]
-        public string FormatSeconds(float value) => $"{value:N2} s";
 
         #endregion
 

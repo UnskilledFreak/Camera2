@@ -15,6 +15,7 @@ namespace Camera2.Middlewares
 
         private Random _random = new(SeedSource.Next());
         private bool _isInMovementScript;
+        private MovementScriptProcessorMiddleware _scriptProcessor;
         private readonly Dictionary<int, int> _inDrunkCooldown = new();
         private Vector3 _drunkPosition = Vector3.zero;
         private Vector3 _drunkRotation = Vector3.zero;
@@ -41,7 +42,7 @@ namespace Camera2.Middlewares
             }
 
             // don't track until MovementScript is done
-            if (Chain.HasType(TransformerTypeAndOrder.MovementScriptProcessor))
+            if (Chain.HasType(TransformerTypeAndOrder.MovementScriptProcessor) && !ScriptLeavesRotationToFollower())
             {
                 // remove follower chain so rotations won't stick
                 RemoveTransformer(TransformerTypeAndOrder.Follower);
@@ -159,6 +160,16 @@ namespace Camera2.Middlewares
             _drunkPosition = Vector3.zero;
             _drunkPositionOffset  = Vector3.zero;
             _drunkRotation  = Vector3.zero;
+        }
+
+        private bool ScriptLeavesRotationToFollower()
+        {
+            if (_scriptProcessor == null)
+            {
+                _scriptProcessor = GetComponent<MovementScriptProcessorMiddleware>();
+            }
+
+            return _scriptProcessor != null && _scriptProcessor.FollowerControlsRotation;
         }
 
         private float GetSlerpTime(float multiplier, float drunk = 1f) => Cam.TimeSinceLastRender * (Settings.Type == CameraType.FollowerDrunk ? multiplier / drunk : multiplier);

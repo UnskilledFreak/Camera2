@@ -1,4 +1,5 @@
-﻿using Camera2.Enums;
+﻿using Camera2.Configuration;
+using Camera2.Enums;
 using Camera2.HarmonyPatches;
 using Camera2.Interfaces;
 using Camera2.Managers;
@@ -13,7 +14,6 @@ namespace Camera2.Middlewares
     {
         [CanBeNull]
         private GameObject _noodleOrigin;
-        private float _lastOriginLookup = float.NegativeInfinity;
 
         public bool Pre()
         {
@@ -35,10 +35,10 @@ namespace Camera2.Middlewares
             }
 
             // Noodle maps do not *necessarily* have a player track if it not actually used            
-            if (_noodleOrigin is null && Time.unscaledTime - _lastOriginLookup >= Settings.ModMapExtensions.ParentLookupDelay)
+            if (_noodleOrigin is null)
             {
-                _lastOriginLookup = Time.unscaledTime;
-                _noodleOrigin = GameObject.Find("NoodlePlayerTrackHead") ?? GameObject.Find("NoodlePlayerTrackRoot");
+                var lookupDelay = PluginConfig.Instance.NoodleParentLookupDelay;
+                _noodleOrigin = ParentManager.Get("NoodlePlayerTrackHead", lookupDelay) ?? ParentManager.Get("NoodlePlayerTrackRoot", lookupDelay);
             }
 
             if (!(_noodleOrigin is null))
@@ -90,7 +90,27 @@ namespace Camera2.Middlewares
         {
             RemoveTransformer(TransformerTypeAndOrder.ModMapParenting);
             _noodleOrigin = null;
-            _lastOriginLookup = float.NegativeInfinity;
+        }
+
+        internal bool TryGetParentPose(out Vector3 position, out Quaternion rotation)
+        {
+            if (Transformer == null || _noodleOrigin == null)
+            {
+                position = Vector3.zero;
+                rotation = Quaternion.identity;
+                return false;
+            }
+
+            var origin = _noodleOrigin.transform;
+            rotation = origin.localRotation;
+            position = origin.localPosition;
+
+            if (Settings.IsFollowerCam())
+            {
+                position += HookRoomAdjust.Position - (rotation * HookRoomAdjust.Position);
+            }
+
+            return true;
         }
     }
 }
