@@ -124,8 +124,6 @@ namespace Camera2.Middlewares
                 _frameIndex = 0;
             }
 
-            Transformer.ApplyAsAbsolute = Settings.IsFollowerCam();
-
             if (_loadedScript.SyncToSong && SceneUtil.IsInSong)
             {
                 /*
@@ -169,6 +167,8 @@ namespace Camera2.Middlewares
                 _lastAnimTime = _currentAnimationTime;
                 _frameIndex = 0;
             }
+
+            Transformer.ApplyAsAbsolute = Settings.IsFollowerCam();
 
             for (;;)
             {

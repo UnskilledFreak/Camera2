@@ -138,7 +138,7 @@ namespace Camera2.Behaviours
 
         internal void UpdateRenderTextureAndView()
         {
-            if (Settings.Spout.Enabled)
+            if (Settings.Spout.Enabled && RenderTexture != null)
             {
                 return;
             }

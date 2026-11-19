@@ -75,13 +75,10 @@ internal class ScriptStepListViewController : BSMLAutomaticViewController
 
     internal void RefreshCells()
     {
-        if (list == null)
+        foreach (var cell in _cells)
         {
-            return;
+            cell.RefreshTexts();
         }
-
-        Table.ReloadDataKeepingPosition();
-        SelectCurrentCell(false);
     }
 
     private void SelectCurrentCell(bool scrollTo)

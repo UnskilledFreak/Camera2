@@ -12,10 +12,10 @@
             <custom-list id="scriptList" select-cell="SelectScript" contents="Scripts" visible-cells="4" stick-scrolling="true">
                 <vertical id="bgContainer" bg="round-rect-panel" pad="1" horizontal-fit="Unconstrained">
                     <horizontal>
-                        <text text="~Name" align="MidlineLeft" font-size="3"/>
+                        <text id="nameText" text="~Name" align="MidlineLeft" font-size="3"/>
                     </horizontal>
                     <horizontal>
-                        <text text="~Details" align="MidlineLeft" font-size="2.3" font-color="#BBB"/>
+                        <text id="detailsText" text="~Details" align="MidlineLeft" font-size="2.3" font-color="#BBB"/>
                     </horizontal>
                 </vertical>
             </custom-list>

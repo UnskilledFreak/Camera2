@@ -2,6 +2,7 @@ using BeatSaberMarkupLanguage.Attributes;
 using Camera2.MovementScript;
 using HMUI;
 using JetBrains.Annotations;
+using TMPro;
 
 namespace Camera2.UI;
 
@@ -30,12 +31,29 @@ internal class ScriptStepListCell
     [UIComponent("bgContainer"), UsedImplicitly]
     private ImageView _bg;
 
+    [UIComponent("nameText"), UsedImplicitly]
+    private TextMeshProUGUI _nameText;
+
+    [UIComponent("detailsText"), UsedImplicitly]
+    private TextMeshProUGUI _detailsText;
+
 #pragma warning restore CS0649
 
     public ScriptStepListCell(int index, ScriptFrame frame)
     {
         Index = index;
         _frame = frame;
+    }
+
+    internal void RefreshTexts()
+    {
+        if (_nameText == null || _detailsText == null)
+        {
+            return;
+        }
+
+        _nameText.text = Name;
+        _detailsText.text = Details;
     }
 
     [UIAction("refresh-visuals"), UsedImplicitly]
